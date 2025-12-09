@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://momentum-si.onrender.com", // URL pública do backend
+  baseURL: "https://momentum-si.onrender.com", // sempre HTTPS
 });
 
 // Adiciona token automaticamente em todas as chamadas
