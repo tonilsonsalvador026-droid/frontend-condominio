@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://backend-condominio.onrender.com", // URL pública do backend
+  baseURL: "http://momentum-si.onrender.com", // URL pública do backend
 });
 
 // Adiciona token automaticamente em todas as chamadas
@@ -16,3 +16,4 @@ api.interceptors.request.use((config) => {
 
 
 export default api;
+
