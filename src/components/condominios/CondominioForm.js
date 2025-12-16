@@ -1,6 +1,6 @@
 // src/components/condominios/CondominioForm.js
 import React, { useState } from "react";
-import api from ".../../api";
+import api from "../../api";
 import { toast } from "sonner";
 
 const CondominioForm = ({ onSuccess }) => {
@@ -101,3 +101,4 @@ const CondominioForm = ({ onSuccess }) => {
 
 
 export default CondominioForm;
+
