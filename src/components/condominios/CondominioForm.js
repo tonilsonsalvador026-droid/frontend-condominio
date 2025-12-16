@@ -1,6 +1,6 @@
 // src/components/condominios/CondominioForm.js
 import React, { useState } from "react";
-import axios from "axios";
+import api from ".../../api";
 import { toast } from "sonner";
 
 const CondominioForm = ({ onSuccess }) => {
@@ -17,24 +17,17 @@ const CondominioForm = ({ onSuccess }) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-
-      // Decodificar o payload do token
       const payload = JSON.parse(atob(token.split(".")[1]));
-      const gestorId = payload.id; // id do utilizador logado
+      const gestorId = payload.id;
 
-      await axios.post(
-        "http://localhost:5000/condominios",
-        { ...formData, gestorId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await api.post("/condominios", {
+        ...formData,
+        gestorId,
+      });
 
       toast.success("Condomínio cadastrado com sucesso!");
       setFormData({ nome: "", localizacao: "" });
-      if (onSuccess) onSuccess();
+      onSuccess?.();
     } catch (err) {
       console.error(err.response?.data || err.message);
       toast.error(
@@ -105,5 +98,6 @@ const CondominioForm = ({ onSuccess }) => {
     </form>
   );
 };
+
 
 export default CondominioForm;
