@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FaHome,
   FaUsers,
@@ -19,9 +19,10 @@ import {
 } from "react-icons/fa";
 
 const Sidebar = () => {
-  const [openMobile, setOpenMobile] = useState(false);
+  const [aberto, setAberto] = useState(true);
   const [permissoes, setPermissoes] = useState([]);
   const [role, setRole] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     try {
@@ -29,16 +30,24 @@ const Sidebar = () => {
       const storedPerms = localStorage.getItem("permissoes");
 
       if (storedRole) setRole(storedRole);
-      if (storedPerms) setPermissoes(JSON.parse(storedPerms));
+      if (storedPerms) {
+        setPermissoes(JSON.parse(storedPerms));
+      } else {
+        console.warn("Nenhuma permissão encontrada no localStorage.");
+      }
     } catch (error) {
       console.error("Erro ao carregar permissões:", error);
     }
   }, []);
 
   const temPermissao = (modulo) => {
-    if (role?.toLowerCase() === "admin") return true;
+    // Se for ADMIN (sem restrições)
+    if (role && role.toLowerCase() === "admin") return true;
+
+    // Se não houver permissões guardadas, bloqueia tudo
     if (!Array.isArray(permissoes) || permissoes.length === 0) return false;
 
+    // Verifica se há permissão de visualizar para o módulo
     return permissoes.some(
       (p) =>
         p.modulo?.toLowerCase() === modulo.toLowerCase() &&
@@ -46,123 +55,196 @@ const Sidebar = () => {
     );
   };
 
-  const NavLink = ({ to, icon: Icon, label }) => (
-    <Link
-      to={to}
-      onClick={() => setOpenMobile(false)}
-      className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
-    >
-      <Icon /> {label}
-    </Link>
-  );
-
   return (
     <>
-      {/* BOTÃO HAMBURGER (APENAS MOBILE) */}
+      {/* Botão abrir/fechar */}
       <button
-        onClick={() => setOpenMobile(true)}
-        className="md:hidden fixed top-4 left-4 z-50 p-3 bg-gray-800 text-white rounded-lg shadow-lg"
+        onClick={() => setAberto(!aberto)}
+        className="p-3 bg-gray-800 text-white fixed top-4 left-4 z-50 rounded-lg shadow-lg hover:bg-gray-700"
       >
-        <FaBars size={20} />
+        {aberto ? <FaTimes size={20} /> : <FaBars size={20} />}
       </button>
 
-      {/* OVERLAY MOBILE */}
-      {openMobile && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
-          onClick={() => setOpenMobile(false)}
-        />
-      )}
-
-      {/* SIDEBAR */}
-      <aside
-        className={`
-          fixed top-0 left-0 z-50 h-screen w-64 bg-gray-900 text-white
-          transform transition-transform duration-300
-          ${openMobile ? "translate-x-0" : "-translate-x-full"}
-          md:translate-x-0
-        `}
+      {/* Sidebar fixa */}
+      <div
+        className={`${
+          aberto ? "w-64" : "w-0"
+        } bg-gray-900 text-white h-screen fixed top-0 left-0 transition-all duration-300 overflow-y-auto`}
+        style={{
+          scrollbarWidth: "thin",
+          scrollbarColor: "#4B5563 transparent",
+        }}
       >
-        {/* TOPO */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-800">
-          <span className="text-lg font-bold">Gestão Condominial</span>
-          <button
-            onClick={() => setOpenMobile(false)}
-            className="md:hidden"
-          >
-            <FaTimes />
-          </button>
+        <style>{`
+          ::-webkit-scrollbar {
+            width: 6px;
+          }
+          ::-webkit-scrollbar-thumb {
+            background-color: #4B5563;
+            border-radius: 10px;
+          }
+          ::-webkit-scrollbar-thumb:hover {
+            background-color: #6B7280;
+          }
+          ::-webkit-scrollbar-track {
+            background: transparent;
+          }
+        `}</style>
+
+        <div className="p-6 text-lg font-bold border-b border-gray-800">
+          Gestão Condominial
         </div>
 
-        {/* MENU */}
-        <nav className="mt-4 flex flex-col gap-1 overflow-y-auto">
+        <nav className="mt-6 flex flex-col gap-2">
           {temPermissao("dashboard") && (
-            <NavLink to="/dashboard" icon={FaHome} label="Dashboard" />
+            <Link
+              to="/dashboard"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaHome /> Dashboard
+            </Link>
           )}
 
           {temPermissao("users") && (
-            <NavLink to="/users" icon={FaUserShield} label="Utilizadores" />
+            <Link
+              to="/users"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaUserShield /> Utilizadores
+            </Link>
           )}
 
           {temPermissao("condominios") && (
-            <NavLink to="/condominios" icon={FaBuilding} label="Condomínios" />
+            <Link
+              to="/condominios"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaBuilding /> Condomínios
+            </Link>
           )}
 
           {temPermissao("edificios") && (
-            <NavLink to="/edificios" icon={FaBuilding} label="Edifícios" />
+            <Link
+              to="/edificios"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaBuilding /> Edifícios
+            </Link>
           )}
 
           {temPermissao("fracoes") && (
-            <NavLink to="/fracoes" icon={FaKey} label="Frações" />
+            <Link
+              to="/fracoes"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaKey /> Frações
+            </Link>
           )}
 
           {temPermissao("proprietarios") && (
-            <NavLink to="/proprietarios" icon={FaUsers} label="Proprietários" />
+            <Link
+              to="/proprietarios"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaUsers /> Proprietários
+            </Link>
           )}
 
           {temPermissao("inquilinos") && (
-            <NavLink to="/inquilinos" icon={FaUsers} label="Inquilinos" />
+            <Link
+              to="/inquilinos"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaUsers /> Inquilinos
+            </Link>
           )}
 
           {temPermissao("pagamentos") && (
-            <NavLink to="/pagamentos" icon={FaFileInvoiceDollar} label="Pagamentos" />
+            <Link
+              to="/pagamentos"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaFileInvoiceDollar /> Pagamentos
+            </Link>
           )}
 
           {temPermissao("recibos") && (
-            <NavLink to="/recibos" icon={FaReceipt} label="Recibos" />
+            <Link
+              to="/recibos"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaReceipt /> Recibos
+            </Link>
           )}
 
           {temPermissao("conta-corrente") && (
-            <NavLink to="/conta-corrente" icon={FaWallet} label="Conta Corrente" />
+            <Link
+              to="/conta-corrente"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaWallet /> Conta Corrente
+            </Link>
           )}
 
           {temPermissao("servicos-extras") && (
-            <NavLink to="/servicos-extras" icon={FaTools} label="Serviços Extras" />
+            <Link
+              to="/servicos-extras"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaTools /> Serviços Extras
+            </Link>
           )}
 
           {temPermissao("servicos-agendados") && (
-            <NavLink to="/servicos-agendados" icon={FaClipboardList} label="Serviços Agendados" />
+            <Link
+              to="/servicos-agendados"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaClipboardList /> Serviços Agendados
+            </Link>
           )}
 
           {temPermissao("eventos") && (
-            <NavLink to="/eventos" icon={FaCalendarAlt} label="Eventos" />
+            <Link
+              to="/eventos"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaCalendarAlt /> Eventos
+            </Link>
           )}
 
+          {/* GESTÃO DE ACESSOS */}
           {temPermissao("gestao-acessos") && (
             <>
-              <div className="mt-6 px-6 text-gray-400 uppercase text-xs">
+              <div className="mt-6 px-6 text-gray-400 uppercase text-xs tracking-wider">
                 Gestão de Acessos
               </div>
 
-              <NavLink to="/roles" icon={FaLock} label="Funções / Roles" />
-              <NavLink to="/permissoes" icon={FaUnlockAlt} label="Permissões" />
-              <NavLink to="/atribuir-role" icon={FaUserShield} label="Atribuir Papéis" />
+              <Link
+                to="/roles"
+                className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+              >
+                <FaLock /> Funções / Roles
+              </Link>
+              <Link
+                to="/permissoes"
+                className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+              >
+                <FaUnlockAlt /> Permissões
+              </Link>
+              <Link
+                to="/atribuir-role"
+                className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+              >
+                <FaUserShield /> Atribuir Papéis
+              </Link>
             </>
           )}
         </nav>
-      </aside>
+      </div>
     </>
   );
 };
+
 
 export default Sidebar;
