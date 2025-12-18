@@ -1,3 +1,7 @@
+// src/components/layout/MainLayout.js
+import React from "react";
+import Sidebar from "../ui/Sidebar";
+
 const MainLayout = ({ children }) => {
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -9,3 +13,6 @@ const MainLayout = ({ children }) => {
     </div>
   );
 };
+
+
+export default MainLayout;
