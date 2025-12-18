@@ -19,20 +19,26 @@ import {
 } from "react-icons/fa";
 
 const Sidebar = () => {
-  const [aberto, setAberto] = useState(true);
+  const [aberto, setAberto] = useState(false); // Mobile: fechado por padrão
   const [permissoes, setPermissoes] = useState([]);
   const [role, setRole] = useState("");
 
   useEffect(() => {
-    const storedRole = localStorage.getItem("role");
-    const storedPerms = localStorage.getItem("permissoes");
-    if (storedRole) setRole(storedRole);
-    if (storedPerms) setPermissoes(JSON.parse(storedPerms));
+    try {
+      const storedRole = localStorage.getItem("role");
+      const storedPerms = localStorage.getItem("permissoes");
+
+      if (storedRole) setRole(storedRole);
+      if (storedPerms) setPermissoes(JSON.parse(storedPerms) || []);
+    } catch (error) {
+      console.error("Erro ao carregar permissões:", error);
+    }
   }, []);
 
   const temPermissao = (modulo) => {
     if (role?.toLowerCase() === "admin") return true;
-    if (!Array.isArray(permissoes)) return false;
+    if (!Array.isArray(permissoes) || permissoes.length === 0) return false;
+
     return permissoes.some(
       (p) =>
         p.modulo?.toLowerCase() === modulo.toLowerCase() &&
@@ -41,112 +47,192 @@ const Sidebar = () => {
   };
 
   return (
-    <div
-      className="
-        fixed top-0 left-0 h-screen
-        bg-gray-900 text-white
-        w-56 sm:w-60 lg:w-64
-        overflow-y-auto
-        z-40
-      "
-    >
-      <div className="p-4 text-base sm:text-lg font-bold border-b border-gray-800">
-        Gestão Condominial
+    <>
+      {/* Botão Hamburger para Mobile */}
+      <div className="md:hidden fixed top-4 left-4 z-50">
+        <button
+          onClick={() => setAberto(!aberto)}
+          className="p-3 bg-gray-800 text-white rounded-lg shadow-lg hover:bg-gray-700 transition"
+        >
+          {aberto ? <FaTimes size={20} /> : <FaBars size={20} />}
+        </button>
       </div>
 
-      <nav className="mt-3 flex flex-col text-sm sm:text-base">
-        {temPermissao("dashboard") && (
-          <Link to="/dashboard" className="menu-item">
-            <FaHome className="text-sm" /> Dashboard
-          </Link>
-        )}
+      {/* Sidebar */}
+      <div
+        className={`fixed top-0 left-0 h-screen bg-gray-900 text-white overflow-y-auto z-40 transform ${
+          aberto ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 w-64 transition-transform duration-300`}
+        style={{
+          scrollbarWidth: "thin",
+          scrollbarColor: "#4B5563 transparent",
+        }}
+      >
+        <style>{`
+          ::-webkit-scrollbar {
+            width: 6px;
+          }
+          ::-webkit-scrollbar-thumb {
+            background-color: #4B5563;
+            border-radius: 10px;
+          }
+          ::-webkit-scrollbar-thumb:hover {
+            background-color: #6B7280;
+          }
+          ::-webkit-scrollbar-track {
+            background: transparent;
+          }
+        `}</style>
 
-        {temPermissao("users") && (
-          <Link to="/users" className="menu-item">
-            <FaUserShield className="text-sm" /> Utilizadores
-          </Link>
-        )}
+        {/* Cabeçalho */}
+        <div className="p-6 text-lg font-bold border-b border-gray-800">
+          Gestão Condominial
+        </div>
 
-        {temPermissao("condominios") && (
-          <Link to="/condominios" className="menu-item">
-            <FaBuilding className="text-sm" /> Condomínios
-          </Link>
-        )}
+        {/* Menu */}
+        <nav className="mt-6 flex flex-col gap-2">
+          {temPermissao("dashboard") && (
+            <Link
+              to="/dashboard"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaHome /> Dashboard
+            </Link>
+          )}
+          {temPermissao("users") && (
+            <Link
+              to="/users"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaUserShield /> Utilizadores
+            </Link>
+          )}
+          {temPermissao("condominios") && (
+            <Link
+              to="/condominios"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaBuilding /> Condomínios
+            </Link>
+          )}
+          {temPermissao("edificios") && (
+            <Link
+              to="/edificios"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaBuilding /> Edifícios
+            </Link>
+          )}
+          {temPermissao("fracoes") && (
+            <Link
+              to="/fracoes"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaKey /> Frações
+            </Link>
+          )}
+          {temPermissao("proprietarios") && (
+            <Link
+              to="/proprietarios"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaUsers /> Proprietários
+            </Link>
+          )}
+          {temPermissao("inquilinos") && (
+            <Link
+              to="/inquilinos"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaUsers /> Inquilinos
+            </Link>
+          )}
+          {temPermissao("pagamentos") && (
+            <Link
+              to="/pagamentos"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaFileInvoiceDollar /> Pagamentos
+            </Link>
+          )}
+          {temPermissao("recibos") && (
+            <Link
+              to="/recibos"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaReceipt /> Recibos
+            </Link>
+          )}
+          {temPermissao("conta-corrente") && (
+            <Link
+              to="/conta-corrente"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaWallet /> Conta Corrente
+            </Link>
+          )}
+          {temPermissao("servicos-extras") && (
+            <Link
+              to="/servicos-extras"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaTools /> Serviços Extras
+            </Link>
+          )}
+          {temPermissao("servicos-agendados") && (
+            <Link
+              to="/servicos-agendados"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaClipboardList /> Serviços Agendados
+            </Link>
+          )}
+          {temPermissao("eventos") && (
+            <Link
+              to="/eventos"
+              className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+            >
+              <FaCalendarAlt /> Eventos
+            </Link>
+          )}
 
-        {temPermissao("edificios") && (
-          <Link to="/edificios" className="menu-item">
-            <FaBuilding className="text-sm" /> Edifícios
-          </Link>
-        )}
+          {/* Gestão de Acessos */}
+          {temPermissao("gestao-acessos") && (
+            <>
+              <div className="mt-6 px-6 text-gray-400 uppercase text-xs tracking-wider">
+                Gestão de Acessos
+              </div>
+              <Link
+                to="/roles"
+                className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+              >
+                <FaLock /> Funções / Roles
+              </Link>
+              <Link
+                to="/permissoes"
+                className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+              >
+                <FaUnlockAlt /> Permissões
+              </Link>
+              <Link
+                to="/atribuir-role"
+                className="flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition"
+              >
+                <FaUserShield /> Atribuir Papéis
+              </Link>
+            </>
+          )}
+        </nav>
+      </div>
 
-        {temPermissao("fracoes") && (
-          <Link to="/fracoes" className="menu-item">
-            <FaKey className="text-sm" /> Frações
-          </Link>
-        )}
-
-        {temPermissao("proprietarios") && (
-          <Link to="/proprietarios" className="menu-item">
-            <FaUsers className="text-sm" /> Proprietários
-          </Link>
-        )}
-
-        {temPermissao("inquilinos") && (
-          <Link to="/inquilinos" className="menu-item">
-            <FaUsers className="text-sm" /> Inquilinos
-          </Link>
-        )}
-
-        {temPermissao("pagamentos") && (
-          <Link to="/pagamentos" className="menu-item">
-            <FaFileInvoiceDollar className="text-sm" /> Pagamentos
-          </Link>
-        )}
-
-        {temPermissao("recibos") && (
-          <Link to="/recibos" className="menu-item">
-            <FaReceipt className="text-sm" /> Recibos
-          </Link>
-        )}
-
-        {temPermissao("conta-corrente") && (
-          <Link to="/conta-corrente" className="menu-item">
-            <FaWallet className="text-sm" /> Conta Corrente
-          </Link>
-        )}
-
-        {temPermissao("servicos-extras") && (
-          <Link to="/servicos-extras" className="menu-item">
-            <FaTools className="text-sm" /> Serviços Extras
-          </Link>
-        )}
-
-        {temPermissao("servicos-agendados") && (
-          <Link to="/servicos-agendados" className="menu-item">
-            <FaClipboardList className="text-sm" /> Serviços Agendados
-          </Link>
-        )}
-
-        {temPermissao("eventos") && (
-          <Link to="/eventos" className="menu-item">
-            <FaCalendarAlt className="text-sm" /> Eventos
-          </Link>
-        )}
-      </nav>
-
-      <style>{`
-        .menu-item {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding: 10px 16px;
-          white-space: nowrap;
-        }
-        .menu-item:hover {
-          background-color: #374151;
-        }
-      `}</style>
-    </div>
+      {/* Overlay para mobile */}
+      {aberto && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+          onClick={() => setAberto(false)}
+        />
+      )}
+    </>
   );
 };
 
