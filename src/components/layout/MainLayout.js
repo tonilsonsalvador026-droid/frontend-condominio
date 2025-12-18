@@ -5,13 +5,22 @@ import Sidebar from "../ui/Sidebar";
 const MainLayout = ({ children }) => {
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar fixa à esquerda */}
+      {/* Sidebar */}
       <Sidebar />
 
       {/* Conteúdo principal */}
-      <div className="flex-1 ml-64 p-6 overflow-y-auto">
+      <main
+        className="
+          flex-1
+          w-full
+          p-4
+          sm:p-6
+          lg:ml-64
+          overflow-y-auto
+        "
+      >
         {children}
-      </div>
+      </main>
     </div>
   );
 };
