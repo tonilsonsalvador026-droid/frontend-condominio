@@ -19,30 +19,6 @@ import {
 } from "react-icons/fa";
 
 const Sidebar = () => {
-  const [aberto, setAberto] = useState(false);
-  const [permissoes, setPermissoes] = useState([]);
-  const [role, setRole] = useState("");
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import {
-  FaHome,
-  FaUsers,
-  FaFileInvoiceDollar,
-  FaBuilding,
-  FaKey,
-  FaReceipt,
-  FaCalendarAlt,
-  FaTools,
-  FaClipboardList,
-  FaUserShield,
-  FaBars,
-  FaTimes,
-  FaWallet,
-  FaLock,
-  FaUnlockAlt,
-} from "react-icons/fa";
-
-const Sidebar = () => {
   const [aberto, setAberto] = useState(true);
   const [permissoes, setPermissoes] = useState([]);
   const [role, setRole] = useState("");
