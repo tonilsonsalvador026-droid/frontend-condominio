@@ -11,12 +11,11 @@ export default function Dashboard() {
   const menuRef = useRef(null);
 
   useEffect(() => {
-    // Aguarda pequeno delay para garantir que o localStorage está disponível
+    // Pequeno delay para garantir localStorage
     setTimeout(() => {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        console.warn("⚠️ Nenhum token encontrado — redirecionando para login.");
         navigate("/", { replace: true });
         return;
       }
@@ -33,13 +32,12 @@ export default function Dashboard() {
         } else {
           setUser({ name: "Admin" });
         }
-      } catch (err) {
-        console.warn("Token inválido ou não é JWT — usando dados padrão.");
+      } catch {
         setUser({ name: "Admin" });
       } finally {
         setLoading(false);
       }
-    }, 100); // pequeno atraso (100ms) resolve timing issues
+    }, 100);
   }, [navigate]);
 
   // Fechar menu se clicar fora
@@ -53,8 +51,7 @@ export default function Dashboard() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  if (loading) return null;
-  if (!user) return null;
+  if (loading || !user) return null;
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -66,22 +63,21 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Header fixo */}
       <header className="w-full bg-indigo-700 text-white px-6 py-4 flex justify-between items-center shadow-md fixed top-0 left-0 z-50">
         <h1 className="text-xl font-bold">Painel Principal</h1>
 
+        {/* Menu de usuário */}
         <div className="relative" ref={menuRef}>
-          {/* Nome + seta */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="flex items-center gap-2 font-medium hover:bg-indigo-600 px-3 py-2 rounded-lg transition"
           >
-            <span>{user.name || "Admin"}</span>
+            <span>{user.name}</span>
             <ChevronDown size={18} />
           </button>
 
-          {/* Menu suspenso */}
           {menuOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 shadow-lg rounded-lg py-2 z-50">
               <button
@@ -102,13 +98,15 @@ export default function Dashboard() {
       </header>
 
       {/* Conteúdo principal */}
-      <main className="flex-1 p-6 mt-20 bg-gray-50">
-        <div className="bg-white shadow-lg rounded-xl p-6">
-          <h2 className="text-2xl font-bold mb-4">Bem-vindo ao sistema!</h2>
-          <p className="text-gray-700">
-            Aqui será desenvolvido o conteúdo e funcionalidades do sistema de
-            gestão. 🚀
-          </p>
+      <main className="flex-1 p-6 md:ml-0 mt-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-white shadow-lg rounded-xl p-6 hover:shadow-2xl transition">
+            <h2 className="text-2xl font-bold mb-4">Bem-vindo, {user.name}!</h2>
+            <p className="text-gray-700">
+              Aqui será desenvolvido o conteúdo e funcionalidades do sistema de gestão. 🚀
+            </p>
+          </div>
+          {/* Adicione outros cards do dashboard aqui */}
         </div>
       </main>
     </div>
