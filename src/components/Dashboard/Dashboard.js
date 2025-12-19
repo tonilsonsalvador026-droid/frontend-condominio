@@ -1,9 +1,9 @@
 // src/components/Dashboard.js
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronDown, Power, User } from "lucide-react";
+import { ChevronDown, Power, User, Menu } from "lucide-react";
 
-export default function Dashboard() {
+export default function Dashboard({ onToggleSidebar }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -11,27 +11,19 @@ export default function Dashboard() {
   const menuRef = useRef(null);
 
   useEffect(() => {
-    // Pequeno delay para garantir localStorage
     setTimeout(() => {
       const token = localStorage.getItem("token");
-
       if (!token) {
         navigate("/", { replace: true });
         return;
       }
 
       try {
-        const parts = token.split(".");
-        if (parts.length === 3) {
-          const payload = JSON.parse(atob(parts[1]));
-          setUser({
-            id: payload.id || null,
-            role: payload.role || "admin",
-            name: payload.nome || "Admin",
-          });
-        } else {
-          setUser({ name: "Admin" });
-        }
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        setUser({
+          name: payload.nome || "Admin",
+          role: payload.role || "admin",
+        });
       } catch {
         setUser({ name: "Admin" });
       } finally {
@@ -40,10 +32,9 @@ export default function Dashboard() {
     }, 100);
   }, [navigate]);
 
-  // Fechar menu se clicar fora
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
         setMenuOpen(false);
       }
     };
@@ -53,62 +44,68 @@ export default function Dashboard() {
 
   if (loading || !user) return null;
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/", { replace: true });
-  };
-
-  const handlePerfil = () => {
-    navigate("/perfil");
-  };
-
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* Header fixo */}
-      <header className="w-full bg-indigo-700 text-white px-6 py-4 flex justify-between items-center shadow-md fixed top-0 left-0 z-50">
-        <h1 className="text-xl font-bold">Painel Principal</h1>
+    <div className="min-h-screen bg-gray-50">
+      {/* HEADER */}
+      <header className="fixed top-0 left-0 right-0 z-40 bg-indigo-700 text-white h-16 flex items-center justify-between px-4 md:px-6 shadow-md">
+        <div className="flex items-center gap-3">
+          {/* BOTÃO HAMBURGER (mobile) */}
+          <button
+            onClick={onToggleSidebar}
+            className="md:hidden p-2 rounded-lg hover:bg-indigo-600 transition"
+          >
+            <Menu size={22} />
+          </button>
 
-        {/* Menu de usuário */}
+          <h1 className="text-lg md:text-xl font-bold">
+            Painel Principal
+          </h1>
+        </div>
+
+        {/* USER MENU */}
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="flex items-center gap-2 font-medium hover:bg-indigo-600 px-3 py-2 rounded-lg transition"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-600 transition"
           >
-            <span>{user.name}</span>
+            <span className="hidden sm:block">{user.name}</span>
             <ChevronDown size={18} />
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 shadow-lg rounded-lg py-2 z-50">
+            <div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-lg shadow-lg overflow-hidden">
               <button
-                onClick={handlePerfil}
-                className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition"
+                onClick={() => navigate("/perfil")}
+                className="w-full px-4 py-2 flex items-center gap-2 hover:bg-gray-100"
               >
-                <User size={18} /> Perfil
+                <User size={16} /> Perfil
               </button>
               <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition text-red-600"
+                onClick={() => {
+                  localStorage.removeItem("token");
+                  navigate("/", { replace: true });
+                }}
+                className="w-full px-4 py-2 flex items-center gap-2 hover:bg-gray-100 text-red-600"
               >
-                <Power size={18} /> Sair
+                <Power size={16} /> Sair
               </button>
             </div>
           )}
         </div>
       </header>
 
-      {/* Conteúdo principal */}
-      <main className="flex-1 p-6 md:ml-0 mt-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white shadow-lg rounded-xl p-6 hover:shadow-2xl transition">
-            <h2 className="text-2xl font-bold mb-4">Bem-vindo, {user.name}!</h2>
-            <p className="text-gray-700">
-              Aqui será desenvolvido o conteúdo e funcionalidades do sistema de gestão. 🚀
-            </p>
-          </div>
-          {/* Adicione outros cards do dashboard aqui */}
+      {/* CONTEÚDO */}
+      <main className="pt-20 px-4 md:px-6">
+        <div className="bg-white rounded-xl shadow p-6">
+          <h2 className="text-2xl font-bold mb-2">
+            Bem-vindo, {user.name} 👋
+          </h2>
+          <p className="text-gray-600">
+            Este é o painel principal do sistema de gestão.
+          </p>
         </div>
       </main>
     </div>
   );
 }
+
