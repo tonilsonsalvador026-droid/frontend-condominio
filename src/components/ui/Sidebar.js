@@ -1,6 +1,6 @@
 // src/components/ui/Sidebar.js
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   FaHome,
   FaUsers,
@@ -12,17 +12,18 @@ import {
   FaTools,
   FaClipboardList,
   FaUserShield,
+  FaBars,
+  FaTimes,
   FaWallet,
   FaLock,
   FaUnlockAlt,
-  FaBars,
-  FaTimes,
 } from "react-icons/fa";
 
 const Sidebar = () => {
+  const [aberto, setAberto] = useState(false); // Mobile: fechado por padrão
   const [permissoes, setPermissoes] = useState([]);
   const [role, setRole] = useState("");
-  const [open, setOpen] = useState(false); // mobile toggle
+  const location = useLocation();
 
   useEffect(() => {
     try {
@@ -47,197 +48,113 @@ const Sidebar = () => {
     );
   };
 
-  const fecharMobile = () => setOpen(false);
+  const menuItems = [
+    { name: "Dashboard", icon: <FaHome />, path: "/dashboard", key: "dashboard" },
+    { name: "Utilizadores", icon: <FaUserShield />, path: "/users", key: "users" },
+    { name: "Condomínios", icon: <FaBuilding />, path: "/condominios", key: "condominios" },
+    { name: "Edifícios", icon: <FaBuilding />, path: "/edificios", key: "edificios" },
+    { name: "Fraçãoes", icon: <FaKey />, path: "/fracoes", key: "fracoes" },
+    { name: "Proprietários", icon: <FaUsers />, path: "/proprietarios", key: "proprietarios" },
+    { name: "Inquilinos", icon: <FaUsers />, path: "/inquilinos", key: "inquilinos" },
+    { name: "Pagamentos", icon: <FaFileInvoiceDollar />, path: "/pagamentos", key: "pagamentos" },
+    { name: "Recibos", icon: <FaReceipt />, path: "/recibos", key: "recibos" },
+    { name: "Conta Corrente", icon: <FaWallet />, path: "/conta-corrente", key: "conta-corrente" },
+    { name: "Serviços Extras", icon: <FaTools />, path: "/servicos-extras", key: "servicos-extras" },
+    { name: "Serviços Agendados", icon: <FaClipboardList />, path: "/servicos-agendados", key: "servicos-agendados" },
+    { name: "Eventos", icon: <FaCalendarAlt />, path: "/eventos", key: "eventos" },
+  ];
+
+  const acessoItems = [
+    { name: "Funções / Roles", icon: <FaLock />, path: "/roles", key: "roles" },
+    { name: "Permissões", icon: <FaUnlockAlt />, path: "/permissoes", key: "permissoes" },
+    { name: "Atribuir Papéis", icon: <FaUserShield />, path: "/atribuir-role", key: "atribuir-role" },
+  ];
 
   return (
     <>
-      {/* Botão ☰ Mobile */}
-      <button
-        onClick={() => setOpen(true)}
-        className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-gray-900 text-white shadow"
-      >
-        <FaBars />
-      </button>
-
-      {/* Overlay Mobile */}
-      {open && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
-          onClick={fecharMobile}
-        />
-      )}
+      {/* Botão Hamburger para Mobile */}
+      <div className="md:hidden fixed top-4 left-4 z-50">
+        <button
+          onClick={() => setAberto(!aberto)}
+          className="p-3 bg-gray-800 text-white rounded-lg shadow-lg hover:bg-gray-700 transition"
+        >
+          {aberto ? <FaTimes size={20} /> : <FaBars size={20} />}
+        </button>
+      </div>
 
       {/* Sidebar */}
-      <aside
-        className={`
-          fixed top-0 left-0 z-50 h-screen w-64 bg-gray-900 text-white
-          transform transition-transform duration-300
-          ${open ? "translate-x-0" : "-translate-x-full"}
-          md:translate-x-0
-        `}
+      <div
+        className={`fixed top-0 left-0 h-screen bg-gray-900 text-white z-40 transform transition-transform duration-300
+          ${aberto ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 w-64 overflow-y-auto`}
         style={{
           scrollbarWidth: "thin",
           scrollbarColor: "#4B5563 transparent",
         }}
       >
-        {/* Scrollbar */}
         <style>{`
           ::-webkit-scrollbar { width: 6px; }
-          ::-webkit-scrollbar-thumb {
-            background-color: #4B5563;
-            border-radius: 10px;
-          }
-          ::-webkit-scrollbar-thumb:hover {
-            background-color: #6B7280;
-          }
+          ::-webkit-scrollbar-thumb { background-color: #4B5563; border-radius: 10px; }
+          ::-webkit-scrollbar-thumb:hover { background-color: #6B7280; }
+          ::-webkit-scrollbar-track { background: transparent; }
         `}</style>
 
         {/* Cabeçalho */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-800">
-          <span className="text-lg font-bold">Gestão Condominial</span>
-          <button
-            className="md:hidden text-gray-400 hover:text-white"
-            onClick={fecharMobile}
-          >
-            <FaTimes />
-          </button>
+        <div className="p-6 text-lg font-bold border-b border-gray-800">
+          Gestão Condominial
         </div>
 
-        {/* Menu */}
-        <nav className="mt-4 flex flex-col gap-1">
-          {temPermissao("dashboard") && (
-            <Link to="/dashboard" onClick={fecharMobile} className="menu-item">
-              <FaHome /> Dashboard
-            </Link>
-          )}
+        {/* Menu principal */}
+        <nav className="mt-6 flex flex-col gap-2">
+          {menuItems.map((item) => {
+            if (!temPermissao(item.key)) return null;
+            const ativo = location.pathname === item.path;
+            return (
+              <Link
+                key={item.key}
+                to={item.path}
+                className={`flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition rounded-r-lg ${
+                  ativo ? "bg-gray-700 font-semibold" : ""
+                }`}
+                onClick={() => setAberto(false)} // fecha sidebar no mobile ao clicar
+              >
+                {item.icon} {item.name}
+              </Link>
+            );
+          })}
 
-          {temPermissao("users") && (
-            <Link to="/users" onClick={fecharMobile} className="menu-item">
-              <FaUserShield /> Utilizadores
-            </Link>
-          )}
-
-          {temPermissao("condominios") && (
-            <Link to="/condominios" onClick={fecharMobile} className="menu-item">
-              <FaBuilding /> Condomínios
-            </Link>
-          )}
-
-          {temPermissao("edificios") && (
-            <Link to="/edificios" onClick={fecharMobile} className="menu-item">
-              <FaBuilding /> Edifícios
-            </Link>
-          )}
-
-          {temPermissao("fracoes") && (
-            <Link to="/fracoes" onClick={fecharMobile} className="menu-item">
-              <FaKey /> Frações
-            </Link>
-          )}
-
-          {temPermissao("proprietarios") && (
-            <Link to="/proprietarios" onClick={fecharMobile} className="menu-item">
-              <FaUsers /> Proprietários
-            </Link>
-          )}
-
-          {temPermissao("inquilinos") && (
-            <Link to="/inquilinos" onClick={fecharMobile} className="menu-item">
-              <FaUsers /> Inquilinos
-            </Link>
-          )}
-
-          {temPermissao("pagamentos") && (
-            <Link to="/pagamentos" onClick={fecharMobile} className="menu-item">
-              <FaFileInvoiceDollar /> Pagamentos
-            </Link>
-          )}
-
-          {temPermissao("recibos") && (
-            <Link to="/recibos" onClick={fecharMobile} className="menu-item">
-              <FaReceipt /> Recibos
-            </Link>
-          )}
-
-          {temPermissao("conta-corrente") && (
-            <Link
-              to="/conta-corrente"
-              onClick={fecharMobile}
-              className="menu-item"
-            >
-              <FaWallet /> Conta Corrente
-            </Link>
-          )}
-
-          {temPermissao("servicos-extras") && (
-            <Link
-              to="/servicos-extras"
-              onClick={fecharMobile}
-              className="menu-item"
-            >
-              <FaTools /> Serviços Extras
-            </Link>
-          )}
-
-          {temPermissao("servicos-agendados") && (
-            <Link
-              to="/servicos-agendados"
-              onClick={fecharMobile}
-              className="menu-item"
-            >
-              <FaClipboardList /> Serviços Agendados
-            </Link>
-          )}
-
-          {temPermissao("eventos") && (
-            <Link to="/eventos" onClick={fecharMobile} className="menu-item">
-              <FaCalendarAlt /> Eventos
-            </Link>
-          )}
-
+          {/* Separador: Gestão de acessos */}
           {temPermissao("gestao-acessos") && (
             <>
-              <div className="mt-6 px-6 text-xs uppercase tracking-wider text-gray-400">
+              <div className="mt-6 px-6 text-gray-400 uppercase text-xs tracking-wider">
                 Gestão de Acessos
               </div>
-
-              <Link to="/roles" onClick={fecharMobile} className="menu-item">
-                <FaLock /> Funções / Roles
-              </Link>
-
-              <Link
-                to="/permissoes"
-                onClick={fecharMobile}
-                className="menu-item"
-              >
-                <FaUnlockAlt /> Permissões
-              </Link>
-
-              <Link
-                to="/atribuir-role"
-                onClick={fecharMobile}
-                className="menu-item"
-              >
-                <FaUserShield /> Atribuir Papéis
-              </Link>
+              {acessoItems.map((item) => {
+                const ativo = location.pathname === item.path;
+                return (
+                  <Link
+                    key={item.key}
+                    to={item.path}
+                    className={`flex items-center gap-3 px-6 py-3 hover:bg-gray-700 transition rounded-r-lg ${
+                      ativo ? "bg-gray-700 font-semibold" : ""
+                    }`}
+                    onClick={() => setAberto(false)}
+                  >
+                    {item.icon} {item.name}
+                  </Link>
+                );
+              })}
             </>
           )}
         </nav>
-      </aside>
+      </div>
 
-      {/* Classe reutilizável */}
-      <style>{`
-        .menu-item {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          padding: 0.75rem 1.5rem;
-          transition: background 0.2s;
-        }
-        .menu-item:hover {
-          background-color: #374151;
-        }
-      `}</style>
+      {/* Overlay para mobile */}
+      {aberto && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+          onClick={() => setAberto(false)}
+        />
+      )}
     </>
   );
 };
