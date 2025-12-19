@@ -5,11 +5,11 @@ import Sidebar from "../ui/Sidebar";
 const MainLayout = ({ children }) => {
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar fixa */}
+      {/* Sidebar */}
       <Sidebar />
 
       {/* Conteúdo principal */}
-      <main className="flex-1 ml-64 p-4 md:p-6 overflow-y-auto">
+      <main className="flex-1 flex flex-col transition-all duration-300 md:ml-64">
         {children}
       </main>
     </div>
@@ -17,4 +17,5 @@ const MainLayout = ({ children }) => {
 };
 
 export default MainLayout;
+
 
