@@ -1,4 +1,3 @@
-// src/components/ui/Topbar.js
 import React, { useState, useRef, useEffect } from "react";
 import { ChevronDown, Power, User, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -31,10 +30,19 @@ const Topbar = ({ onToggleSidebar }) => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 bg-indigo-700 text-white flex items-center justify-between px-4 md:px-6 shadow-md z-40">
+    <header
+      className="
+        fixed top-0 right-0
+        h-16 bg-indigo-700 text-white
+        flex items-center justify-between
+        px-4 md:px-6
+        shadow-md z-40
+        ml-0 md:ml-64
+      "
+    >
       {/* Lado esquerdo */}
       <div className="flex items-center gap-3">
-        {/* Botão menu SEMPRE visível */}
+        {/* Botão menu (mobile e desktop) */}
         <button
           onClick={onToggleSidebar}
           className="p-2 rounded-md hover:bg-indigo-600 transition"
