@@ -1,3 +1,4 @@
+// src/components/layout/MainLayout.js
 import React, { useState } from "react";
 import Sidebar from "../ui/Sidebar";
 import Topbar from "../ui/Topbar";
@@ -13,13 +14,13 @@ const MainLayout = ({ children }) => {
         setAberto={setSidebarOpen}
       />
 
-      {/* Área direita (Topbar + Conteúdo) */}
-      <div className="flex flex-col flex-1">
+      {/* Área direita */}
+      <div className="flex flex-col flex-1 md:ml-64">
         {/* Topbar */}
-        <Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+        <Topbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
         {/* Conteúdo */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+        <main className="flex-1 overflow-y-auto pt-16 p-4 md:p-6">
           {children}
         </main>
       </div>
@@ -28,6 +29,7 @@ const MainLayout = ({ children }) => {
 };
 
 export default MainLayout;
+
 
 
 
