@@ -31,15 +31,16 @@ const Topbar = ({ onToggleSidebar }) => {
 
   return (
     <header
-      className="
-        fixed top-0 right-0
-        h-16 bg-indigo-700 text-white
-        flex items-center justify-between
-        px-4 md:px-6
-        shadow-md z-40
-        ml-0 md:ml-64
-      "
-    >
+  className="
+    fixed top-0
+    left-0 md:left-64
+    right-0
+    h-16 bg-indigo-700 text-white
+    flex items-center justify-between
+    px-4 md:px-6
+    shadow-md z-40
+  "
+>
       {/* Lado esquerdo */}
       <div className="flex items-center gap-3">
         {/* Botão menu (mobile e desktop) */}
