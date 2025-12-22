@@ -19,7 +19,7 @@ const MainLayout = ({ children }) => {
         <Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
 
         {/* Conteúdo */}
-        <main className="pt-16 md:ml-64">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6">
           {children}
         </main>
       </div>
@@ -28,6 +28,7 @@ const MainLayout = ({ children }) => {
 };
 
 export default MainLayout;
+
 
 
 
