@@ -33,7 +33,7 @@ const Topbar = ({ onToggleSidebar }) => {
     <header
   className="
     fixed top-0 left-0 md:left-64 right-0
-    h-16 bg-indigo-20 text-white
+    h-16 bg-indigo-700 text-white
     flex items-center justify-between
     px-4 md:px-6
     shadow-md z-40
