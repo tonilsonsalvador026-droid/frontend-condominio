@@ -7,20 +7,17 @@ const MainLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-gray-100 overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-gray-100">
       {/* Sidebar */}
-      <Sidebar
-        aberto={sidebarOpen}
-        setAberto={setSidebarOpen}
-      />
+      <Sidebar aberto={sidebarOpen} setAberto={setSidebarOpen} />
 
       {/* Área direita */}
-      <div className="flex flex-col flex-1 md:ml-64">
+      <div className="flex flex-col flex-1">
         {/* Topbar */}
         <Topbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
         {/* Conteúdo */}
-        <main className="flex-1 overflow-y-auto pt-16 p-4 md:p-6">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6">
           {children}
         </main>
       </div>
@@ -29,8 +26,3 @@ const MainLayout = ({ children }) => {
 };
 
 export default MainLayout;
-
-
-
-
-
