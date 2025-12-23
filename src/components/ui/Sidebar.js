@@ -1,3 +1,4 @@
+// src/components/ui/Sidebar.js
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -44,6 +45,12 @@ const Sidebar = ({ aberto, setAberto }) => {
     );
   };
 
+  const fecharNoMobile = () => {
+    if (window.innerWidth < 768) {
+      setAberto(false);
+    }
+  };
+
   const menuItems = [
     { name: "Dashboard", icon: <FaHome />, path: "/dashboard", key: "dashboard" },
     { name: "Utilizadores", icon: <FaUserShield />, path: "/users", key: "users" },
@@ -68,22 +75,20 @@ const Sidebar = ({ aberto, setAberto }) => {
 
   return (
     <>
-      {/* Sidebar */}
       <aside
         className={`
-          fixed md:static top-0 left-0 h-screen w-64 bg-gray-900 text-white z-40
+          fixed md:static top-0 left-0 h-screen w-64
+          bg-gray-900 text-white z-40
           transform transition-transform duration-300
           ${aberto ? "translate-x-0" : "-translate-x-full"}
           md:translate-x-0
           overflow-y-auto
         `}
       >
-        {/* Título */}
         <div className="p-6 text-lg font-bold border-b border-gray-800">
           Gestão Condominial
         </div>
 
-        {/* Menu */}
         <nav className="mt-4 flex flex-col gap-1">
           {menuItems.map((item) => {
             if (!temPermissao(item.key)) return null;
@@ -93,7 +98,7 @@ const Sidebar = ({ aberto, setAberto }) => {
               <Link
                 key={item.key}
                 to={item.path}
-                onClick={() => setAberto(false)}
+                onClick={fecharNoMobile}
                 className={`flex items-center gap-3 px-6 py-3 transition rounded-r-lg
                   ${ativo ? "bg-gray-700 font-semibold" : "hover:bg-gray-800"}
                 `}
@@ -117,7 +122,7 @@ const Sidebar = ({ aberto, setAberto }) => {
                   <Link
                     key={item.key}
                     to={item.path}
-                    onClick={() => setAberto(false)}
+                    onClick={fecharNoMobile}
                     className={`flex items-center gap-3 px-6 py-3 transition rounded-r-lg
                       ${ativo ? "bg-gray-700 font-semibold" : "hover:bg-gray-800"}
                     `}
@@ -144,4 +149,5 @@ const Sidebar = ({ aberto, setAberto }) => {
 };
 
 export default Sidebar;
+
 
