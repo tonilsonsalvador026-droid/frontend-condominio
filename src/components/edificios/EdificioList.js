@@ -2,12 +2,16 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api";
+import { toast } from "sonner";
 import {
+  Plus,
+  Pencil,
+  Trash2,
+  Eye,
   FileText,
   FileSpreadsheet,
   FileDown,
   Printer,
-  Eye,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
@@ -15,62 +19,40 @@ import autoTable from "jspdf-autotable";
 
 const EdificioList = () => {
   const [edificios, setEdificios] = useState([]);
-  const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
-  const fetchData = async () => {
+  const fetchEdificios = async () => {
     try {
       const res = await api.get("/edificios");
       setEdificios(res.data);
     } catch (err) {
-      console.error("Erro ao carregar edifícios:", err);
-      setError("Não foi possível carregar os edifícios");
+      toast.error("Erro ao carregar edifícios");
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchEdificios();
   }, []);
 
-  // 🔎 Filtro por nome
-  const filteredEdificios = edificios.filter((e) =>
+  const filtered = edificios.filter((e) =>
     e.nome.toLowerCase().includes(search.toLowerCase())
   );
 
-  // 📤 Exportar CSV
-  const exportCSV = () => {
-    const header = [
-      "ID",
-      "Nome",
-      "Endereço",
-      "Andares",
-      "Apartamentos",
-      "Condomínio",
-    ];
-    const rows = filteredEdificios.map((e) => [
-      e.id,
-      e.nome,
-      e.endereco,
-      e.numeroAndares,
-      e.numeroApartamentos,
-      e.condominio?.nome || "-",
-    ]);
-    const csv = [header, ...rows].map((r) => r.join(",")).join("\n");
-
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "edificios.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleDelete = async (id) => {
+    if (!window.confirm("Deseja eliminar este edifício?")) return;
+    try {
+      await api.delete(`/edificios/${id}`);
+      toast.success("Edifício eliminado com sucesso");
+      fetchEdificios();
+    } catch {
+      toast.error("Erro ao eliminar edifício");
+    }
   };
 
-  // 📤 Exportar Excel
+  // ===== EXPORTAÇÕES (mesmo padrão das outras listas)
   const exportExcel = () => {
-    const data = filteredEdificios.map((e) => ({
+    const data = filtered.map((e) => ({
       ID: e.id,
       Nome: e.nome,
       Endereço: e.endereco,
@@ -84,14 +66,11 @@ const EdificioList = () => {
     XLSX.writeFile(wb, "edificios.xlsx");
   };
 
-  // 📤 Exportar PDF
   const exportPDF = () => {
     const doc = new jsPDF();
-    doc.text("Relatório de Edifícios", 14, 15);
     autoTable(doc, {
-      startY: 25,
       head: [["ID", "Nome", "Endereço", "Andares", "Apartamentos", "Condomínio"]],
-      body: filteredEdificios.map((e) => [
+      body: filtered.map((e) => [
         e.id,
         e.nome,
         e.endereco,
@@ -103,111 +82,103 @@ const EdificioList = () => {
     doc.save("edificios.pdf");
   };
 
-  // 📤 Impressão
-  const handlePrint = () => {
-    const content = document.getElementById("printArea").innerHTML;
-    const win = window.open("", "", "width=900,height=650");
-    win.document.write(`
-      <html>
-        <head>
-          <title>Relatório de Edifícios</title>
-          <style>
-            table { width: 100%; border-collapse: collapse; font-size: 14px; }
-            th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-            th { background: #f5f5f5; }
-          </style>
-        </head>
-        <body>${content}</body>
-      </html>
-    `);
-    win.document.close();
-    win.print();
-  };
-
   return (
-    <div className="bg-white p-4 rounded-lg shadow">
-      {/* Cabeçalho */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
-        <h2 className="text-lg font-semibold text-gray-700">
-          Lista de Edifícios
+    <div className="bg-white rounded-2xl shadow border p-6">
+      {/* HEADER PADRÃO */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <h2 className="text-xl font-semibold text-gray-800">
+          Gestão de Edifícios
         </h2>
+
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => navigate("/edificios/novo")}
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          >
+            <Plus size={18} /> Novo Edifício
+          </button>
+
+          <button
+            onClick={exportExcel}
+            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+          >
+            <FileSpreadsheet size={18} /> Excel
+          </button>
+
+          <button
+            onClick={exportPDF}
+            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+          >
+            <FileDown size={18} /> PDF
+          </button>
+        </div>
+      </div>
+
+      {/* PESQUISA */}
+      <div className="mb-4">
         <input
           type="text"
-          placeholder="Pesquisar por nome..."
+          placeholder="Pesquisar edifício por nome..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border rounded p-2 w-full md:w-64 text-gray-700"
+          className="border rounded-lg p-2 w-full md:w-80"
         />
       </div>
 
-      {/* Mensagem de erro */}
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-
-      {/* Botões de exportação */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        <button
-          onClick={exportCSV}
-          className="flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 text-sm"
-        >
-          <FileText size={16} /> CSV
-        </button>
-        <button
-          onClick={exportExcel}
-          className="flex items-center gap-2 bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 text-sm"
-        >
-          <FileSpreadsheet size={16} /> Excel
-        </button>
-        <button
-          onClick={exportPDF}
-          className="flex items-center gap-2 bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 text-sm"
-        >
-          <FileDown size={16} /> PDF
-        </button>
-        <button
-          onClick={handlePrint}
-          className="flex items-center gap-2 bg-gray-600 text-white px-3 py-2 rounded hover:bg-gray-700 text-sm"
-        >
-          <Printer size={16} /> Imprimir
-        </button>
-      </div>
-
-      {/* Tabela */}
-      <div id="printArea" className="overflow-x-auto">
-        <table className="w-full text-sm md:text-base border-collapse">
+      {/* TABELA PROFISSIONAL */}
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm border-collapse">
           <thead>
-            <tr className="bg-gray-100 text-gray-700 text-left">
-              <th className="p-2">ID</th>
-              <th className="p-2">Nome</th>
-              <th className="p-2">Endereço</th>
-              <th className="p-2">Andares</th>
-              <th className="p-2">Apartamentos</th>
-              <th className="p-2">Condomínio</th>
-              <th className="p-2 text-center">Ações</th>
+            <tr className="bg-gray-100 text-gray-700">
+              <th className="p-3 text-left">Nome</th>
+              <th className="p-3 text-left">Endereço</th>
+              <th className="p-3 text-center">Andares</th>
+              <th className="p-3 text-center">Apartamentos</th>
+              <th className="p-3 text-left">Condomínio</th>
+              <th className="p-3 text-center">Ações</th>
             </tr>
           </thead>
           <tbody>
-            {filteredEdificios.map((e) => (
-              <tr key={e.id} className="hover:bg-gray-50 border-b last:border-none">
-                <td className="p-2">{e.id}</td>
-                <td className="p-2">{e.nome}</td>
-                <td className="p-2">{e.endereco}</td>
-                <td className="p-2">{e.numeroAndares}</td>
-                <td className="p-2">{e.numeroApartamentos}</td>
-                <td className="p-2">{e.condominio?.nome || "-"}</td>
-                <td className="p-2 text-center">
-                  <button
-                    onClick={() => navigate(`/edificios/${e.id}`)}
-                    className="text-green-600 hover:text-green-800"
-                    title="Ver Detalhes"
-                  >
-                    <Eye size={18} />
-                  </button>
+            {filtered.map((e) => (
+              <tr key={e.id} className="border-b hover:bg-gray-50">
+                <td className="p-3">{e.nome}</td>
+                <td className="p-3">{e.endereco}</td>
+                <td className="p-3 text-center">{e.numeroAndares}</td>
+                <td className="p-3 text-center">{e.numeroApartamentos}</td>
+                <td className="p-3">{e.condominio?.nome || "-"}</td>
+                <td className="p-3">
+                  <div className="flex justify-center gap-3">
+                    <button
+                      onClick={() => navigate(`/edificios/${e.id}`)}
+                      className="text-green-600 hover:text-green-800"
+                      title="Detalhes"
+                    >
+                      <Eye size={18} />
+                    </button>
+
+                    <button
+                      onClick={() => navigate(`/edificios/editar/${e.id}`)}
+                      className="text-blue-600 hover:text-blue-800"
+                      title="Editar"
+                    >
+                      <Pencil size={18} />
+                    </button>
+
+                    <button
+                      onClick={() => handleDelete(e.id)}
+                      className="text-red-600 hover:text-red-800"
+                      title="Eliminar"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
-            {filteredEdificios.length === 0 && (
+
+            {filtered.length === 0 && (
               <tr>
-                <td colSpan="7" className="p-4 text-center text-gray-500">
+                <td colSpan="6" className="p-4 text-center text-gray-500">
                   Nenhum edifício encontrado.
                 </td>
               </tr>
