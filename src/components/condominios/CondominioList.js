@@ -30,14 +30,12 @@ const CondominioList = () => {
     fetchData();
   }, []);
 
-  // 🔎 Filtro por nome ou localização
   const filteredCondominios = condominios.filter(
     (c) =>
       c.nome.toLowerCase().includes(search.toLowerCase()) ||
       c.localizacao.toLowerCase().includes(search.toLowerCase())
   );
 
-  // 📤 Exportar CSV
   const exportCSV = () => {
     const header = ["ID", "Nome", "Localização", "Data Criação"];
     const rows = filteredCondominios.map((c) => [
@@ -58,7 +56,6 @@ const CondominioList = () => {
     document.body.removeChild(link);
   };
 
-  // 📤 Exportar Excel
   const exportExcel = () => {
     const data = filteredCondominios.map((c) => ({
       ID: c.id,
@@ -72,7 +69,6 @@ const CondominioList = () => {
     XLSX.writeFile(wb, "condominios.xlsx");
   };
 
-  // 📤 Exportar PDF
   const exportPDF = () => {
     const doc = new jsPDF();
     doc.text("Relatório de Condomínios", 14, 15);
@@ -89,7 +85,6 @@ const CondominioList = () => {
     doc.save("condominios.pdf");
   };
 
-  // 📤 Impressão
   const handlePrint = () => {
     const content = document.getElementById("printArea").innerHTML;
     const win = window.open("", "", "width=900,height=650");
@@ -103,9 +98,7 @@ const CondominioList = () => {
             th { background: #f5f5f5; }
           </style>
         </head>
-        <body>
-          ${content}
-        </body>
+        <body>${content}</body>
       </html>
     `);
     win.document.close();
@@ -113,78 +106,85 @@ const CondominioList = () => {
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
-        <h2 className="text-lg font-semibold text-gray-700">
-          Lista de Condomínios
-        </h2>
+    <div className="bg-white rounded-2xl shadow-md border p-6">
+      {/* Cabeçalho */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+        <div>
+          <h2 className="text-2xl font-semibold text-gray-800">
+            Lista de Condomínios
+          </h2>
+          <p className="text-gray-500 text-sm">
+            Visualize, pesquise e exporte os condomínios cadastrados
+          </p>
+        </div>
+
         <input
           type="text"
           placeholder="Pesquisar por nome ou localização..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border rounded p-2 w-full md:w-64 text-gray-700"
+          className="border rounded-lg px-4 py-2 w-full lg:w-80 focus:ring-2 focus:ring-blue-200 outline-none"
         />
       </div>
 
       {error && <p className="text-red-500 mb-4">{error}</p>}
 
-      {/* Botões de exportação */}
-      <div className="flex flex-wrap gap-2 mb-4">
+      {/* Botões */}
+      <div className="flex flex-wrap gap-3 mb-6">
         <button
           onClick={exportCSV}
-          className="flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 text-sm"
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm"
         >
           <FileText size={16} /> CSV
         </button>
         <button
           onClick={exportExcel}
-          className="flex items-center gap-2 bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 text-sm"
+          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm"
         >
           <FileSpreadsheet size={16} /> Excel
         </button>
         <button
           onClick={exportPDF}
-          className="flex items-center gap-2 bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 text-sm"
+          className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm"
         >
           <FileDown size={16} /> PDF
         </button>
         <button
           onClick={handlePrint}
-          className="flex items-center gap-2 bg-gray-600 text-white px-3 py-2 rounded hover:bg-gray-700 text-sm"
+          className="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm"
         >
           <Printer size={16} /> Imprimir
         </button>
       </div>
 
-      {/* Tabela responsiva */}
-      <div id="printArea" className="overflow-x-auto">
-        <table className="w-full text-sm md:text-base border-collapse">
-          <thead>
-            <tr className="bg-gray-100 text-gray-700 text-left">
-              <th className="p-2">ID</th>
-              <th className="p-2">Nome</th>
-              <th className="p-2">Localização</th>
-              <th className="p-2">Data Criação</th>
+      {/* Tabela */}
+      <div id="printArea" className="overflow-x-auto rounded-lg border">
+        <table className="w-full text-sm md:text-base">
+          <thead className="bg-gray-50 text-gray-700">
+            <tr>
+              <th className="p-3 text-left">ID</th>
+              <th className="p-3 text-left">Nome</th>
+              <th className="p-3 text-left">Localização</th>
+              <th className="p-3 text-left">Data Criação</th>
             </tr>
           </thead>
           <tbody>
             {filteredCondominios.map((c) => (
               <tr
                 key={c.id}
-                className="hover:bg-gray-50 border-b last:border-none"
+                className="border-t hover:bg-gray-50 transition"
               >
-                <td className="p-2">{c.id}</td>
-                <td className="p-2">{c.nome}</td>
-                <td className="p-2">{c.localizacao}</td>
-                <td className="p-2">
+                <td className="p-3">{c.id}</td>
+                <td className="p-3 font-medium text-gray-800">{c.nome}</td>
+                <td className="p-3 text-gray-600">{c.localizacao}</td>
+                <td className="p-3 text-gray-600">
                   {new Date(c.criadoEm).toLocaleDateString("pt-PT")}
                 </td>
               </tr>
             ))}
             {filteredCondominios.length === 0 && (
               <tr>
-                <td colSpan="4" className="p-4 text-center text-gray-500">
+                <td colSpan="4" className="p-6 text-center text-gray-400">
                   Nenhum condomínio encontrado.
                 </td>
               </tr>
