@@ -1,62 +1,40 @@
 // src/components/edificios/EdificioPage.js
 import React, { useState } from "react";
-import {PlusCircle, ArrowLeft } from "lucide-react";
+import { PlusCircle } from "lucide-react";
 import EdificioForm from "./EdificioForm";
 import EdificioList from "./EdificioList";
 
 const EdificioPage = () => {
-  const [view, setView] = useState("menu"); // "menu" = lista | "form" = formulário
+  const [showForm, setShowForm] = useState(false);
+  const [reloadList, setReloadList] = useState(false);
+
+  const handleSuccess = () => {
+    setShowForm(false);
+    setReloadList(!reloadList);
+  };
 
   return (
-    <div className="w-full px-4 md:px-8 lg:px-16 xl:px-20">
-      {/* === VISUALIZAÇÃO PRINCIPAL (LISTA + BOTÃO NOVO) === */}
-      {view === "menu" && (
-        <div className="space-y-10 mt-10">
-          {/* Cabeçalho */}
-          <div className="flex items-center space-x-2 mb-4">
-            <h1 className="text-4xl font-bold text-gray-800">
-              Gestão de Edifícios
-            </h1>
-          </div>
+    <div className="w-full px-4 md:px-8 lg:px-16 xl:px-20 mt-8 space-y-6">
+      {/* Cabeçalho do Módulo */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <h1 className="text-3xl font-bold text-gray-800">
+          Gestão de Edifícios
+        </h1>
 
-          {/* Botão Novo Edifício */}
-          <div
-            onClick={() => setView("form")}
-            className="cursor-pointer bg-white rounded-2xl shadow-md hover:shadow-lg transition p-6 flex items-center space-x-4 border border-gray-100 hover:border-blue-400"
-          >
-            <PlusCircle className="w-10 h-10 text-blue-600" />
-            <div>
-              <h2 className="text-lg font-semibold text-gray-800">Novo Edifício</h2>
-              <p className="text-sm text-gray-500">
-                Adicionar um novo edifício ao sistema
-              </p>
-            </div>
-          </div>
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition text-sm"
+        >
+          <PlusCircle size={18} />
+          {showForm ? "Fechar Formulário" : "Novo Edifício"}
+        </button>
+      </div>
 
-          {/* Lista de Edifícios */}
-          <EdificioList />
-        </div>
-      )}
+      {/* Formulário */}
+      {showForm && <EdificioForm onSuccess={handleSuccess} />}
 
-      {/* === FORMULÁRIO NOVO EDIFÍCIO === */}
-      {view === "form" && (
-        <div className="w-full mt-5">
-          {/* Cabeçalho com botão voltar */}
-          <div className="flex items-center mb-6 space-x-3">
-            <button
-              onClick={() => setView("menu")}
-              className="flex items-center text-sm text-gray-600 hover:text-blue-600 transition"
-            >
-              <ArrowLeft className="w-4 h-4 mr-1" />
-              Voltar
-            </button>
-            <h2 className="text-xl font-semibold text-gray-800">Novo Edifício</h2>
-          </div>
-
-          {/* Formulário */}
-          <EdificioForm onSuccess={() => setView("menu")} />
-        </div>
-      )}
+      {/* Lista */}
+      <EdificioList key={reloadList} />
     </div>
   );
 };
