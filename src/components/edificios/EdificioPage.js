@@ -1,29 +1,65 @@
+// src/components/edificios/EdificioPage.js
 import React, { useState } from "react";
+import {PlusCircle, ArrowLeft } from "lucide-react";
 import EdificioForm from "./EdificioForm";
 import EdificioList from "./EdificioList";
 
 const EdificioPage = () => {
-  const [view, setView] = useState("list");
+  const [view, setView] = useState("menu"); // "menu" = lista | "form" = formulário
 
   return (
-    <div className="space-y-8">
-      {view === "list" && (
-        <>
-          <button
+    <div className="w-full px-4 md:px-8 lg:px-16 xl:px-20">
+      {/* === VISUALIZAÇÃO PRINCIPAL (LISTA + BOTÃO NOVO) === */}
+      {view === "menu" && (
+        <div className="space-y-10 mt-10">
+          {/* Cabeçalho */}
+          <div className="flex items-center space-x-2 mb-4">
+            <h1 className="text-4xl font-bold text-gray-800">
+              Gestão de Edifícios
+            </h1>
+          </div>
+
+          {/* Botão Novo Edifício */}
+          <div
             onClick={() => setView("form")}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg"
+            className="cursor-pointer bg-white rounded-2xl shadow-md hover:shadow-lg transition p-6 flex items-center space-x-4 border border-gray-100 hover:border-blue-400"
           >
-            Novo Edifício
-          </button>
+            <PlusCircle className="w-10 h-10 text-blue-600" />
+            <div>
+              <h2 className="text-lg font-semibold text-gray-800">Novo Edifício</h2>
+              <p className="text-sm text-gray-500">
+                Adicionar um novo edifício ao sistema
+              </p>
+            </div>
+          </div>
+
+          {/* Lista de Edifícios */}
           <EdificioList />
-        </>
+        </div>
       )}
 
+      {/* === FORMULÁRIO NOVO EDIFÍCIO === */}
       {view === "form" && (
-        <EdificioForm onSuccess={() => setView("list")} />
+        <div className="w-full mt-5">
+          {/* Cabeçalho com botão voltar */}
+          <div className="flex items-center mb-6 space-x-3">
+            <button
+              onClick={() => setView("menu")}
+              className="flex items-center text-sm text-gray-600 hover:text-blue-600 transition"
+            >
+              <ArrowLeft className="w-4 h-4 mr-1" />
+              Voltar
+            </button>
+            <h2 className="text-xl font-semibold text-gray-800">Novo Edifício</h2>
+          </div>
+
+          {/* Formulário */}
+          <EdificioForm onSuccess={() => setView("menu")} />
+        </div>
       )}
     </div>
   );
 };
+
 
 export default EdificioPage;
