@@ -13,16 +13,28 @@ const EdificioForm = ({ onSuccess }) => {
   });
 
   const [condominios, setCondominios] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    api.get("/condominios").then((res) => setCondominios(res.data));
+    const fetchCondominios = async () => {
+      try {
+        const res = await api.get("/condominios");
+        setCondominios(res.data);
+      } catch (err) {
+        console.error("Erro ao carregar condomínios:", err);
+        toast.error("Erro ao carregar condomínios.");
+      }
+    };
+    fetchCondominios();
   }, []);
 
-  const handleChange = (e) =>
+  const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await api.post("/edificios", formData);
       toast.success("Edifício cadastrado com sucesso!");
@@ -34,8 +46,11 @@ const EdificioForm = ({ onSuccess }) => {
         condominioId: "",
       });
       onSuccess?.();
-    } catch {
+    } catch (err) {
+      console.error("Erro ao cadastrar edifício:", err);
       toast.error("Erro ao cadastrar edifício.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -45,7 +60,7 @@ const EdificioForm = ({ onSuccess }) => {
         onSubmit={handleSubmit}
         className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 md:p-8"
       >
-        {/* Título padrão */}
+        {/* Título */}
         <div className="mb-6">
           <h2 className="text-2xl font-semibold text-gray-800">
             Novo Edifício
@@ -55,7 +70,7 @@ const EdificioForm = ({ onSuccess }) => {
           </p>
         </div>
 
-        {/* Campos no grid padrão */}
+        {/* Campos */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Nome */}
           <div className="flex flex-col">
@@ -69,7 +84,7 @@ const EdificioForm = ({ onSuccess }) => {
               type="text"
               id="nome"
               name="nome"
-              placeholder="Ex: Edifício Sol Nascente"
+              placeholder="Ex: Edifício Atlântico"
               value={formData.nome}
               onChange={handleChange}
               className="border border-gray-300 rounded-lg px-4 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
@@ -109,7 +124,7 @@ const EdificioForm = ({ onSuccess }) => {
               type="number"
               id="numeroAndares"
               name="numeroAndares"
-              placeholder="Ex: 10"
+              min="1"
               value={formData.numeroAndares}
               onChange={handleChange}
               className="border border-gray-300 rounded-lg px-4 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
@@ -128,14 +143,14 @@ const EdificioForm = ({ onSuccess }) => {
               type="number"
               id="numeroApartamentos"
               name="numeroApartamentos"
-              placeholder="Ex: 40"
+              min="1"
               value={formData.numeroApartamentos}
               onChange={handleChange}
               className="border border-gray-300 rounded-lg px-4 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
             />
           </div>
 
-          {/* Condomínio (linha inteira) */}
+          {/* Condomínio */}
           <div className="flex flex-col md:col-span-2">
             <label
               htmlFor="condominioId"
@@ -151,7 +166,7 @@ const EdificioForm = ({ onSuccess }) => {
               className="border border-gray-300 rounded-lg px-4 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
               required
             >
-              <option value="">Selecione o condomínio</option>
+              <option value="">Selecione um condomínio</option>
               {condominios.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.nome}
@@ -161,13 +176,18 @@ const EdificioForm = ({ onSuccess }) => {
           </div>
         </div>
 
-        {/* Botão padrão */}
+        {/* Botão */}
         <div className="mt-8 flex justify-start">
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 py-2.5 rounded-lg transition duration-200"
+            disabled={loading}
+            className={`text-white font-medium px-8 py-2.5 rounded-lg transition duration-200 ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
-            Salvar Edifício
+            {loading ? "Salvando..." : "Salvar Edifício"}
           </button>
         </div>
       </form>
