@@ -1,6 +1,6 @@
 // src/components/edificios/EdificioPage.js
 import React, { useState } from "react";
-import {PlusCircle, ArrowLeft } from "lucide-react";
+import { PlusCircle, ArrowLeft } from "lucide-react";
 import EdificioForm from "./EdificioForm";
 import EdificioList from "./EdificioList";
 
@@ -60,6 +60,5 @@ const EdificioPage = () => {
     </div>
   );
 };
-
 
 export default EdificioPage;
