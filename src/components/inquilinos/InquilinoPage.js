@@ -53,10 +53,8 @@ const InquilinoPage = () => {
             <h2 className="text-xl font-semibold text-gray-800">Novo Inquilino</h2>
           </div>
 
-          {/* Formulário dentro do container padronizado */}
-          <div className="bg-white rounded-2xl shadow-md border p-6 md:p-8">
-            <InquilinoForm onSuccess={() => setView("menu")} />
-          </div>
+          {/* Formulário diretamente */}
+          <InquilinoForm onSuccess={() => setView("menu")} />
         </div>
       )}
     </div>
@@ -64,3 +62,4 @@ const InquilinoPage = () => {
 };
 
 export default InquilinoPage;
+
