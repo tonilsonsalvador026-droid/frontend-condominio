@@ -29,7 +29,6 @@ const FracaoForm = ({ onSuccess }) => {
         setProprietarios(prRes.data);
         setInquilinos(inqRes.data);
       } catch (err) {
-        console.error("Erro ao carregar dados:", err);
         toast.error("Erro ao carregar dados.");
       }
     };
@@ -51,7 +50,7 @@ const FracaoForm = ({ onSuccess }) => {
     setLoading(true);
     try {
       await api.post("/fracoes", formData);
-      toast.success("✅ Fração cadastrada com sucesso!");
+      toast.success("Fração cadastrada com sucesso!");
       setFormData({
         numero: "",
         tipo: "",
@@ -59,142 +58,156 @@ const FracaoForm = ({ onSuccess }) => {
         proprietarioId: "",
         inquilinoId: "",
       });
-      if (onSuccess) onSuccess();
+      onSuccess?.();
     } catch (err) {
-      console.error("Erro ao cadastrar fração:", err);
-      toast.error("❌ Erro ao cadastrar fração.");
+      toast.error("Erro ao cadastrar fração.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white p-6 rounded-2xl shadow-md border mb-6"
-    >
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">Nova Fração</h2>
-
-      {/* Layout em colunas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">
-            Número
-          </label>
-          <input
-            type="text"
-            name="numero"
-            value={formData.numero}
-            onChange={handleChange}
-            className="border rounded-lg p-2 w-full text-gray-700 focus:ring focus:ring-blue-200"
-            required
-          />
+    <div className="w-full">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 md:p-8"
+      >
+        {/* Título */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-semibold text-gray-800">
+            Nova Fração
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">
+            Preencha os dados abaixo para cadastrar uma nova fração.
+          </p>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">
-            Tipo
-          </label>
-          <select
-            name="tipo"
-            value={formData.tipo}
-            onChange={handleChange}
-            className="border rounded-lg p-2 w-full text-gray-700 focus:ring focus:ring-blue-200"
-            required
+        {/* Campos */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Número */}
+          <div className="flex flex-col">
+            <label className="text-sm font-medium text-gray-600 mb-2">
+              Número
+            </label>
+            <input
+              type="text"
+              name="numero"
+              value={formData.numero}
+              onChange={handleChange}
+              className="border border-gray-300 rounded-lg px-4 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              required
+            />
+          </div>
+
+          {/* Tipo */}
+          <div className="flex flex-col">
+            <label className="text-sm font-medium text-gray-600 mb-2">
+              Tipo
+            </label>
+            <select
+              name="tipo"
+              value={formData.tipo}
+              onChange={handleChange}
+              className="border border-gray-300 rounded-lg px-4 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              required
+            >
+              <option value="">Selecione o Tipo</option>
+              <option value="apartamento">Apartamento</option>
+              <option value="loja">Loja</option>
+              <option value="garagem">Garagem</option>
+            </select>
+          </div>
+
+          {/* Edifício */}
+          <div className="flex flex-col">
+            <label className="text-sm font-medium text-gray-600 mb-2">
+              Edifício
+            </label>
+            <select
+              name="edificioId"
+              value={formData.edificioId}
+              onChange={handleChange}
+              className="border border-gray-300 rounded-lg px-4 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              required
+            >
+              <option value="">Selecione o Edifício</option>
+              {edificios.map((e) => (
+                <option key={e.id} value={e.id}>
+                  {e.nome}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Proprietário */}
+          <div className="flex flex-col">
+            <label className="text-sm font-medium text-gray-600 mb-2">
+              Proprietário
+            </label>
+            <select
+              name="proprietarioId"
+              value={formData.proprietarioId}
+              onChange={handleChange}
+              className="border border-gray-300 rounded-lg px-4 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            >
+              <option value="">Selecione o Proprietário</option>
+              {proprietarios.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.nome}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Inquilino */}
+          <div className="flex flex-col">
+            <label className="text-sm font-medium text-gray-600 mb-2">
+              Inquilino
+            </label>
+            <select
+              name="inquilinoId"
+              value={formData.inquilinoId}
+              onChange={handleChange}
+              className="border border-gray-300 rounded-lg px-4 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            >
+              <option value="">Selecione o Inquilino</option>
+              {inquilinos.map((i) => (
+                <option key={i.id} value={i.id}>
+                  {i.nome}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Estado */}
+        <p className="text-sm text-gray-600 mt-4">
+          Estado atual:{" "}
+          <span
+            className={`font-semibold ${
+              formData.inquilinoId ? "text-green-600" : "text-blue-600"
+            }`}
           >
-            <option value="">Selecione o Tipo</option>
-            <option value="apartamento">Apartamento</option>
-            <option value="loja">Loja</option>
-            <option value="garagem">Garagem</option>
-          </select>
-        </div>
+            {formData.inquilinoId ? "Ocupado" : "Vago"}
+          </span>
+        </p>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">
-            Edifício
-          </label>
-          <select
-            name="edificioId"
-            value={formData.edificioId}
-            onChange={handleChange}
-            className="border rounded-lg p-2 w-full text-gray-700 focus:ring focus:ring-blue-200"
-            required
+        {/* Botão */}
+        <div className="mt-8 flex justify-start">
+          <button
+            type="submit"
+            disabled={loading}
+            className={`text-white font-medium px-8 py-2.5 rounded-lg transition duration-200 ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
-            <option value="">Selecione o Edifício</option>
-            {edificios.map((e) => (
-              <option key={e.id} value={e.id}>
-                {e.nome}
-              </option>
-            ))}
-          </select>
+            {loading ? "Salvando..." : "Salvar Fração"}
+          </button>
         </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">
-            Proprietário
-          </label>
-          <select
-            name="proprietarioId"
-            value={formData.proprietarioId}
-            onChange={handleChange}
-            className="border rounded-lg p-2 w-full text-gray-700 focus:ring focus:ring-blue-200"
-          >
-            <option value="">Selecione o Proprietário</option>
-            {proprietarios.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.nome}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">
-            Inquilino
-          </label>
-          <select
-            name="inquilinoId"
-            value={formData.inquilinoId}
-            onChange={handleChange}
-            className="border rounded-lg p-2 w-full text-gray-700 focus:ring focus:ring-blue-200"
-          >
-            <option value="">Selecione o Inquilino</option>
-            {inquilinos.map((i) => (
-              <option key={i.id} value={i.id}>
-                {i.nome}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* Estado automático (visual informativo apenas) */}
-      <p className="text-sm text-gray-600 mt-3">
-        Estado atual:{" "}
-        <span
-          className={`font-semibold ${
-            formData.inquilinoId ? "text-green-600" : "text-blue-600"
-          }`}
-        >
-          {formData.inquilinoId ? "Ocupado" : "Vago"}
-        </span>
-      </p>
-
-      {/* Botão */}
-      <div className="mt-5">
-        <button
-          type="submit"
-          disabled={loading}
-          className={`px-5 py-2 rounded-lg transition text-white ${
-            loading
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
-          }`}
-        >
-          {loading ? "Salvando..." : "Salvar"}
-        </button>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 };
 
