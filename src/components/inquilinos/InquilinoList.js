@@ -1,12 +1,7 @@
 // src/components/inquilinos/InquilinoList.js
 import React, { useEffect, useState } from "react";
 import api from "../../api";
-import {
-  FileText,
-  FileSpreadsheet,
-  FileDown,
-  Printer,
-} from "lucide-react";
+import { FileText, FileSpreadsheet, FileDown, Printer } from "lucide-react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -30,12 +25,11 @@ const InquilinoList = () => {
     fetchData();
   }, []);
 
-  // 🔎 Filtro por nome
   const filteredInquilinos = inquilinos.filter((i) =>
     i.nome.toLowerCase().includes(search.toLowerCase())
   );
 
-  // 📤 Exportar CSV
+  // Exportações
   const exportCSV = () => {
     const header = ["ID", "Nome", "Email", "Telefone", "NIF", "Fração", "Edifício"];
     const rows = filteredInquilinos.map((i) => [
@@ -48,7 +42,6 @@ const InquilinoList = () => {
       i.fracao?.edificio?.nome || "-",
     ]);
     const csv = [header, ...rows].map((r) => r.join(",")).join("\n");
-
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -59,7 +52,6 @@ const InquilinoList = () => {
     document.body.removeChild(link);
   };
 
-  // 📤 Exportar Excel
   const exportExcel = () => {
     const data = filteredInquilinos.map((i) => ({
       ID: i.id,
@@ -76,7 +68,6 @@ const InquilinoList = () => {
     XLSX.writeFile(wb, "inquilinos.xlsx");
   };
 
-  // 📤 Exportar PDF
   const exportPDF = () => {
     const doc = new jsPDF();
     doc.text("Relatório de Inquilinos", 14, 15);
@@ -96,7 +87,6 @@ const InquilinoList = () => {
     doc.save("inquilinos.pdf");
   };
 
-  // 📤 Impressão
   const handlePrint = () => {
     const content = document.getElementById("printArea").innerHTML;
     const win = window.open("", "", "width=900,height=650");
@@ -110,9 +100,7 @@ const InquilinoList = () => {
             th { background: #f5f5f5; }
           </style>
         </head>
-        <body>
-          ${content}
-        </body>
+        <body>${content}</body>
       </html>
     `);
     win.document.close();
@@ -120,82 +108,83 @@ const InquilinoList = () => {
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
-        <h2 className="text-lg font-semibold text-gray-700">
-          Lista de Inquilinos
-        </h2>
+    <div className="bg-white rounded-2xl shadow-md border p-6">
+      {/* Cabeçalho */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+        <div>
+          <h2 className="text-2xl font-semibold text-gray-800">Lista de Inquilinos</h2>
+          <p className="text-gray-500 text-sm">
+            Visualize, pesquise e exporte os inquilinos cadastrados
+          </p>
+        </div>
         <input
           type="text"
           placeholder="Pesquisar por nome..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border rounded p-2 w-full md:w-64 text-gray-700"
+          className="border rounded-lg px-4 py-2 w-full lg:w-80 focus:ring-2 focus:ring-blue-200 outline-none"
         />
       </div>
 
       {error && <p className="text-red-500 mb-4">{error}</p>}
 
       {/* Botões de exportação */}
-      <div className="flex flex-wrap gap-2 mb-4">
+      <div className="flex flex-wrap gap-3 mb-6">
         <button
           onClick={exportCSV}
-          className="flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 text-sm"
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm"
         >
           <FileText size={16} /> CSV
         </button>
         <button
           onClick={exportExcel}
-          className="flex items-center gap-2 bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 text-sm"
+          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm"
         >
           <FileSpreadsheet size={16} /> Excel
         </button>
         <button
           onClick={exportPDF}
-          className="flex items-center gap-2 bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 text-sm"
+          className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm"
         >
           <FileDown size={16} /> PDF
         </button>
         <button
           onClick={handlePrint}
-          className="flex items-center gap-2 bg-gray-600 text-white px-3 py-2 rounded hover:bg-gray-700 text-sm"
+          className="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm"
         >
           <Printer size={16} /> Imprimir
         </button>
       </div>
 
-      {/* Tabela responsiva */}
-      <div id="printArea" className="overflow-x-auto">
-        <table className="w-full text-sm md:text-base border-collapse">
-          <thead>
-            <tr className="bg-gray-100 text-gray-700 text-left">
-              <th className="p-2">ID</th>
-              <th className="p-2">Nome</th>
-              <th className="p-2">Email</th>
-              <th className="p-2">Telefone</th>
-              <th className="p-2">NIF</th>
-              <th className="p-2">Fração</th>
-              <th className="p-2">Edifício</th>
+      {/* Tabela */}
+      <div id="printArea" className="overflow-x-auto rounded-lg border">
+        <table className="w-full text-sm md:text-base">
+          <thead className="bg-gray-50 text-gray-700">
+            <tr>
+              <th className="p-3 text-left">ID</th>
+              <th className="p-3 text-left">Nome</th>
+              <th className="p-3 text-left">Email</th>
+              <th className="p-3 text-left">Telefone</th>
+              <th className="p-3 text-left">NIF</th>
+              <th className="p-3 text-left">Fração</th>
+              <th className="p-3 text-left">Edifício</th>
             </tr>
           </thead>
           <tbody>
             {filteredInquilinos.map((i) => (
-              <tr
-                key={i.id}
-                className="hover:bg-gray-50 border-b last:border-none"
-              >
-                <td className="p-2">{i.id}</td>
-                <td className="p-2">{i.nome}</td>
-                <td className="p-2">{i.email || "-"}</td>
-                <td className="p-2">{i.telefone || "-"}</td>
-                <td className="p-2">{i.nif || "-"}</td>
-                <td className="p-2">{i.fracao?.numero || "-"}</td>
-                <td className="p-2">{i.fracao?.edificio?.nome || "-"}</td>
+              <tr key={i.id} className="border-t hover:bg-gray-50 transition">
+                <td className="p-3">{i.id}</td>
+                <td className="p-3 font-medium text-gray-800">{i.nome}</td>
+                <td className="p-3 text-gray-600">{i.email || "-"}</td>
+                <td className="p-3 text-gray-600">{i.telefone || "-"}</td>
+                <td className="p-3 text-gray-600">{i.nif || "-"}</td>
+                <td className="p-3 text-gray-600">{i.fracao?.numero || "-"}</td>
+                <td className="p-3 text-gray-600">{i.fracao?.edificio?.nome || "-"}</td>
               </tr>
             ))}
             {filteredInquilinos.length === 0 && (
               <tr>
-                <td colSpan="7" className="p-4 text-center text-gray-500">
+                <td colSpan="7" className="p-6 text-center text-gray-400">
                   Nenhum inquilino encontrado.
                 </td>
               </tr>
