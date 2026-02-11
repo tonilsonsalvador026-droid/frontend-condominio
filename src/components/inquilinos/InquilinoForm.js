@@ -1,6 +1,6 @@
 // src/components/inquilinos/InquilinoForm.js
 import React, { useState, useEffect } from "react";
-import api from "../../api"; // ✅ usa api com baseURL e token
+import api from "../../api";
 import { toast } from "sonner";
 
 const InquilinoForm = ({ onSuccess }) => {
@@ -9,12 +9,11 @@ const InquilinoForm = ({ onSuccess }) => {
     email: "",
     telefone: "",
     nif: "",
-    fracaoId: "", // ligação com a fração
+    fracaoId: "",
   });
 
   const [fracoes, setFracoes] = useState([]);
 
-  // 🔄 Buscar frações vagas ao carregar
   useEffect(() => {
     const fetchFracoes = async () => {
       try {
@@ -35,13 +34,12 @@ const InquilinoForm = ({ onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // 👇 converte fracaoId para número antes de enviar
       await api.post("/inquilinos", {
         ...formData,
         fracaoId: formData.fracaoId ? Number(formData.fracaoId) : null,
       });
 
-      toast.success("✅ Inquilino cadastrado com sucesso!");
+      toast.success(" Inquilino cadastrado com sucesso!");
       setFormData({
         nome: "",
         email: "",
@@ -49,109 +47,107 @@ const InquilinoForm = ({ onSuccess }) => {
         nif: "",
         fracaoId: "",
       });
-      if (onSuccess) onSuccess();
+      onSuccess?.();
     } catch (err) {
       console.error("Erro ao cadastrar inquilino:", err);
-      toast.error("❌ Erro ao cadastrar inquilino.");
+      toast.error(" Erro ao cadastrar inquilino.");
     }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white p-6 rounded-2xl shadow-md border mb-6"
-    >
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">
-        Novo Inquilino
-      </h2>
-
-      {/* Layout responsivo em colunas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">
-            Nome
-          </label>
-          <input
-            type="text"
-            name="nome"
-            value={formData.nome}
-            onChange={handleChange}
-            className="border rounded-lg p-2 w-full text-gray-700 focus:ring focus:ring-blue-200"
-            required
-          />
+    <div className="w-full">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 md:p-8"
+      >
+        {/* Título */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-semibold text-gray-800">
+            Novo Inquilino
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">
+            Preencha os dados abaixo para cadastrar um novo inquilino.
+          </p>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">
-            Email
-          </label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="border rounded-lg p-2 w-full text-gray-700 focus:ring focus:ring-blue-200"
-          />
+        {/* Campos */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex flex-col">
+            <label className="text-sm font-medium text-gray-600 mb-2">Nome</label>
+            <input
+              type="text"
+              name="nome"
+              value={formData.nome}
+              onChange={handleChange}
+              className="border border-gray-300 rounded-lg px-4 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              required
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label className="text-sm font-medium text-gray-600 mb-2">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="border border-gray-300 rounded-lg px-4 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label className="text-sm font-medium text-gray-600 mb-2">Telefone</label>
+            <input
+              type="text"
+              name="telefone"
+              value={formData.telefone}
+              onChange={handleChange}
+              className="border border-gray-300 rounded-lg px-4 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label className="text-sm font-medium text-gray-600 mb-2">NIF</label>
+            <input
+              type="text"
+              name="nif"
+              value={formData.nif}
+              onChange={handleChange}
+              className="border border-gray-300 rounded-lg px-4 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            />
+          </div>
+
+          {/* Select de fração */}
+          <div className="md:col-span-2 flex flex-col">
+            <label className="text-sm font-medium text-gray-600 mb-2">Fração</label>
+            <select
+              name="fracaoId"
+              value={formData.fracaoId}
+              onChange={handleChange}
+              className="border border-gray-300 rounded-lg px-4 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              required
+            >
+              <option value="">Selecione uma Fração</option>
+              {fracoes.map((f) => (
+                <option key={f.id} value={f.id}>
+                  {f.numero} - {f.edificio?.nome || "Sem Edifício"}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">
-            Telefone
-          </label>
-          <input
-            type="text"
-            name="telefone"
-            value={formData.telefone}
-            onChange={handleChange}
-            className="border rounded-lg p-2 w-full text-gray-700 focus:ring focus:ring-blue-200"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">
-            NIF
-          </label>
-          <input
-            type="text"
-            name="nif"
-            value={formData.nif}
-            onChange={handleChange}
-            className="border rounded-lg p-2 w-full text-gray-700 focus:ring focus:ring-blue-200"
-          />
-        </div>
-
-        {/* Select de fração */}
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-600 mb-1">
-            Fração
-          </label>
-          <select
-            name="fracaoId"
-            value={formData.fracaoId}
-            onChange={handleChange}
-            className="border rounded-lg p-2 w-full text-gray-700 focus:ring focus:ring-blue-200"
-            required
+        {/* Botão */}
+        <div className="mt-8 flex justify-start">
+          <button
+            type="submit"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 py-2.5 rounded-lg transition duration-200"
           >
-            <option value="">Selecione uma Fração</option>
-            {fracoes.map((f) => (
-              <option key={f.id} value={f.id}>
-                {f.numero} - {f.edificio?.nome || "Sem Edifício"}
-              </option>
-            ))}
-          </select>
+            Salvar Inquilino
+          </button>
         </div>
-      </div>
-
-      {/* Botão alinhado à esquerda */}
-      <div className="mt-5">
-        <button
-          type="submit"
-          className="px-5 py-2 rounded-lg transition text-white bg-blue-600 hover:bg-blue-700"
-        >
-          Salvar
-        </button>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 };
 
