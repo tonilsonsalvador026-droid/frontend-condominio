@@ -26,7 +26,6 @@ const FracaoList = () => {
       const res = await api.get("/fracoes");
       setFracoes(res.data);
     } catch (err) {
-      console.error("Erro ao carregar frações:", err);
       setError("Não foi possível carregar as frações");
     }
   };
@@ -35,51 +34,33 @@ const FracaoList = () => {
     fetchData();
   }, []);
 
-  // 🔎 Filtro
   const filteredFracoes = fracoes.filter((f) => {
     const q = search.trim().toLowerCase();
     if (!q) return true;
-    const numero = String(f.numero || "").toLowerCase();
-    const tipo = String(f.tipo || "").toLowerCase();
-    const proprietario = String(f.proprietario?.nome || "").toLowerCase();
-    const inquilino = String(f.inquilino?.nome || "").toLowerCase();
     return (
-      numero.includes(q) ||
-      tipo.includes(q) ||
-      proprietario.includes(q) ||
-      inquilino.includes(q)
+      String(f.numero || "").toLowerCase().includes(q) ||
+      String(f.tipo || "").toLowerCase().includes(q) ||
+      String(f.proprietario?.nome || "").toLowerCase().includes(q) ||
+      String(f.inquilino?.nome || "").toLowerCase().includes(q)
     );
   });
 
-  // ✏️ Editar
-  const handleEdit = (id) => {
-    navigate(`/fracoes/editar/${id}`);
-  };
+  const handleEdit = (id) => navigate(`/fracoes/editar/${id}`);
 
-  // 🗑️ Eliminar
   const handleDelete = async (id) => {
     if (!window.confirm("Tem certeza que deseja eliminar esta fração?")) return;
     try {
       await api.delete(`/fracoes/${id}`);
       toast.success("Fração eliminada com sucesso!");
       fetchData();
-    } catch (err) {
-      console.error("Erro ao eliminar fração:", err);
+    } catch {
       toast.error("Erro ao eliminar fração.");
     }
   };
 
-  // 📤 Exportações
+  // EXPORTAÇÕES (mantidas)
   const exportCSV = () => {
-    const header = [
-      "ID",
-      "Número",
-      "Tipo",
-      "Estado",
-      "Edifício",
-      "Proprietário",
-      "Inquilino",
-    ];
+    const header = ["ID","Número","Tipo","Estado","Edifício","Proprietário","Inquilino"];
     const rows = filteredFracoes.map((f) => [
       f.id,
       f.numero,
@@ -91,13 +72,10 @@ const FracaoList = () => {
     ]);
     const csv = [header, ...rows].map((r) => r.join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "fracoes.csv");
-    document.body.appendChild(link);
+    link.href = URL.createObjectURL(blob);
+    link.download = "fracoes.csv";
     link.click();
-    document.body.removeChild(link);
   };
 
   const exportExcel = () => {
@@ -121,9 +99,7 @@ const FracaoList = () => {
     doc.text("Relatório de Frações", 14, 15);
     autoTable(doc, {
       startY: 25,
-      head: [
-        ["ID", "Número", "Tipo", "Estado", "Edifício", "Proprietário", "Inquilino"],
-      ],
+      head: [["ID","Número","Tipo","Estado","Edifício","Proprietário","Inquilino"]],
       body: filteredFracoes.map((f) => [
         f.id,
         f.numero,
@@ -143,7 +119,6 @@ const FracaoList = () => {
     win.document.write(`
       <html>
         <head>
-          <title>Relatório de Frações</title>
           <style>
             table { width: 100%; border-collapse: collapse; font-size: 14px; }
             th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
@@ -158,88 +133,75 @@ const FracaoList = () => {
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
-        <h2 className="text-lg font-semibold text-gray-700">
-          Lista de Frações
-        </h2>
+    <div className="bg-white rounded-2xl shadow-md border p-6">
+      {/* Cabeçalho IGUAL ao CondominioList */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+        <div>
+          <h2 className="text-2xl font-semibold text-gray-800">
+            Lista de Frações
+          </h2>
+          <p className="text-gray-500 text-sm">
+            Visualize, pesquise, edite e exporte as frações cadastradas
+          </p>
+        </div>
+
         <input
           type="text"
           placeholder="Pesquisar por número, tipo, proprietário ou inquilino..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border rounded p-2 w-full md:w-64 text-gray-700"
+          className="border rounded-lg px-4 py-2 w-full lg:w-80 focus:ring-2 focus:ring-blue-200 outline-none"
         />
       </div>
 
       {error && <p className="text-red-500 mb-4">{error}</p>}
 
-      {/* Botões de exportação */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        <button
-          onClick={exportCSV}
-          className="flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 text-sm"
-        >
+      {/* Botões IGUAIS */}
+      <div className="flex flex-wrap gap-3 mb-6">
+        <button onClick={exportCSV} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
           <FileText size={16} /> CSV
         </button>
-        <button
-          onClick={exportExcel}
-          className="flex items-center gap-2 bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 text-sm"
-        >
+        <button onClick={exportExcel} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
           <FileSpreadsheet size={16} /> Excel
         </button>
-        <button
-          onClick={exportPDF}
-          className="flex items-center gap-2 bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 text-sm"
-        >
+        <button onClick={exportPDF} className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm">
           <FileDown size={16} /> PDF
         </button>
-        <button
-          onClick={handlePrint}
-          className="flex items-center gap-2 bg-gray-600 text-white px-3 py-2 rounded hover:bg-gray-700 text-sm"
-        >
+        <button onClick={handlePrint} className="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm">
           <Printer size={16} /> Imprimir
         </button>
       </div>
 
-      {/* Tabela */}
-      <div id="printArea" className="overflow-x-auto">
-        <table className="w-full text-sm md:text-base border-collapse">
-          <thead>
-            <tr className="bg-gray-100 text-gray-700 text-left">
-              <th className="p-2">ID</th>
-              <th className="p-2">Número</th>
-              <th className="p-2">Tipo</th>
-              <th className="p-2">Estado</th>
-              <th className="p-2">Edifício</th>
-              <th className="p-2">Proprietário</th>
-              <th className="p-2">Inquilino</th>
-              <th className="p-2">Ações</th>
+      {/* Tabela IGUAL */}
+      <div id="printArea" className="overflow-x-auto rounded-lg border">
+        <table className="w-full text-sm md:text-base">
+          <thead className="bg-gray-50 text-gray-700">
+            <tr>
+              <th className="p-3 text-left">ID</th>
+              <th className="p-3 text-left">Número</th>
+              <th className="p-3 text-left">Tipo</th>
+              <th className="p-3 text-left">Estado</th>
+              <th className="p-3 text-left">Edifício</th>
+              <th className="p-3 text-left">Proprietário</th>
+              <th className="p-3 text-left">Inquilino</th>
+              <th className="p-3 text-left">Ações</th>
             </tr>
           </thead>
           <tbody>
             {filteredFracoes.map((f) => (
-              <tr key={f.id} className="hover:bg-gray-50 border-b last:border-none">
-                <td className="p-2">{f.id}</td>
-                <td className="p-2">{f.numero}</td>
-                <td className="p-2">{f.tipo || "-"}</td>
-                <td className="p-2">{f.estado || "-"}</td>
-                <td className="p-2">{f.edificio?.nome || "-"}</td>
-                <td className="p-2">{f.proprietario?.nome || "-"}</td>
-                <td className="p-2">{f.inquilino?.nome || "-"}</td>
-                <td className="p-2 flex gap-2">
-                  <button
-                    onClick={() => handleEdit(f.id)}
-                    className="text-blue-600 hover:text-blue-800"
-                    title="Editar"
-                  >
+              <tr key={f.id} className="border-t hover:bg-gray-50 transition">
+                <td className="p-3">{f.id}</td>
+                <td className="p-3 font-medium text-gray-800">{f.numero}</td>
+                <td className="p-3">{f.tipo || "-"}</td>
+                <td className="p-3">{f.estado || "-"}</td>
+                <td className="p-3">{f.edificio?.nome || "-"}</td>
+                <td className="p-3">{f.proprietario?.nome || "-"}</td>
+                <td className="p-3">{f.inquilino?.nome || "-"}</td>
+                <td className="p-3 flex gap-3">
+                  <button onClick={() => handleEdit(f.id)} className="text-blue-600 hover:text-blue-800">
                     <Pencil size={18} />
                   </button>
-                  <button
-                    onClick={() => handleDelete(f.id)}
-                    className="text-red-600 hover:text-red-800"
-                    title="Eliminar"
-                  >
+                  <button onClick={() => handleDelete(f.id)} className="text-red-600 hover:text-red-800">
                     <Trash2 size={18} />
                   </button>
                 </td>
@@ -247,7 +209,7 @@ const FracaoList = () => {
             ))}
             {filteredFracoes.length === 0 && (
               <tr>
-                <td colSpan="8" className="p-4 text-center text-gray-500">
+                <td colSpan="8" className="p-6 text-center text-gray-400">
                   Nenhuma fração encontrada.
                 </td>
               </tr>
