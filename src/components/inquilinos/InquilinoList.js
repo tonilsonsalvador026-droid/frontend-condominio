@@ -227,6 +227,8 @@ return (
 
   </div>
 );
+};
 
 export default InquilinoList;
+
 
