@@ -22,7 +22,7 @@ const InquilinoPage = () => {
           {/* Botão Novo Inquilino */}
           <div
             onClick={() => setView("form")}
-            className="cursor-pointer bg-white rounded-2xl shadow-md hover:shadow-lg transition p-6 flex items-center space-x-4 border border-gray-200 hover:border-blue-400"
+            className="cursor-pointer bg-white rounded-2xl shadow-md hover:shadow-lg transition p-6 flex items-center space-x-4 border border-gray-100 hover:border-blue-400"
           >
             <PlusCircle className="w-10 h-10 text-blue-600" />
             <div>
@@ -62,4 +62,5 @@ const InquilinoPage = () => {
 };
 
 export default InquilinoPage;
+
 
