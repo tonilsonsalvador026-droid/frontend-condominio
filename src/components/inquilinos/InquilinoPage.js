@@ -7,7 +7,7 @@ const InquilinoPage = () => {
   const [view, setView] = useState("menu"); // menu = lista | form = formulário
 
   return (
-    <div className="max-w-md mx-auto bg-red-200">
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       {view === "menu" && (
         <div className="space-y-10 mt-10">
           {/* Cabeçalho */}
@@ -57,5 +57,6 @@ const InquilinoPage = () => {
 };
 
 export default InquilinoPage;
+
 
 
