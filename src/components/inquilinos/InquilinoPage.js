@@ -1,48 +1,59 @@
 // src/components/inquilinos/InquilinoPage.js
 import React, { useState } from "react";
 import { PlusCircle, ArrowLeft } from "lucide-react";
+
+import CardContainer from "../ui/CardContainer";
+import PageHeader from "../ui/PageHeader";
+
 import InquilinoForm from "./InquilinoForm";
 import InquilinoList from "./InquilinoList";
 
 const InquilinoPage = () => {
-  const [view, setView] = useState("menu"); // "menu" = lista | "form" = formulário
+  const [view, setView] = useState("menu");
 
   return (
-    <div className="w-full px-4 md:px-8 lg:px-16 xl:px-20">
-      {/* === VISUALIZAÇÃO PRINCIPAL (LISTA + BOTÃO NOVO INQUILINO) === */}
+    <div className="w-full px-4 md:px-8 lg:px-16 xl:px-20 mt-6">
+
+      {/* ===== MENU PRINCIPAL ===== */}
       {view === "menu" && (
-        <div className="space-y-10 mt-10">
-          {/* Cabeçalho */}
-          <div className="flex items-center space-x-2 mb-4">
-            <h1 className="text-4xl font-bold text-gray-800">
-              Gestão de Inquilinos
-            </h1>
-          </div>
+        <div className="space-y-8">
 
-          {/* Botão Novo Inquilino */}
-          <div
-            onClick={() => setView("form")}
-            className="cursor-pointer bg-white rounded-2xl shadow-md hover:shadow-lg transition p-6 flex items-center space-x-4 border border-gray-100 hover:border-blue-400"
-          >
-            <PlusCircle className="w-10 h-10 text-blue-600" />
-            <div>
-              <h2 className="text-lg font-semibold text-gray-800">Novo Inquilino</h2>
-              <p className="text-sm text-gray-500">
-                Adicionar um novo inquilino ao sistema
-              </p>
+          <PageHeader
+            title="Gestão de Inquilinos"
+            subtitle="Gerencie os inquilinos do sistema"
+          />
+
+          {/* Card — Novo Inquilino */}
+          <CardContainer>
+            <div
+              onClick={() => setView("form")}
+              className="cursor-pointer flex items-center gap-4 hover:bg-gray-50 rounded-xl p-4 transition"
+            >
+              <PlusCircle className="w-10 h-10 text-blue-600" />
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Novo Inquilino
+                </h3>
+                <p className="text-sm text-gray-500">
+                  Adicionar um novo inquilino ao sistema
+                </p>
+              </div>
             </div>
-          </div>
+          </CardContainer>
 
-          {/* Lista de Inquilinos */}
+          {/* Lista */}
           <InquilinoList />
+
         </div>
       )}
 
-      {/* === FORMULÁRIO NOVO INQUILINO === */}
+      {/* ===== FORMULÁRIO ===== */}
       {view === "form" && (
-        <div className="w-full mt-5">
-          {/* Cabeçalho com botão voltar */}
-          <div className="flex items-center mb-6 space-x-3">
+        <div className="space-y-6">
+
+          <div className="flex items-center gap-3">
+
             <button
               onClick={() => setView("menu")}
               className="flex items-center text-sm text-gray-600 hover:text-blue-600 transition"
@@ -50,13 +61,18 @@ const InquilinoPage = () => {
               <ArrowLeft className="w-4 h-4 mr-1" />
               Voltar
             </button>
-            <h2 className="text-xl font-semibold text-gray-800">Novo Inquilino</h2>
+
+            <h2 className="text-xl font-semibold text-gray-800">
+              Novo Inquilino
+            </h2>
+
           </div>
 
-          {/* Formulário diretamente */}
           <InquilinoForm onSuccess={() => setView("menu")} />
+
         </div>
       )}
+
     </div>
   );
 };
