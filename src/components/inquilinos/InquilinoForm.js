@@ -1,8 +1,6 @@
-// src/components/inquilinos/InquilinoForm.js
 import React, { useState, useEffect } from "react";
 import api from "../../api";
 import { toast } from "sonner";
-import CardContainer from "../ui/CardContainer";
 
 const InquilinoForm = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -39,7 +37,6 @@ const InquilinoForm = ({ onSuccess }) => {
         ...formData,
         fracaoId: formData.fracaoId ? Number(formData.fracaoId) : null,
       });
-
       toast.success("Inquilino cadastrado com sucesso!");
       setFormData({
         nome: "",
@@ -48,7 +45,6 @@ const InquilinoForm = ({ onSuccess }) => {
         nif: "",
         fracaoId: "",
       });
-
       onSuccess?.();
     } catch (err) {
       console.error("Erro ao cadastrar inquilino:", err);
@@ -57,8 +53,11 @@ const InquilinoForm = ({ onSuccess }) => {
   };
 
   return (
-    <CardContainer>
-      <form onSubmit={handleSubmit}>
+    <div className="w-full">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 md:p-8"
+      >
         {/* Título */}
         <div className="mb-6">
           <h2 className="text-2xl font-semibold text-gray-800">
@@ -72,9 +71,7 @@ const InquilinoForm = ({ onSuccess }) => {
         {/* Campos */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-600 mb-2">
-              Nome
-            </label>
+            <label className="text-sm font-medium text-gray-600 mb-2">Nome</label>
             <input
               type="text"
               name="nome"
@@ -86,9 +83,7 @@ const InquilinoForm = ({ onSuccess }) => {
           </div>
 
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-600 mb-2">
-              Email
-            </label>
+            <label className="text-sm font-medium text-gray-600 mb-2">Email</label>
             <input
               type="email"
               name="email"
@@ -99,9 +94,7 @@ const InquilinoForm = ({ onSuccess }) => {
           </div>
 
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-600 mb-2">
-              Telefone
-            </label>
+            <label className="text-sm font-medium text-gray-600 mb-2">Telefone</label>
             <input
               type="text"
               name="telefone"
@@ -112,9 +105,7 @@ const InquilinoForm = ({ onSuccess }) => {
           </div>
 
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-600 mb-2">
-              NIF
-            </label>
+            <label className="text-sm font-medium text-gray-600 mb-2">NIF</label>
             <input
               type="text"
               name="nif"
@@ -124,11 +115,8 @@ const InquilinoForm = ({ onSuccess }) => {
             />
           </div>
 
-          {/* Fração */}
           <div className="md:col-span-2 flex flex-col">
-            <label className="text-sm font-medium text-gray-600 mb-2">
-              Fração
-            </label>
+            <label className="text-sm font-medium text-gray-600 mb-2">Fração</label>
             <select
               name="fracaoId"
               value={formData.fracaoId}
@@ -146,19 +134,17 @@ const InquilinoForm = ({ onSuccess }) => {
           </div>
         </div>
 
-        {/* Botão */}
-        <div className="mt-8">
+        <div className="mt-8 flex justify-start">
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 py-2.5 rounded-lg transition"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 py-2.5 rounded-lg transition duration-200"
           >
             Salvar Inquilino
           </button>
         </div>
       </form>
-    </CardContainer>
+    </div>
   );
 };
 
 export default InquilinoForm;
-
