@@ -49,6 +49,7 @@ import UsersPage from "./components/users/UsersPage";
 import RolePage from "./components/roles/RolePage";
 import PermissaoPage from "./components/permissoes/PermissaoPage";
 import AtribuirRolePage from "./components/roles/AtribuirRolePage";
+import InquilinoForm from "./components/inquilinos/InquilinoForm";
 
 function App() {
   return (
@@ -100,6 +101,7 @@ function App() {
 
           <Route path="/proprietarios" element={<ProprietarioPage />} />
           <Route path="/inquilinos" element={<InquilinoPage />} />
+          <Route path="/inquilinos" element={<InquilinoForm />} />
           <Route path="/condominios" element={<CondominioPage />} />
           <Route path="/users" element={<UsersPage />} />
           <Route path="/roles" element={<RolePage />} />
@@ -112,3 +114,4 @@ function App() {
 }
 
 export default App;
+
