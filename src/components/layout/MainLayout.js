@@ -9,7 +9,7 @@ const MainLayout = ({ children }) => {
     <div className="bg-gradient-to-br from-slate-50/90 via-blue-50/50 to-indigo-50/30 min-h-screen w-screen">
       {/* Header Fixo Topo */}
       <header className="bg-white/95 backdrop-blur-xl shadow-sm border-b border-slate-200/50 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 lg:px-8">
+        <div className="w-full px-6 py-4 lg:px-8">
           <div className="flex items-center justify-between w-full">
             <button
               onClick={() => setSidebarAberto(true)}
@@ -33,8 +33,8 @@ const MainLayout = ({ children }) => {
 
       <div className="flex flex-1 overflow-hidden">
         <Sidebar aberto={sidebarAberto} setAberto={setSidebarAberto} />
-        <main className="flex-1 min-h-[calc(100vh-80px)] md:ml-72 p-8 lg:p-12 bg-slate-50/50 backdrop-blur-sm overflow-y-auto">
-          <div className="max-w-7xl mx-auto space-y-8">
+        <main className="flex-1 h-[calc(100vh-80px)] md:ml-72 p-8 lg:p-12 bg-gradient-to-br from-slate-50/80 via-blue-50/30 to-indigo-50/20 backdrop-blur-sm overflow-y-auto">
+          <div className="w-full space-y-8">
             {children}
           </div>
         </main>
@@ -44,3 +44,4 @@ const MainLayout = ({ children }) => {
 };
 
 export default MainLayout;
+
