@@ -77,7 +77,7 @@ const Sidebar = ({ aberto, setAberto }) => {
               <h1 className="text-xl font-bold bg-gradient-to-r from-white to-slate-200 bg-clip-text text-transparent">
                 CondoPro
               </h1>
-              <p className="text-xs text-slate-400 font-medium">Gestão Premium</p>
+              <p className="text-xs text-slate-400 font-medium">Gestão Condomínios</p>
             </div>
           </div>
         </div>
@@ -118,7 +118,7 @@ const Sidebar = ({ aberto, setAberto }) => {
             </div>
             <div className="px-4 pb-6 space-y-1">
               <div className="px-3 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
-                🔐 Gestão de Acessos
+                 Gestão de Acessos
               </div>
               {acessoItems.map((item) => {
                 const ativo = location.pathname === item.path;
@@ -157,3 +157,4 @@ const Sidebar = ({ aberto, setAberto }) => {
 };
 
 export default Sidebar;
+
