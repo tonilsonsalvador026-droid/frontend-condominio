@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import api from "../../api";
 import { toast } from "sonner";
+import { Building2, MapPin, Home, ChevronLeft, Save } from "lucide-react";
 
 const EdificioForm = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -39,11 +40,7 @@ const EdificioForm = ({ onSuccess }) => {
       await api.post("/edificios", formData);
       toast.success("Edifício cadastrado com sucesso!");
       setFormData({
-        nome: "",
-        endereco: "",
-        numeroAndares: "",
-        numeroApartamentos: "",
-        condominioId: "",
+        nome: "", endereco: "", numeroAndares: "", numeroApartamentos: "", condominioId: ""
       });
       onSuccess?.();
     } catch (err) {
@@ -55,142 +52,157 @@ const EdificioForm = ({ onSuccess }) => {
   };
 
   return (
-    <div className="w-full">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 md:p-8"
-      >
-        {/* Título */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800">
-            Novo Edifício
-          </h2>
-          <p className="text-sm text-gray-500 mt-1">
-            Preencha os dados abaixo para cadastrar um novo edifício.
-          </p>
+    <div className="w-full max-w-4xl mx-auto">
+      {/* Container Glass Principal */}
+      <div className="bg-white/40 backdrop-blur-xl rounded-3xl p-8 lg:p-12 border border-slate-200/40 shadow-2xl">
+        
+        {/* Header Form */}
+        <div className="flex items-center gap-4 mb-10 pb-8 border-b border-slate-200/30">
+          <div className="p-4 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 rounded-2xl border border-blue-200/50">
+            <Building2 className="w-8 h-8 text-blue-600" />
+          </div>
+          <div>
+            <h2 className="text-3xl lg:text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
+              Novo Edifício
+            </h2>
+            <p className="text-xl text-slate-600 font-semibold mt-1">
+              Preencha os dados para cadastrar
+            </p>
+          </div>
         </div>
 
-        {/* Campos */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Nome */}
-          <div className="flex flex-col">
-            <label
-              htmlFor="nome"
-              className="text-sm font-medium text-gray-600 mb-2"
-            >
-              Nome do Edifício
-            </label>
-            <input
-              type="text"
-              id="nome"
-              name="nome"
-              placeholder="Ex: Edifício Atlântico"
-              value={formData.nome}
-              onChange={handleChange}
-              className="border border-gray-300 rounded-lg px-4 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-              required
-            />
+        {/* Form Glass */}
+        <form onSubmit={handleSubmit} className="space-y-8">
+          
+          {/* Grid Inputs Glass */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            {/* Nome */}
+            <div className="space-y-3">
+              <label className="font-bold text-lg text-slate-800 flex items-center gap-2">
+                <span>🏢</span> Nome do Edifício
+              </label>
+              <input
+                type="text"
+                id="nome"
+                name="nome"
+                placeholder="Ex: Edifício Atlântico"
+                value={formData.nome}
+                onChange={handleChange}
+                className="w-full px-6 py-5 bg-white/60 backdrop-blur-xl border border-slate-200/50 rounded-2xl focus:ring-4 focus:ring-blue-200/60 focus:border-blue-300/70 shadow-xl hover:shadow-2xl transition-all duration-300 text-lg placeholder-slate-400"
+                required
+              />
+            </div>
+
+            {/* Endereço */}
+            <div className="space-y-3">
+              <label className="font-bold text-lg text-slate-800 flex items-center gap-2">
+                <MapPin className="w-6 h-6 text-slate-500" />
+                Endereço
+              </label>
+              <input
+                type="text"
+                id="endereco"
+                name="endereco"
+                placeholder="Ex: Rua Principal, Talatona"
+                value={formData.endereco}
+                onChange={handleChange}
+                className="w-full px-6 py-5 bg-white/60 backdrop-blur-xl border border-slate-200/50 rounded-2xl focus:ring-4 focus:ring-blue-200/60 focus:border-blue-300/70 shadow-xl hover:shadow-2xl transition-all duration-300 text-lg placeholder-slate-400"
+                required
+              />
+            </div>
+
+            {/* Andares */}
+            <div className="space-y-3">
+              <label className="font-bold text-lg text-slate-800 flex items-center gap-2">
+                📊
+                <span>Nº de Andares</span>
+              </label>
+              <input
+                type="number"
+                id="numeroAndares"
+                name="numeroAndares"
+                min="1"
+                value={formData.numeroAndares}
+                onChange={handleChange}
+                className="w-full px-6 py-5 bg-white/60 backdrop-blur-xl border border-slate-200/50 rounded-2xl focus:ring-4 focus:ring-emerald-200/60 focus:border-emerald-300/70 shadow-xl hover:shadow-2xl transition-all duration-300 text-lg placeholder-slate-400"
+              />
+            </div>
+
+            {/* Apartamentos */}
+            <div className="space-y-3">
+              <label className="font-bold text-lg text-slate-800 flex items-center gap-2">
+                <Home className="w-6 h-6 text-slate-500" />
+                Nº de Apartamentos
+              </label>
+              <input
+                type="number"
+                id="numeroApartamentos"
+                name="numeroApartamentos"
+                min="1"
+                value={formData.numeroApartamentos}
+                onChange={handleChange}
+                className="w-full px-6 py-5 bg-white/60 backdrop-blur-xl border border-slate-200/50 rounded-2xl focus:ring-4 focus:ring-emerald-200/60 focus:border-emerald-300/70 shadow-xl hover:shadow-2xl transition-all duration-300 text-lg placeholder-slate-400"
+              />
+            </div>
           </div>
 
-          {/* Endereço */}
-          <div className="flex flex-col">
-            <label
-              htmlFor="endereco"
-              className="text-sm font-medium text-gray-600 mb-2"
-            >
-              Endereço
-            </label>
-            <input
-              type="text"
-              id="endereco"
-              name="endereco"
-              placeholder="Ex: Rua Principal, Talatona"
-              value={formData.endereco}
-              onChange={handleChange}
-              className="border border-gray-300 rounded-lg px-4 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-              required
-            />
-          </div>
-
-          {/* Número de Andares */}
-          <div className="flex flex-col">
-            <label
-              htmlFor="numeroAndares"
-              className="text-sm font-medium text-gray-600 mb-2"
-            >
-              Número de Andares
-            </label>
-            <input
-              type="number"
-              id="numeroAndares"
-              name="numeroAndares"
-              min="1"
-              value={formData.numeroAndares}
-              onChange={handleChange}
-              className="border border-gray-300 rounded-lg px-4 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-            />
-          </div>
-
-          {/* Número de Apartamentos */}
-          <div className="flex flex-col">
-            <label
-              htmlFor="numeroApartamentos"
-              className="text-sm font-medium text-gray-600 mb-2"
-            >
-              Número de Apartamentos
-            </label>
-            <input
-              type="number"
-              id="numeroApartamentos"
-              name="numeroApartamentos"
-              min="1"
-              value={formData.numeroApartamentos}
-              onChange={handleChange}
-              className="border border-gray-300 rounded-lg px-4 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-            />
-          </div>
-
-          {/* Condomínio */}
-          <div className="flex flex-col md:col-span-2">
-            <label
-              htmlFor="condominioId"
-              className="text-sm font-medium text-gray-600 mb-2"
-            >
-              Condomínio
+          {/* Select Condomínio */}
+          <div className="space-y-3">
+            <label className="font-bold text-lg text-slate-800 flex items-center gap-2">
+              🏘️ Condomínio
             </label>
             <select
               id="condominioId"
               name="condominioId"
               value={formData.condominioId}
               onChange={handleChange}
-              className="border border-gray-300 rounded-lg px-4 py-2.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              className="w-full px-6 py-5 bg-white/60 backdrop-blur-xl border border-slate-200/50 rounded-2xl focus:ring-4 focus:ring-purple-200/60 focus:border-purple-300/70 shadow-xl hover:shadow-2xl transition-all duration-300 text-lg"
               required
             >
               <option value="">Selecione um condomínio</option>
               {condominios.map((c) => (
                 <option key={c.id} value={c.id}>
-                  {c.nome}
+                  {c.nome} {c.localizacao ? `• ${c.localizacao}` : ""}
                 </option>
               ))}
             </select>
           </div>
-        </div>
 
-        {/* Botão */}
-        <div className="mt-8 flex justify-start">
-          <button
-            type="submit"
-            disabled={loading}
-            className={`text-white font-medium px-8 py-2.5 rounded-lg transition duration-200 ${
-              loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
-            }`}
-          >
-            {loading ? "Salvando..." : "Salvar Edifício"}
-          </button>
-        </div>
-      </form>
+          {/* Botões */}
+          <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-slate-200/30">
+            <button
+              type="button"
+              onClick={onSuccess}
+              className="flex-1 flex items-center justify-center gap-3 px-8 py-5 bg-gradient-to-r from-slate-100/80 to-slate-200/80 hover:from-slate-200/90 hover:to-slate-300/90 backdrop-blur-xl border border-slate-200/50 rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 text-lg font-bold text-slate-800"
+            >
+              <ChevronLeft className="w-5 h-5" />
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className={`flex-1 flex items-center justify-center gap-3 px-8 py-5 rounded-2xl shadow-2xl hover:shadow-3xl hover:-translate-y-1 transition-all duration-300 text-lg font-bold flex-shrink-0 ${
+                loading
+                  ? "bg-slate-400/80 backdrop-blur-sm cursor-not-allowed"
+                  : "bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white"
+              }`}
+            >
+              {loading ? (
+                <>
+                  <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Salvando...
+                </>
+              ) : (
+                <>
+                  <Save className="w-5 h-5" />
+                  Salvar Edifício
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
