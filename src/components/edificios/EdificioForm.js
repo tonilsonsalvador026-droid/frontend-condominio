@@ -80,7 +80,7 @@ const EdificioForm = ({ onSuccess }) => {
             {/* Nome */}
             <div className="space-y-3">
               <label className="font-bold text-lg text-slate-800 flex items-center gap-2">
-                <span>🏢</span> Nome do Edifício
+                <span></span> Nome do Edifício
               </label>
               <input
                 type="text"
@@ -115,7 +115,7 @@ const EdificioForm = ({ onSuccess }) => {
             {/* Andares */}
             <div className="space-y-3">
               <label className="font-bold text-lg text-slate-800 flex items-center gap-2">
-                📊
+              
                 <span>Nº de Andares</span>
               </label>
               <input
@@ -150,7 +150,7 @@ const EdificioForm = ({ onSuccess }) => {
           {/* Select Condomínio */}
           <div className="space-y-3">
             <label className="font-bold text-lg text-slate-800 flex items-center gap-2">
-              🏘️ Condomínio
+               Condomínio
             </label>
             <select
               id="condominioId"
