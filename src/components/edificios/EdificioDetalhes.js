@@ -16,7 +16,7 @@ import {
   CreditCard,
 } from "lucide-react";
 import dayjs from "dayjs";
-import { formatCurrency } from "../../utils/formatCurrency"; // ✅ adicionado
+import { formatCurrency } from "../../utils/formatCurrency";
 
 const EdificioDetalhes = () => {
   const { id } = useParams();
@@ -34,39 +34,39 @@ const EdificioDetalhes = () => {
   });
 
   useEffect(() => {
-  const fetchEdificio = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
+    const fetchEdificio = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
 
-      const res = await api.get(`/edificios/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+        const res = await api.get(`/edificios/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-      setEdificio(res.data);
-    } catch (err) {
-      console.error("Erro ao carregar detalhes do edifício:", err);
-      if (err.response) {
-        setErro(
-          err.response.data?.error ||
-            `Erro ${err.response.status}: Não foi possível carregar o edifício.`
-        );
-      } else {
-        setErro("Erro de conexão com o servidor.");
+        setEdificio(res.data);
+      } catch (err) {
+        console.error("Erro ao carregar detalhes do edifício:", err);
+        if (err.response) {
+          setErro(
+            err.response.data?.error ||
+              `Erro ${err.response.status}: Não foi possível carregar o edifício.`
+          );
+        } else {
+          setErro("Erro de conexão com o servidor.");
+        }
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  fetchEdificio();
-}, [id]);
+    fetchEdificio();
+  }, [id]);
 
   const carregarHistoricoProprietario = async (proprietarioId) => {
     try {
       const token = localStorage.getItem("token");
       if (!token) return;
-      // Simulação — substituir por rotas reais no futuro:
+
       const [pagamentos, servicos, eventos] = await Promise.all([
         api.get(`/proprietarios/${proprietarioId}/pagamentos`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -78,6 +78,7 @@ const EdificioDetalhes = () => {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
+
       setDetalhesProprietario({
         pagamentos: pagamentos.data || [],
         servicos: servicos.data || [],
@@ -137,7 +138,7 @@ const EdificioDetalhes = () => {
     ]) || [];
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
+    <div className="p-8">
       {/* Cabeçalho */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
@@ -172,30 +173,16 @@ const EdificioDetalhes = () => {
             Informações do Edifício
           </h2>
           <div className="space-y-3 text-gray-600">
-            <p>
-              <strong>Nome:</strong> {edificio.nome || "—"}
-            </p>
-            <p>
-              <strong>Endereço:</strong> {edificio.endereco || "—"}
-            </p>
-            <p>
-              <strong>Número de andares:</strong>{" "}
-              {edificio.numeroAndares ?? "—"}
-            </p>
-            <p>
-              <strong>Número de apartamentos:</strong>{" "}
-              {edificio.numeroApartamentos ?? "—"}
-            </p>
-            <p>
-              <strong>Condomínio:</strong> {edificio.condominio?.nome || "—"}
-            </p>
-            <p>
-              <strong>Total de moradores:</strong> {moradores.length}
-            </p>
+            <p><strong>Nome:</strong> {edificio.nome || "—"}</p>
+            <p><strong>Endereço:</strong> {edificio.endereco || "—"}</p>
+            <p><strong>Número de andares:</strong> {edificio.numeroAndares ?? "—"}</p>
+            <p><strong>Número de apartamentos:</strong> {edificio.numeroApartamentos ?? "—"}</p>
+            <p><strong>Condomínio:</strong> {edificio.condominio?.nome || "—"}</p>
+            <p><strong>Total de moradores:</strong> {moradores.length}</p>
           </div>
         </div>
 
-        {/* Coluna direita - Abas */}
+        {/* Coluna direita */}
         <div className="md:col-span-2 bg-white rounded-2xl shadow overflow-hidden">
           <div className="border-b flex">
             {[
@@ -221,18 +208,14 @@ const EdificioDetalhes = () => {
             ))}
           </div>
 
-          {/* Conteúdo das abas */}
           <div className="p-6">
-            {/* Aba Geral */}
             {activeTab === "geral" && (
               <div className="space-y-6">
                 <p className="text-gray-600">
                   O edifício <strong>{edificio.nome}</strong> possui{" "}
                   <strong>{edificio.numeroAndares ?? "—"}</strong> andares e{" "}
-                  <strong>{edificio.numeroApartamentos ?? "—"}</strong>{" "}
-                  apartamentos, com um total de{" "}
-                  <strong>{moradores.length}</strong> moradores registados entre
-                  proprietários e inquilinos.
+                  <strong>{edificio.numeroApartamentos ?? "—"}</strong> apartamentos,
+                  com um total de <strong>{moradores.length}</strong> moradores.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -267,7 +250,6 @@ const EdificioDetalhes = () => {
               </div>
             )}
 
- {/* --- FRAÇÕES E MORADORES (melhorado) --- */}
             {activeTab === "moradores" && (
               <div>
                 <h3 className="text-lg font-semibold mb-4 text-gray-800">
@@ -282,28 +264,10 @@ const EdificioDetalhes = () => {
                         className="bg-gray-50 border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200"
                       >
                         <div className="space-y-1 text-gray-700 text-sm leading-relaxed">
-                          <p>
-                            <strong className="text-gray-600"> Andar :</strong>{" "}
-                            {f.andar ?? "—"}
-                          </p>
-                          <p>
-                            <strong className="text-gray-600">
-                               Apartamento :
-                            </strong>{" "}
-                            {f.numero ?? "—"}
-                          </p>
-                          <p>
-                            <strong className="text-gray-600">
-                               Proprietário :
-                            </strong>{" "}
-                            {f.proprietario?.nome ?? "—"}
-                          </p>
-                          <p>
-                            <strong className="text-gray-600">
-                               Inquilino :
-                            </strong>{" "}
-                            {f.inquilino?.nome ?? "—"}
-                          </p>
+                          <p><strong>Andar:</strong> {f.andar ?? "—"}</p>
+                          <p><strong>Apartamento:</strong> {f.numero ?? "—"}</p>
+                          <p><strong>Proprietário:</strong> {f.proprietario?.nome ?? "—"}</p>
+                          <p><strong>Inquilino:</strong> {f.inquilino?.nome ?? "—"}</p>
                         </div>
                       </div>
                     ))}
@@ -316,130 +280,114 @@ const EdificioDetalhes = () => {
               </div>
             )}
 
-          {/* Aba Histórico */}
-{activeTab === "historico" && (
-  <div>
-    <h3 className="text-lg font-semibold mb-4 text-gray-800">
-      Histórico de Proprietários
-    </h3>
+            {activeTab === "historico" && (
+              <div>
+                <h3 className="text-lg font-semibold mb-4 text-gray-800">
+                  Histórico de Proprietários
+                </h3>
 
-    {moradores.length > 0 ? (
-      <div className="space-y-3">
-        {moradores.map((p) => {
-          // Filtrar pagamentos deste edifício que pertençam ao proprietário atual
-          const pagamentosProprietario = historicoPagamentos.filter(
-            (pg) =>
-              pg.fracao?.proprietarioId === p.id ||
-              pg.proprietarioId === p.id
-          );
+                {moradores.length > 0 ? (
+                  <div className="space-y-3">
+                    {moradores.map((p) => {
+                      const pagamentosProprietario = historicoPagamentos.filter(
+                        (pg) =>
+                          pg.fracao?.proprietarioId === p.id ||
+                          pg.proprietarioId === p.id
+                      );
 
-          // Filtrar serviços e eventos conforme o que já tens carregado
-          const servicos = detalhesProprietario?.servicos || [];
-          const eventos = detalhesProprietario?.eventos || [];
+                      const servicos = detalhesProprietario?.servicos || [];
+                      const eventos = detalhesProprietario?.eventos || [];
 
-          return (
-            <div
-              key={p.id}
-              onDoubleClick={() => handleDoubleClick(p)}
-              className={`cursor-pointer border rounded-lg p-3 ${
-                proprietarioSelecionado?.id === p.id
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200 bg-gray-50 hover:bg-gray-100"
-              }`}
-            >
-              <div className="flex justify-between items-center text-sm text-gray-700">
-                <p>
-                  <strong>{p.nome}</strong>
-                </p>
-                <span className="text-xs text-gray-500">
-                  {p.email || "sem email"}
-                </span>
+                      return (
+                        <div
+                          key={p.id}
+                          onDoubleClick={() => handleDoubleClick(p)}
+                          className={`cursor-pointer border rounded-lg p-3 ${
+                            proprietarioSelecionado?.id === p.id
+                              ? "border-blue-500 bg-blue-50"
+                              : "border-gray-200 bg-gray-50 hover:bg-gray-100"
+                          }`}
+                        >
+                          <div className="flex justify-between items-center text-sm text-gray-700">
+                            <p><strong>{p.nome}</strong></p>
+                            <span className="text-xs text-gray-500">
+                              {p.email || "sem email"}
+                            </span>
+                          </div>
+
+                          {proprietarioSelecionado?.id === p.id && (
+                            <div className="mt-3 border-t pt-3 space-y-3 text-sm text-gray-700">
+                              <div>
+                                <h4 className="font-semibold flex items-center gap-2 text-blue-600">
+                                  <CreditCard size={14} /> Pagamentos
+                                </h4>
+
+                                {pagamentosProprietario.length > 0 ? (
+                                  <ul className="list-disc list-inside">
+                                    {pagamentosProprietario.map((pg) => (
+                                      <li key={pg.id}>
+                                        {dayjs(pg.dataFormatada || pg.data).format("DD/MM/YYYY")} —{" "}
+                                        <strong>{formatCurrency(pg.valor || 0)}</strong> ({pg.estado || "—"})
+                                      </li>
+                                    ))}
+                                  </ul>
+                                ) : (
+                                  <p className="text-gray-500 text-xs ml-4">
+                                    Nenhum pagamento registado.
+                                  </p>
+                                )}
+                              </div>
+
+                              <div>
+                                <h4 className="font-semibold flex items-center gap-2 text-blue-600">
+                                  <Calendar size={14} /> Serviços agendados
+                                </h4>
+                                {servicos.length > 0 ? (
+                                  <ul className="list-disc list-inside">
+                                    {servicos.map((s) => (
+                                      <li key={s.id}>{s.nome}</li>
+                                    ))}
+                                  </ul>
+                                ) : (
+                                  <p className="text-gray-500 text-xs ml-4">
+                                    Nenhum serviço agendado.
+                                  </p>
+                                )}
+                              </div>
+
+                              <div>
+                                <h4 className="font-semibold flex items-center gap-2 text-blue-600">
+                                  <Clock size={14} /> Eventos do condomínio
+                                </h4>
+                                {eventos.length > 0 ? (
+                                  <ul className="list-disc list-inside">
+                                    {eventos.map((e) => (
+                                      <li key={e.id}>{e.nome}</li>
+                                    ))}
+                                  </ul>
+                                ) : (
+                                  <p className="text-gray-500 text-xs ml-4">
+                                    Nenhum evento registado.
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="text-center text-gray-500 border rounded-lg p-6 bg-gray-50">
+                    Nenhum proprietário registado neste edifício.
+                  </div>
+                )}
               </div>
-
-              {/* Quando o proprietário for selecionado */}
-              {proprietarioSelecionado?.id === p.id && (
-                <div className="mt-3 border-t pt-3 space-y-3 text-sm text-gray-700">
-                  {/* Pagamentos */}
-                  <div>
-                    <h4 className="font-semibold flex items-center gap-2 text-blue-600">
-                      <CreditCard size={14} /> Pagamentos
-                    </h4>
-
-                    {pagamentosProprietario.length > 0 ? (
-                      <ul className="list-disc list-inside">
-                        {pagamentosProprietario.map((pg) => (
-                          <li key={pg.id}>
-                            {dayjs(pg.dataFormatada || pg.data).format(
-                              "DD/MM/YYYY"
-                            )}{" "}
-                            —{" "}
-                            <strong>
-                              {formatCurrency(pg.valor || 0)}
-                            </strong>{" "}
-                            ({pg.estado || "—"})
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-gray-500 text-xs ml-4">
-                        Nenhum pagamento registado.
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Serviços */}
-                  <div>
-                    <h4 className="font-semibold flex items-center gap-2 text-blue-600">
-                      <Calendar size={14} /> Serviços agendados
-                    </h4>
-                    {servicos.length > 0 ? (
-                      <ul className="list-disc list-inside">
-                        {servicos.map((s) => (
-                          <li key={s.id}>{s.nome}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-gray-500 text-xs ml-4">
-                        Nenhum serviço agendado.
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Eventos */}
-                  <div>
-                    <h4 className="font-semibold flex items-center gap-2 text-blue-600">
-                      <Clock size={14} /> Eventos do condomínio
-                    </h4>
-                    {eventos.length > 0 ? (
-                      <ul className="list-disc list-inside">
-                        {eventos.map((e) => (
-                          <li key={e.id}>{e.nome}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-gray-500 text-xs ml-4">
-                        Nenhum evento registado.
-                      </p>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    ) : (
-      <div className="text-center text-gray-500 border rounded-lg p-6 bg-gray-50">
-        Nenhum proprietário registado neste edifício.
-      </div>
-    )}
-  </div>
-)}
+            )}
           </div>
         </div>
       </div>
 
-      {/* Botão inferior */}
       {moradores.length > 0 && (
         <div className="flex justify-end mt-8">
           <button
