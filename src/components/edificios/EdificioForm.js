@@ -208,6 +208,3 @@ const EdificioForm = ({ onSuccess }) => {
 };
 
 export default EdificioForm;
-};
-
-export default EdificioForm;
