@@ -51,7 +51,7 @@ const EdificioForm = ({ onSuccess }) => {
     }
   };
 
-  return (
+ return (
     <div className="w-full max-w-4xl mx-auto">
       {/* Container Glass Principal */}
       <div className="bg-white/40 backdrop-blur-xl rounded-3xl p-8 lg:p-12 border border-slate-200/40 shadow-2xl">
@@ -205,6 +205,9 @@ const EdificioForm = ({ onSuccess }) => {
       </div>
     </div>
   );
+};
+
+export default EdificioForm;
 };
 
 export default EdificioForm;
