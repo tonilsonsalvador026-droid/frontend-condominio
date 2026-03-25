@@ -129,27 +129,15 @@ const EdificioList = () => {
         </div>
       </div>
 
-      {/* FORM */}
-      {showForm && (
-        <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-slate-800">Novo Edifício</h2>
-            <button
-              onClick={() => setShowForm(false)}
-              className="text-sm font-semibold text-slate-500 hover:text-slate-700"
-            >
-              Cancelar
-            </button>
-          </div>
-
-          <EdificioForm
-            onSuccess={() => {
-              setShowForm(false);
-              fetchData();
-            }}
-          />
-        </div>
-      )}
+{/* FORM */}
+{showForm && (
+  <EdificioForm
+    onSuccess={() => {
+      setShowForm(false);
+      fetchData();
+    }}
+  />
+)}
 
       {error && (
         <div className="bg-red-50/80 border border-red-200 rounded-3xl p-8 text-center">
