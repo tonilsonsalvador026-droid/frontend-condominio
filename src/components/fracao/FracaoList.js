@@ -1,11 +1,10 @@
 // src/components/fracoes/FracaoList.js
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import api from "../../api";
 import FracaoForm from "./FracaoForm";
 import {
   FileText, FileSpreadsheet, FileDown, Printer, Search, Plus,
-  Home, Building2, User
+  Home
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
@@ -41,11 +40,90 @@ const FracaoList = () => {
     );
   });
 
-  // EXPORTS (mantidos)
-  const exportCSV = () => {};
-  const exportExcel = () => {};
-  const exportPDF = () => {};
-  const handlePrint = () => {};
+  // ✅ EXPORT CSV
+  const exportCSV = () => {
+    const header = ["ID","Número","Tipo","Estado","Edifício","Proprietário","Inquilino"];
+    const rows = filteredFracoes.map((f) => [
+      f.id,
+      f.numero,
+      f.tipo || "-",
+      f.estado || "-",
+      f.edificio?.nome || "-",
+      f.proprietario?.nome || "-",
+      f.inquilino?.nome || "-",
+    ]);
+
+    const csv = [header, ...rows].map(r => r.join(",")).join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "fracoes.csv";
+    link.click();
+  };
+
+  // ✅ EXPORT EXCEL
+  const exportExcel = () => {
+    const data = filteredFracoes.map((f) => ({
+      ID: f.id,
+      Número: f.numero,
+      Tipo: f.tipo || "-",
+      Estado: f.estado || "-",
+      Edifício: f.edificio?.nome || "-",
+      Proprietário: f.proprietario?.nome || "-",
+      Inquilino: f.inquilino?.nome || "-",
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Frações");
+    XLSX.writeFile(wb, "fracoes.xlsx");
+  };
+
+  // ✅ EXPORT PDF
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    doc.text("Relatório de Frações", 14, 15);
+
+    autoTable(doc, {
+      startY: 25,
+      head: [["ID","Número","Tipo","Estado","Edifício","Proprietário","Inquilino"]],
+      body: filteredFracoes.map((f) => [
+        f.id,
+        f.numero,
+        f.tipo || "-",
+        f.estado || "-",
+        f.edificio?.nome || "-",
+        f.proprietario?.nome || "-",
+        f.inquilino?.nome || "-",
+      ]),
+    });
+
+    doc.save("fracoes.pdf");
+  };
+
+  // ✅ PRINT
+  const handlePrint = () => {
+    const content = document.getElementById("printArea").innerHTML;
+
+    const win = window.open("", "", "width=900,height=650");
+    win.document.write(`
+      <html>
+        <head>
+          <title>Relatório de Frações</title>
+          <style>
+            table { width:100%; border-collapse:collapse; font-size:14px; }
+            th, td { border:1px solid #ccc; padding:8px; text-align:left; }
+            th { background:#f5f5f5; }
+          </style>
+        </head>
+        <body>${content}</body>
+      </html>
+    `);
+
+    win.document.close();
+    win.print();
+  };
 
   return (
     <div className="space-y-8">
@@ -66,17 +144,16 @@ const FracaoList = () => {
               <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
-                placeholder="Pesquisar por número, tipo, proprietário ou inquilino..."
+                placeholder="Pesquisar..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-12 pr-6 py-4 bg-white/50 border border-slate-200/50 rounded-2xl focus:ring-4 focus:ring-blue-200 outline-none shadow-lg"
+                className="w-full pl-12 pr-6 py-4 bg-white/50 border rounded-2xl focus:ring-4 focus:ring-blue-200 outline-none"
               />
             </div>
 
-            {/* BOTÃO CORRIGIDO */}
             <button
               onClick={() => setShowForm(true)}
-              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-2xl shadow-xl hover:-translate-y-1 transition-all flex items-center"
+              className="px-8 py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-xl flex items-center"
             >
               <Plus className="w-5 h-5 mr-2" /> Nova Fração
             </button>
@@ -86,17 +163,10 @@ const FracaoList = () => {
 
       {/* FORM */}
       {showForm && (
-        <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
+        <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border shadow-2xl">
           <div className="flex justify-between mb-6">
-            <h2 className="text-2xl font-bold text-slate-800">
-              Nova Fração
-            </h2>
-            <button
-              onClick={() => setShowForm(false)}
-              className="text-sm text-slate-500 hover:text-slate-700"
-            >
-              Cancelar
-            </button>
+            <h2 className="text-xl font-bold">Nova Fração</h2>
+            <button onClick={() => setShowForm(false)}>Cancelar</button>
           </div>
 
           <FracaoForm
@@ -108,20 +178,13 @@ const FracaoList = () => {
         </div>
       )}
 
-      {error && (
-        <div className="bg-red-50 border border-red-200 rounded-3xl p-6 text-center">
-          <p className="text-red-600">{error}</p>
-        </div>
-      )}
-
       {/* LISTA */}
       {!showForm && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredFracoes.map((fracao) => (
-            <Link
+            <div
               key={fracao.id}
-              to={`/fracoes/${fracao.id}`}
-              className="group bg-white/80 rounded-3xl p-8 shadow-xl hover:-translate-y-2 transition-all flex flex-col"
+              className="group bg-white/80 rounded-3xl p-6 shadow-xl hover:-translate-y-2 transition-all flex flex-col cursor-pointer"
             >
               <div className="flex justify-between mb-4">
                 <Home className="w-6 h-6 text-emerald-600" />
@@ -130,70 +193,45 @@ const FracaoList = () => {
                 </span>
               </div>
 
-              <h3 className="text-2xl font-bold mb-3">
+              <h3 className="text-xl font-bold mb-2">
                 Fr. {fracao.numero}
               </h3>
 
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-gray-500 mb-3">
                 {fracao.tipo || "-"}
               </p>
 
-              <div className="text-sm space-y-2 flex-1">
+              <div className="text-sm space-y-1 flex-1">
                 <p><strong>Proprietário:</strong> {fracao.proprietario?.nome || "-"}</p>
                 <p><strong>Inquilino:</strong> {fracao.inquilino?.nome || "-"}</p>
               </div>
 
-              <div className="mt-4 text-sm font-semibold">
+              <div className="mt-3 font-semibold">
                 {fracao.edificio?.nome || "-"}
               </div>
-            </Link>
-          ))}
-
-          {filteredFracoes.length === 0 && (
-            <div className="col-span-full text-center p-10 text-gray-400">
-              Nenhuma fração encontrada
             </div>
-          )}
+          ))}
         </div>
       )}
 
       {/* EXPORTS */}
       {filteredFracoes.length > 0 && !showForm && (
-  <div
-    id="printArea"
-    className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-xl"
-  >
-    <div className="flex flex-wrap gap-3 justify-center">
-      <button
-        onClick={exportCSV}
-        className="group flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all"
-      >
-        <FileText className="w-4 h-4" /> CSV
-      </button>
-
-      <button
-        onClick={exportExcel}
-        className="group flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all"
-      >
-        <FileSpreadsheet className="w-4 h-4" /> Excel
-      </button>
-
-      <button
-        onClick={exportPDF}
-        className="group flex items-center gap-2 px-6 py-3 bg-red-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all"
-      >
-        <FileDown className="w-4 h-4" /> PDF
-      </button>
-
-      <button
-        onClick={handlePrint}
-        className="group flex items-center gap-2 px-6 py-3 bg-slate-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all"
-      >
-        <Printer className="w-4 h-4" /> Imprimir
-      </button>
-    </div>
-  </div>
-)}
+        <div id="printArea" className="bg-white/60 rounded-3xl p-6 shadow-xl">
+          <div className="flex flex-wrap gap-3 justify-center">
+            <button onClick={exportCSV} className="px-6 py-3 bg-blue-600 text-white rounded-2xl flex items-center gap-2">
+              <FileText /> CSV
+            </button>
+            <button onClick={exportExcel} className="px-6 py-3 bg-emerald-600 text-white rounded-2xl flex items-center gap-2">
+              <FileSpreadsheet /> Excel
+            </button>
+            <button onClick={exportPDF} className="px-6 py-3 bg-red-600 text-white rounded-2xl flex items-center gap-2">
+              <FileDown /> PDF
+            </button>
+            <button onClick={handlePrint} className="px-6 py-3 bg-gray-600 text-white rounded-2xl flex items-center gap-2">
+              <Printer /> Imprimir
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
