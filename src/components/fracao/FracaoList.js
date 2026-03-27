@@ -215,7 +215,7 @@ const FracaoList = () => {
       )}
 
       {/* EXPORTS */}
-      {filtered.length > 0 && !showForm && (
+      {filteredFracoes.length > 0 && !showForm && (
         <div id="printArea" className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-xl">
           <div className="flex flex-wrap gap-3 justify-center">
             <button onClick={exportCSV} className="group flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
