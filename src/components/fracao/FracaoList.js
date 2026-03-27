@@ -215,20 +215,20 @@ const FracaoList = () => {
       )}
 
       {/* EXPORTS */}
-      {filteredFracoes.length > 0 && !showForm && (
-        <div id="printArea" className="bg-white/60 rounded-3xl p-6 shadow-xl">
+      {filtered.length > 0 && !showForm && (
+        <div id="printArea" className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-xl">
           <div className="flex flex-wrap gap-3 justify-center">
-            <button onClick={exportCSV} className="px-6 py-3 bg-blue-600 text-white rounded-2xl flex items-center gap-2">
-              <FileText /> CSV
+            <button onClick={exportCSV} className="group flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
+              <FileText className="w-4 h-4" /> CSV
             </button>
-            <button onClick={exportExcel} className="px-6 py-3 bg-emerald-600 text-white rounded-2xl flex items-center gap-2">
-              <FileSpreadsheet /> Excel
+            <button onClick={exportExcel} className="group flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
+              <FileSpreadsheet className="w-4 h-4" /> Excel
             </button>
-            <button onClick={exportPDF} className="px-6 py-3 bg-red-600 text-white rounded-2xl flex items-center gap-2">
-              <FileDown /> PDF
+            <button onClick={exportPDF} className="group flex items-center gap-2 px-6 py-3 bg-red-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
+              <FileDown className="w-4 h-4" /> PDF
             </button>
-            <button onClick={handlePrint} className="px-6 py-3 bg-gray-600 text-white rounded-2xl flex items-center gap-2">
-              <Printer /> Imprimir
+            <button onClick={handlePrint} className="group flex items-center gap-2 px-6 py-3 bg-slate-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
+              <Printer className="w-4 h-4" /> Imprimir
             </button>
           </div>
         </div>
