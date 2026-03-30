@@ -1,16 +1,15 @@
 // src/components/proprietarios/ProprietarioForm.js
 import React, { useState } from "react";
-import api from "../../api"; // ✅ usa api com baseURL e token
+import api from "../../api";
 import { toast } from "sonner";
+import { User, Mail, Phone, Hash, Save } from "lucide-react";
 
 const ProprietarioForm = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
-    nome: "",
-    email: "",
-    telefone: "",
-    nif: "",
+    nome: "", email: "", telefone: "", nif: ""
   });
 
+  // TUA LÓGICA 100% IGUAL
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -29,80 +28,87 @@ const ProprietarioForm = ({ onSuccess }) => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white p-6 rounded-2xl shadow-md border mb-6"
-    >
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">
-        Novo Proprietário
-      </h2>
+    <div className="w-full max-w-2xl mx-auto">
+      {/* Form Glass ÚNICO (padrão Edifícios - 1 camada azul) */}
+      <form onSubmit={handleSubmit} className="bg-white/70 backdrop-blur-xl rounded-3xl p-10 lg:p-12 border border-slate-200/50 shadow-2xl space-y-10">
+        
+        {/* Grid Inputs Glass AZUL */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          
+          {/* Nome */}
+          <div className="space-y-3">
+            <label className="font-bold text-xl text-slate-800">
+              Nome Completo
+            </label>
+            <input
+              type="text"
+              name="nome"
+              value={formData.nome}
+              onChange={handleChange}
+              className="w-full px-6 py-5 bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-2xl focus:ring-4 focus:ring-blue-200/70 focus:border-blue-300/80 shadow-lg hover:shadow-xl transition-all duration-300 text-lg placeholder-slate-400"
+              placeholder="Ex: João Silva Santos"
+              required
+            />
+          </div>
 
-      {/* Layout responsivo em colunas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">
-            Nome
-          </label>
-          <input
-            type="text"
-            name="nome"
-            value={formData.nome}
-            onChange={handleChange}
-            className="border rounded-lg p-2 w-full text-gray-700 focus:ring focus:ring-blue-200"
-            required
-          />
+          {/* Email */}
+          <div className="space-y-3">
+            <label className="font-bold text-xl text-slate-800">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="w-full px-6 py-5 bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-2xl focus:ring-4 focus:ring-emerald-200/70 focus:border-emerald-300/80 shadow-lg hover:shadow-xl transition-all duration-300 text-lg placeholder-slate-400"
+              placeholder="Ex: joao.silva@email.com"
+            />
+          </div>
+
+          {/* Telefone */}
+          <div className="space-y-3">
+            <label className="font-bold text-xl text-slate-800">
+              Telefone
+            </label>
+            <input
+              type="tel"
+              name="telefone"
+              value={formData.telefone}
+              onChange={handleChange}
+              className="w-full px-6 py-5 bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-2xl focus:ring-4 focus:ring-blue-200/70 focus:border-blue-300/80 shadow-lg hover:shadow-xl transition-all duration-300 text-lg placeholder-slate-400"
+              placeholder="Ex: 923 456 789"
+            />
+          </div>
+
+          {/* NIF */}
+          <div className="space-y-3">
+            <label className="font-bold text-xl text-slate-800">
+              NIF
+            </label>
+            <input
+              type="text"
+              name="nif"
+              value={formData.nif}
+              onChange={handleChange}
+              className="w-full px-6 py-5 bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-2xl focus:ring-4 focus:ring-purple-200/70 focus:border-purple-300/80 shadow-lg hover:shadow-xl transition-all duration-300 text-lg placeholder-slate-400 font-mono tracking-widest"
+              placeholder="Ex: 123456789"
+            />
+          </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">
-            Email
-          </label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="border rounded-lg p-2 w-full text-gray-700 focus:ring focus:ring-blue-200"
-          />
+        {/* Botão Salvar CENTRALIZADO XL AZUL (padrão) */}
+        <div className="pt-10 border-t border-slate-200/40 flex justify-center">
+          <button
+            type="submit"
+            className="px-16 py-7 rounded-3xl shadow-2xl hover:shadow-3xl hover:-translate-y-1 transition-all duration-500 text-xl font-black w-full max-w-md mx-auto bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white flex items-center justify-center gap-3"
+          >
+            <Save className="w-7 h-7" />
+            Salvar Proprietário
+          </button>
         </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">
-            Telefone
-          </label>
-          <input
-            type="text"
-            name="telefone"
-            value={formData.telefone}
-            onChange={handleChange}
-            className="border rounded-lg p-2 w-full text-gray-700 focus:ring focus:ring-blue-200"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">
-            NIF
-          </label>
-          <input
-            type="text"
-            name="nif"
-            value={formData.nif}
-            onChange={handleChange}
-            className="border rounded-lg p-2 w-full text-gray-700 focus:ring focus:ring-blue-200"
-          />
-        </div>
-      </div>
-
-      {/* Botão alinhado à esquerda */}
-      <div className="mt-5">
-        <button
-          type="submit"
-          className="px-5 py-2 rounded-lg transition text-white bg-blue-600 hover:bg-blue-700"
-        >
-          Salvar
-        </button>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 };
 
