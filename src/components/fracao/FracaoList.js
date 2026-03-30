@@ -162,21 +162,14 @@ const FracaoList = () => {
       </div>
 
       {/* FORM */}
-      {showForm && (
-        <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border shadow-2xl">
-          <div className="flex justify-between mb-6">
-            <h2 className="text-xl font-bold">Nova Fração</h2>
-            <button onClick={() => setShowForm(false)}>Cancelar</button>
-          </div>
-
-          <FracaoForm
-            onSuccess={() => {
-              setShowForm(false);
-              fetchData();
-            }}
-          />
-        </div>
-      )}
+{showForm && (
+  <EdificioForm
+    onSuccess={() => {
+      setShowForm(false);
+      fetchData();
+    }}
+  />
+)}
 
       {/* LISTA */}
       {!showForm && (
