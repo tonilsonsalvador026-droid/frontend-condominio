@@ -163,7 +163,7 @@ const FracaoList = () => {
 
       {/* FORM */}
 {showForm && (
-  <EdificioForm
+  <FracaoForm
     onSuccess={() => {
       setShowForm(false);
       fetchData();
