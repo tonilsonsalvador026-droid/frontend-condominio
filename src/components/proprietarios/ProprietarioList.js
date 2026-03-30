@@ -152,31 +152,30 @@ const ProprietarioList = () => {
       </div>
 
       {/* FORM */}
-      {showForm && (
-        <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
-          
-          <div className="flex justify-between mb-6">
-            <h2 className="text-2xl font-bold text-slate-800">
-              Novo Proprietário
-            </h2>
+{showForm && (
+  <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
+    
+    <div className="flex justify-between mb-6">
+      <h2 className="text-2xl font-bold text-slate-800">
+        Novo Proprietário
+      </h2>
 
-            <button
-              onClick={() => setShowForm(false)}
-              className="text-sm text-slate-500 hover:text-slate-700"
-            >
-              Cancelar
-            </button>
-          </div>
+      <button
+        onClick={() => setShowForm(false)}
+        className="text-sm text-slate-500 hover:text-slate-700"
+      >
+        Cancelar
+      </button>
+    </div>
 
-          <ProprietarioForm
-            onSuccess={() => {
-              setShowForm(false);
-              fetchData();
-            }}
-          />
-        </div>
-      )}
-
+    <ProprietarioForm
+      onSuccess={() => {
+        setShowForm(false);
+        fetchData();
+      }}
+    />
+  </div>
+)}
       {/* LISTA */}
       {!showForm && (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
