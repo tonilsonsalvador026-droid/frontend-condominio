@@ -43,11 +43,11 @@ const ProprietarioList = () => {
 
   return (
     <div className="space-y-8">
-      {/* Header Glass (padrão) */}
+      {/* Header (PURPLE como padrão) */}
       <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div>
-            <h1 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-purple-900 bg-clip-text text-transparent mb-2">
+            <h1 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent mb-2">
               Proprietários
             </h1>
             <p className="text-xl text-slate-600 font-semibold">
@@ -63,12 +63,12 @@ const ProprietarioList = () => {
                 placeholder="Pesquisar por nome..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-12 pr-6 py-4 bg-white/50 backdrop-blur-sm border border-slate-200/50 rounded-2xl focus:ring-4 focus:ring-purple-200/50 focus:border-purple-300 outline-none transition-all shadow-lg hover:shadow-xl"
+                className="w-full pl-12 pr-6 py-4 bg-white/50 backdrop-blur-sm border border-slate-200/50 rounded-2xl focus:ring-4 focus:ring-blue-200/50 focus:border-blue-300 outline-none transition-all shadow-lg hover:shadow-xl"
               />
             </div>
             <Link
               to="/proprietarios/novo"
-              className="px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all whitespace-nowrap flex items-center justify-center"
+              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all whitespace-nowrap flex items-center justify-center"
             >
               <Plus className="w-5 h-5 mr-2" /> Novo Proprietário
             </Link>
@@ -76,36 +76,30 @@ const ProprietarioList = () => {
         </div>
       </div>
 
-      {error && (
-        <div className="bg-red-50/80 backdrop-blur-sm border border-red-200/50 rounded-3xl p-8 text-center">
-          <p className="text-red-600 font-semibold text-lg">{error}</p>
-        </div>
-      )}
-
-      {/* Cards Glass Proprietários */}
+      {/* Cards (AZUL como Edifícios) */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
         {filteredProprietarios.map((proprietario) => (
           <Link
             key={proprietario.id}
             to={`/proprietarios/${proprietario.id}`}
-            className="group bg-white/80 backdrop-blur-xl hover:bg-white/95 rounded-3xl p-8 shadow-xl hover:shadow-2xl border border-slate-200/40 hover:border-purple-200/60 hover:-translate-y-3 transition-all duration-500 overflow-hidden h-full flex flex-col"
+            className="group bg-white/80 backdrop-blur-xl hover:bg-white/95 rounded-3xl p-8 shadow-xl hover:shadow-2xl border border-slate-200/40 hover:border-blue-200/60 hover:-translate-y-3 transition-all duration-500 overflow-hidden h-full flex flex-col"
           >
-            {/* Header Card */}
+            {/* Header Card AZUL */}
             <div className="flex items-start justify-between mb-6">
-              <div className="p-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-2xl border border-purple-200/50 group-hover:scale-110 transition-all">
-                <User className="w-8 h-8 text-purple-600" />
+              <div className="p-4 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-2xl border border-blue-200/50 group-hover:scale-110 transition-all">
+                <User className="w-8 h-8 text-blue-600" />
               </div>
-              <span className="px-3 py-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 text-xs font-bold rounded-full">
+              <span className="px-3 py-1 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 text-xs font-bold rounded-full">
                 ID #{proprietario.id}
               </span>
             </div>
 
-            {/* Nome Principal */}
-            <h3 className="text-3xl font-black text-slate-900 mb-6 group-hover:text-purple-900 transition-colors line-clamp-2">
+            {/* Nome */}
+            <h3 className="text-3xl font-black text-slate-900 mb-6 group-hover:text-blue-900 transition-colors line-clamp-2">
               {proprietario.nome}
             </h3>
 
-            {/* Contatos */}
+            {/* Contatos AZUL/EMERALD */}
             <div className="space-y-4 mb-8 flex-1">
               {proprietario.email && (
                 <div className="flex items-center gap-3 p-4 bg-blue-50/70 rounded-2xl hover:bg-blue-50/90 transition-all">
@@ -128,9 +122,9 @@ const ProprietarioList = () => {
               )}
             </div>
 
-            {/* NIF */}
+            {/* NIF AZUL */}
             {proprietario.nif && (
-              <div className="p-4 bg-gradient-to-r from-slate-50/70 to-purple-50/70 rounded-2xl mb-8">
+              <div className="p-4 bg-gradient-to-r from-slate-50/70 to-blue-50/70 rounded-2xl mb-8">
                 <div className="flex items-center gap-3">
                   <Hash className="w-5 h-5 text-slate-600" />
                   <div>
@@ -141,17 +135,17 @@ const ProprietarioList = () => {
               </div>
             )}
 
-            {/* Footer */}
+            {/* Footer AZUL */}
             <div className="flex items-center justify-between pt-6 border-t border-slate-200/50 mt-auto">
               <span className="text-xs text-slate-500 font-mono uppercase tracking-wider">Proprietário</span>
-              <div className="flex items-center text-purple-600 font-bold text-xl group-hover:translate-x-2 transition-all">
+              <div className="flex items-center text-blue-600 font-bold text-xl group-hover:translate-x-2 transition-all">
                 Ver detalhes →
               </div>
             </div>
           </Link>
         ))}
-
-        {/* Empty State */}
+        
+        {/* Empty State AZUL */}
         {filteredProprietarios.length === 0 && (
           <div className="col-span-full bg-white/50 backdrop-blur-xl rounded-3xl p-20 border-2 border-dashed border-slate-300/50 text-center group hover:-translate-y-2 transition-all">
             <User className="w-32 h-32 text-slate-300 mx-auto mb-8 group-hover:scale-110 transition-transform" />
@@ -161,7 +155,7 @@ const ProprietarioList = () => {
             </p>
             <Link
               to="/proprietarios/novo"
-              className="inline-flex items-center px-12 py-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all text-xl"
+              className="inline-flex items-center px-12 py-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all text-xl"
             >
               <Plus className="w-7 h-7 mr-3" /> Criar Primeiro Proprietário
             </Link>
