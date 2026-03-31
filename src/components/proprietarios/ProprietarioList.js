@@ -4,7 +4,7 @@ import api from "../../api";
 import ProprietarioForm from "./ProprietarioForm";
 import {
   FileText, FileSpreadsheet, FileDown, Printer, Search, Plus,
-  User, Mail, Phone, Hash
+  User
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
@@ -29,11 +29,13 @@ const ProprietarioList = () => {
     fetchData();
   }, []);
 
-  const filteredProprietarios = proprietarios.filter((p) =>
-    p.nome.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredProprietarios = proprietarios.filter((p) => {
+    const q = search.trim().toLowerCase();
+    if (!q) return true;
+    return String(p.nome || "").toLowerCase().includes(q);
+  });
 
-  // EXPORT CSV
+  // ✅ EXPORT CSV
   const exportCSV = () => {
     const header = ["ID", "Nome", "Email", "Telefone", "NIF"];
     const rows = filteredProprietarios.map((p) => [
@@ -44,7 +46,7 @@ const ProprietarioList = () => {
       p.nif || "-",
     ]);
 
-    const csv = [header, ...rows].map((r) => r.join(",")).join("\n");
+    const csv = [header, ...rows].map(r => r.join(",")).join("\n");
 
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
@@ -53,7 +55,7 @@ const ProprietarioList = () => {
     link.click();
   };
 
-  // EXPORT EXCEL
+  // ✅ EXPORT EXCEL
   const exportExcel = () => {
     const data = filteredProprietarios.map((p) => ({
       ID: p.id,
@@ -69,7 +71,7 @@ const ProprietarioList = () => {
     XLSX.writeFile(wb, "proprietarios.xlsx");
   };
 
-  // EXPORT PDF
+  // ✅ EXPORT PDF
   const exportPDF = () => {
     const doc = new jsPDF();
     doc.text("Relatório de Proprietários", 14, 15);
@@ -89,7 +91,7 @@ const ProprietarioList = () => {
     doc.save("proprietarios.pdf");
   };
 
-  // PRINT
+  // ✅ PRINT
   const handlePrint = () => {
     const content = document.getElementById("printArea").innerHTML;
 
@@ -118,7 +120,7 @@ const ProprietarioList = () => {
       {/* HEADER */}
       <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          
+
           <div>
             <h1 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent mb-2">
               Proprietários
@@ -129,12 +131,12 @@ const ProprietarioList = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-            
+
             <div className="relative flex-1 lg:w-96">
               <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
-                placeholder="Pesquisar por nome..."
+                placeholder="Pesquisar..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-12 pr-6 py-4 bg-white/50 border rounded-2xl focus:ring-4 focus:ring-blue-200 outline-none"
@@ -143,7 +145,7 @@ const ProprietarioList = () => {
 
             <button
               onClick={() => setShowForm(true)}
-              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-2xl shadow-xl flex items-center"
+              className="px-8 py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-xl flex items-center"
             >
               <Plus className="w-5 h-5 mr-2" /> Novo Proprietário
             </button>
@@ -152,71 +154,69 @@ const ProprietarioList = () => {
       </div>
 
       {/* FORM */}
-{showForm && (
-  <ProprietarioForm
-    onSuccess={() => {
-      setShowForm(false);
-      fetchData();
-    }}
-  />
-)}
+      {showForm && (
+        <ProprietarioForm
+          onSuccess={() => {
+            setShowForm(false);
+            fetchData();
+          }}
+        />
+      )}
+
       {/* LISTA */}
       {!showForm && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
-          
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredProprietarios.map((p) => (
             <div
               key={p.id}
-              className="group bg-white/80 backdrop-blur-xl hover:bg-white/95 rounded-3xl p-8 shadow-xl hover:shadow-2xl border border-slate-200/40 hover:border-blue-200/60 hover:-translate-y-3 transition-all duration-500 flex flex-col"
+              className="group bg-white/80 rounded-3xl p-6 shadow-xl hover:-translate-y-2 transition-all flex flex-col cursor-pointer"
             >
-
-              <div className="flex justify-between mb-6">
-                <User className="w-8 h-8 text-blue-600" />
-                <span className="text-xs bg-blue-100 px-3 py-1 rounded-full">
+              <div className="flex justify-between mb-4">
+                <User className="w-6 h-6 text-blue-600" />
+                <span className="text-xs bg-blue-100 px-2 py-1 rounded">
                   ID #{p.id}
                 </span>
               </div>
 
-              <h3 className="text-2xl font-bold mb-4">
+              <h3 className="text-xl font-bold mb-2">
                 {p.nome}
               </h3>
 
-              <div className="space-y-3 text-sm flex-1">
+              <div className="text-sm space-y-1 flex-1">
                 <p><strong>Email:</strong> {p.email || "-"}</p>
                 <p><strong>Telefone:</strong> {p.telefone || "-"}</p>
                 <p><strong>NIF:</strong> {p.nif || "-"}</p>
               </div>
-
             </div>
           ))}
-
-          {filteredProprietarios.length === 0 && (
-            <div className="col-span-full text-center p-10 text-gray-400">
-              Nenhum proprietário encontrado
-            </div>
-          )}
         </div>
       )}
 
-           {/* EXPORTS */}
-      {filteredProprietario.length > 0 && !showForm && (
+      {/* EXPORTS */}
+      {filteredProprietarios.length > 0 && !showForm && (
         <div id="printArea" className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-xl">
           <div className="flex flex-wrap gap-3 justify-center">
+            
             <button onClick={exportCSV} className="group flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
               <FileText className="w-4 h-4" /> CSV
             </button>
+
             <button onClick={exportExcel} className="group flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
               <FileSpreadsheet className="w-4 h-4" /> Excel
             </button>
+
             <button onClick={exportPDF} className="group flex items-center gap-2 px-6 py-3 bg-red-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
               <FileDown className="w-4 h-4" /> PDF
             </button>
+
             <button onClick={handlePrint} className="group flex items-center gap-2 px-6 py-3 bg-slate-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
               <Printer className="w-4 h-4" /> Imprimir
             </button>
+
           </div>
         </div>
       )}
+
     </div>
   );
 };
