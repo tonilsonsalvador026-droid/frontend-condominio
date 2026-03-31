@@ -1,4 +1,4 @@
-/ src/components/proprietarios/ProprietarioList.js
+//src/components/proprietarios/ProprietarioList.js
 import React, { useEffect, useState } from "react";
 import api from "../../api";
 import ProprietarioForm from "./ProprietarioForm";
