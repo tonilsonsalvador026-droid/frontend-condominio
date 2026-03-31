@@ -81,7 +81,6 @@ const ProprietarioForm = ({ onSuccess }) => {
                 value={formData.nome}
                 onChange={handleChange}
                 className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-xl"
-                placeholder="Ex: João Silva Santos"
                 required
               />
             </div>
@@ -97,7 +96,6 @@ const ProprietarioForm = ({ onSuccess }) => {
                 value={formData.email}
                 onChange={handleChange}
                 className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-xl"
-                placeholder="Ex: joao@email.com"
               />
             </div>
 
@@ -112,7 +110,6 @@ const ProprietarioForm = ({ onSuccess }) => {
                 value={formData.telefone}
                 onChange={handleChange}
                 className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-xl"
-                placeholder="Ex: 923 456 789"
               />
             </div>
 
@@ -127,7 +124,6 @@ const ProprietarioForm = ({ onSuccess }) => {
                 value={formData.nif}
                 onChange={handleChange}
                 className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-xl font-mono"
-                placeholder="Ex: 123456789"
               />
             </div>
 
