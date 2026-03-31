@@ -86,7 +86,6 @@ const EdificioForm = ({ onSuccess }) => {
                 type="text"
                 id="nome"
                 name="nome"
-                placeholder="Ex: Edifício Atlântico"
                 value={formData.nome}
                 onChange={handleChange}
                 className="w-full px-6 py-5 bg-white/60 backdrop-blur-xl border border-slate-200/50 rounded-2xl focus:ring-4 focus:ring-blue-200/60 focus:border-blue-300/70 shadow-xl hover:shadow-2xl transition-all duration-300 text-lg placeholder-slate-400"
@@ -104,7 +103,6 @@ const EdificioForm = ({ onSuccess }) => {
                 type="text"
                 id="endereco"
                 name="endereco"
-                placeholder="Ex: Rua Principal, Talatona"
                 value={formData.endereco}
                 onChange={handleChange}
                 className="w-full px-6 py-5 bg-white/60 backdrop-blur-xl border border-slate-200/50 rounded-2xl focus:ring-4 focus:ring-blue-200/60 focus:border-blue-300/70 shadow-xl hover:shadow-2xl transition-all duration-300 text-lg placeholder-slate-400"
