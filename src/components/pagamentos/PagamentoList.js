@@ -5,14 +5,8 @@ import api from "../../api";
 import dayjs from "dayjs";
 import { formatCurrency } from "../../utils/formatCurrency";
 import {
-  FileText,
-  FileSpreadsheet,
-  FileDown,
-  Printer,
-  Trash2,
-  Pencil,
-  Eye,
-  Search,
+  FileText, FileSpreadsheet, FileDown, Printer,
+  Search, Trash2, Pencil, Eye
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
@@ -31,10 +25,13 @@ const PagamentoList = () => {
   const fetchData = async (page = 1) => {
     try {
       const res = await api.get(`/pagamentos?page=${page}&limit=${itensPorPagina}`);
-      setPagamentos(res.data.data || []);
-      setTotalPaginas(res.data.totalPages || 1);
+      const { data, totalPages } = res.data;
+
+      setPagamentos(Array.isArray(data) ? data : []);
+      setTotalPaginas(totalPages || 1);
     } catch (err) {
-      console.error(err);
+      console.error("Erro ao carregar pagamentos:", err);
+      setPagamentos([]);
     }
   };
 
@@ -42,8 +39,10 @@ const PagamentoList = () => {
     fetchData(paginaAtual);
   }, [paginaAtual]);
 
+  // 📌 Estado
   const calcularTipificacao = (p) => {
-    if (p.estado === "PAGO") return "Pago";
+    if (!p) return "Desconhecido";
+    if (p.estado === "Pago" || p.estado === "PAGO") return "Pago";
 
     if (p.vencimento) {
       const hoje = dayjs();
@@ -54,33 +53,42 @@ const PagamentoList = () => {
       if (diff === 0) return "Vence hoje";
       return `Atrasado (${Math.abs(diff)} dias)`;
     }
-
-    return "Pendente";
+    return p.estado || "Desconhecido";
   };
 
-  const filtered = pagamentos.filter((p) =>
-    (p.descricao || "").toLowerCase().includes(search.toLowerCase())
-  );
+  // 🔎 Filtro
+  const filtered = pagamentos.filter((p) => {
+    const q = search.toLowerCase();
 
+    return (
+      p.descricao?.toLowerCase().includes(q) ||
+      p.user?.nome?.toLowerCase().includes(q) ||
+      p.proprietario?.nome?.toLowerCase().includes(q) ||
+      p.inquilino?.nome?.toLowerCase().includes(q) ||
+      String(p.fracao?.numero || "").includes(q)
+    );
+  });
+
+  // 🗑️ Eliminar
   const handleDelete = async (id) => {
-    if (!window.confirm("Eliminar pagamento?")) return;
+    if (!window.confirm("Eliminar este pagamento?")) return;
 
     setDeletingId(id);
 
     try {
       const userId = parseInt(localStorage.getItem("userId"), 10);
       await api.put(`/pagamentos/${id}/delete`, { userId });
+
       setPagamentos((prev) => prev.filter((p) => p.id !== id));
-    } catch (err) {
+    } catch {
       alert("Erro ao eliminar");
     } finally {
       setDeletingId(null);
     }
   };
 
-  // EXPORTS PADRÃO
+  // 📤 EXPORTS
   const exportCSV = () => {
-    const header = ["ID", "Valor", "Descrição", "Estado"];
     const rows = filtered.map((p) => [
       p.id,
       formatCurrency(p.valor),
@@ -88,7 +96,9 @@ const PagamentoList = () => {
       calcularTipificacao(p),
     ]);
 
-    const csv = [header, ...rows].map(r => r.join(",")).join("\n");
+    const csv = [["ID","Valor","Descrição","Estado"], ...rows]
+      .map(r => r.join(","))
+      .join("\n");
 
     const blob = new Blob([csv]);
     const link = document.createElement("a");
@@ -98,14 +108,7 @@ const PagamentoList = () => {
   };
 
   const exportExcel = () => {
-    const data = filtered.map((p) => ({
-      ID: p.id,
-      Valor: formatCurrency(p.valor),
-      Descrição: p.descricao,
-      Estado: calcularTipificacao(p),
-    }));
-
-    const ws = XLSX.utils.json_to_sheet(data);
+    const ws = XLSX.utils.json_to_sheet(filtered);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Pagamentos");
     XLSX.writeFile(wb, "pagamentos.xlsx");
@@ -116,7 +119,7 @@ const PagamentoList = () => {
     doc.text("Pagamentos", 14, 15);
 
     autoTable(doc, {
-      head: [["ID", "Valor", "Descrição", "Estado"]],
+      head: [["ID","Valor","Descrição","Estado"]],
       body: filtered.map((p) => [
         p.id,
         formatCurrency(p.valor),
@@ -138,7 +141,7 @@ const PagamentoList = () => {
         <div className="flex flex-col lg:flex-row justify-between gap-6">
 
           <div>
-            <h1 className="text-4xl font-black text-slate-900">
+            <h1 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
               Pagamentos
             </h1>
             <p className="text-slate-600">
@@ -148,86 +151,99 @@ const PagamentoList = () => {
 
           <div className="flex gap-4">
             <div className="relative">
-              <Search className="w-5 h-5 absolute left-3 top-3 text-gray-400" />
+              <Search className="absolute left-3 top-3 text-gray-400" />
               <input
+                type="text"
+                placeholder="Pesquisar..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 pr-4 py-3 border rounded-2xl"
-                placeholder="Pesquisar..."
+                className="pl-10 p-3 border rounded-xl"
               />
             </div>
 
             <button
-              onClick={() => navigate("/pagamentos/novo")}
-              className="px-6 py-3 bg-blue-600 text-white rounded-2xl"
+              onClick={() => navigate("/pagamentos/eliminados")}
+              className="bg-gray-700 text-white px-6 py-3 rounded-xl"
             >
-              Novo
+              Eliminados
             </button>
           </div>
-
         </div>
       </div>
 
-      {/* TABELA */}
-      <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-slate-100">
-            <tr>
-              <th className="p-4 text-left">ID</th>
-              <th className="p-4 text-left">Valor</th>
-              <th className="p-4 text-left">Descrição</th>
-              <th className="p-4 text-left">Estado</th>
-              <th className="p-4 text-left">Ações</th>
-            </tr>
-          </thead>
+      {/* CARDS */}
+      <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {filtered.map((p) => (
+          <div key={p.id} className="bg-white rounded-3xl p-6 shadow-xl flex flex-col">
 
-          <tbody>
-            {filtered.map((p) => (
-              <tr key={p.id} className="border-t hover:bg-slate-50">
+            <h3 className="text-xl font-bold mb-2">
+              {formatCurrency(p.valor)}
+            </h3>
 
-                <td className="p-4">{p.id}</td>
-                <td className="p-4">{formatCurrency(p.valor)}</td>
-                <td className="p-4">{p.descricao}</td>
-                <td className="p-4">{calcularTipificacao(p)}</td>
+            <p className="text-gray-600 mb-3">{p.descricao}</p>
 
-                <td className="p-4 flex gap-3">
-                  <button onClick={() => navigate(`/pagamentos/${p.id}/editar`)}>
-                    <Pencil size={18} />
-                  </button>
+            <p className="text-sm mb-2">
+              Estado: <strong>{calcularTipificacao(p)}</strong>
+            </p>
 
-                  <button onClick={() => navigate(`/pagamentos/${p.id}`)}>
-                    <Eye size={18} />
-                  </button>
+            <p className="text-sm">Fração: {p.fracao?.numero || "-"}</p>
 
-                  <button
-                    onClick={() => handleDelete(p.id)}
-                    className="text-red-600"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </td>
+            {/* AÇÕES */}
+            <div className="flex gap-3 mt-4">
 
-              </tr>
-            ))}
-          </tbody>
-        </table>
+              <Pencil onClick={() => navigate(`/pagamentos/${p.id}/editar`)} className="cursor-pointer text-blue-600" />
+
+              <Eye onClick={() => navigate(`/pagamentos/${p.id}/detalhe`)} className="cursor-pointer text-green-600" />
+
+              <FileText
+                onClick={async () => {
+                  const res = await api.post("/recibos", { pagamentoId: p.id });
+                  navigate(`/recibos/${res.data.id}`);
+                }}
+                className="cursor-pointer text-purple-600"
+              />
+
+              <Trash2
+                onClick={() => handleDelete(p.id)}
+                className={`cursor-pointer text-red-600 ${deletingId === p.id && "opacity-50"}`}
+              />
+
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* EXPORTS PADRÃO */}
-      <div className="flex gap-4 justify-center">
-        <button onClick={exportCSV} className="bg-blue-600 text-white px-6 py-3 rounded-2xl">
-          CSV
-        </button>
-        <button onClick={exportExcel} className="bg-emerald-600 text-white px-6 py-3 rounded-2xl">
-          Excel
-        </button>
-        <button onClick={exportPDF} className="bg-red-600 text-white px-6 py-3 rounded-2xl">
-          PDF
-        </button>
-        <button onClick={handlePrint} className="bg-gray-600 text-white px-6 py-3 rounded-2xl">
-          Print
-        </button>
-      </div>
+      {/* EXPORTS */}
+      {filtered.length > 0 && (
+        <div className="bg-white rounded-3xl p-6 shadow-xl flex justify-center gap-4 flex-wrap">
+
+          <button onClick={exportCSV} className="bg-blue-600 text-white px-6 py-3 rounded-xl">
+            <FileText /> CSV
+          </button>
+
+          <button onClick={exportExcel} className="bg-green-600 text-white px-6 py-3 rounded-xl">
+            <FileSpreadsheet /> Excel
+          </button>
+
+          <button onClick={exportPDF} className="bg-red-600 text-white px-6 py-3 rounded-xl">
+            <FileDown /> PDF
+          </button>
+
+          <button onClick={handlePrint} className="bg-gray-600 text-white px-6 py-3 rounded-xl">
+            <Printer /> Imprimir
+          </button>
+
+        </div>
+      )}
+
+      {/* PAGINAÇÃO */}
+      {totalPaginas > 1 && (
+        <div className="flex justify-center gap-4">
+          <button onClick={() => setPaginaAtual(paginaAtual - 1)}>Anterior</button>
+          <span>{paginaAtual} / {totalPaginas}</span>
+          <button onClick={() => setPaginaAtual(paginaAtual + 1)}>Próxima</button>
+        </div>
+      )}
 
     </div>
   );
