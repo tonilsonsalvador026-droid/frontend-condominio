@@ -118,7 +118,7 @@ const PagamentoList = () => {
     }
   };
 
-  // 📤 EXPORTS (mantidos)
+  // 📤 EXPORTS
   const exportCSV = () => {
     const header = ["ID", "Valor", "Descrição", "Estado"];
     const rows = filteredPagamentos.map((p) => [
@@ -212,12 +212,20 @@ const PagamentoList = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
 
+            {/* + NOVO PAGAMENTO (ADICIONADO) */}
+            <button
+              onClick={() => navigate("/pagamentos/novo")}
+              className="px-6 py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-xl hover:-translate-y-1 transition-all"
+            >
+              + Novo Pagamento
+            </button>
+
             <input
               type="text"
               placeholder="Pesquisar..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full lg:w-96 px-4 py-4 bg-white/50 border rounded-2xl focus:ring-4 focus:ring-blue-200 outline-none"
+              className="w-full lg:w-80 px-4 py-4 bg-white/50 border rounded-2xl focus:ring-4 focus:ring-blue-200 outline-none"
             />
 
             <select
@@ -275,9 +283,7 @@ const PagamentoList = () => {
                 <td className="p-4">#{p.id}</td>
                 <td className="p-4 font-semibold">{formatCurrency(p.valor)}</td>
                 <td className="p-4">{p.descricao || "-"}</td>
-
                 <td className="p-4">{calcularTipificacao(p)}</td>
-
                 <td className="p-4">{p.user?.nome || "-"}</td>
                 <td className="p-4">{p.fracao?.numero || "-"}</td>
 
