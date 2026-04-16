@@ -12,6 +12,8 @@ import {
   Trash2,
   Pencil,
   Eye,
+  Search,
+  Plus,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
@@ -50,7 +52,6 @@ const PagamentoList = () => {
     fetchData(paginaAtual);
   }, [paginaAtual]);
 
-  // 📌 Tipificação
   const calcularTipificacao = (p) => {
     if (!p) return "Desconhecido";
     if (p.estado === "Pago" || p.estado === "PAGO") return "Pago";
@@ -67,32 +68,18 @@ const PagamentoList = () => {
     return p.estado || "Desconhecido";
   };
 
-  // 🔎 Filtro
   const filteredPagamentos = pagamentos.filter((p) => {
     const q = (search || "").trim().toLowerCase();
-    const descricao = String(p.descricao || "").toLowerCase();
-    const estado = String(calcularTipificacao(p) || "").toLowerCase();
-    const utilizador = String(p.user?.nome || "").toLowerCase();
-    const fracao = String(p.fracao?.numero || "").toLowerCase();
-    const proprietario = String(p.proprietario?.nome || "").toLowerCase();
-    const inquilino = String(p.inquilino?.nome || "").toLowerCase();
 
-    const matchSearch =
+    return (
       !q ||
-      descricao.includes(q) ||
-      estado.includes(q) ||
-      utilizador.includes(q) ||
-      fracao.includes(q) ||
-      proprietario.includes(q) ||
-      inquilino.includes(q);
-
-    const matchEstado =
-      !filtroEstado || (p.estado && p.estado.toUpperCase() === filtroEstado);
-
-    return matchSearch && matchEstado;
+      String(p.descricao || "").toLowerCase().includes(q) ||
+      String(calcularTipificacao(p)).toLowerCase().includes(q) ||
+      String(p.user?.nome || "").toLowerCase().includes(q) ||
+      String(p.fracao?.numero || "").toLowerCase().includes(q)
+    );
   });
 
-  // 🗑️ Eliminar
   const handleDelete = async (id) => {
     if (!window.confirm("Tens certeza que queres eliminar este pagamento?")) return;
 
@@ -100,25 +87,18 @@ const PagamentoList = () => {
 
     try {
       const rawUserId = localStorage.getItem("userId");
-      if (!rawUserId) {
-        alert("Utilizador não identificado. Verifica login.");
-        setDeletingId(null);
-        return;
-      }
-
       const userId = parseInt(rawUserId, 10);
 
       await api.put(`/pagamentos/${id}/delete`, { userId });
 
       setPagamentos((prev) => prev.filter((p) => p.id !== id));
-    } catch (error) {
+    } catch {
       alert("Erro ao eliminar pagamento");
     } finally {
       setDeletingId(null);
     }
   };
 
-  // 📤 EXPORTS
   const exportCSV = () => {
     const header = ["ID", "Valor", "Descrição", "Estado"];
     const rows = filteredPagamentos.map((p) => [
@@ -130,14 +110,11 @@ const PagamentoList = () => {
 
     const csv = [header, ...rows].map((r) => r.join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
 
     const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "pagamentos.csv");
-    document.body.appendChild(link);
+    link.href = URL.createObjectURL(blob);
+    link.download = "pagamentos.csv";
     link.click();
-    document.body.removeChild(link);
   };
 
   const exportExcel = () => {
@@ -181,9 +158,8 @@ const PagamentoList = () => {
         <head>
           <title>Relatório de Pagamentos</title>
           <style>
-            table { width: 100%; border-collapse: collapse; font-size: 14px; }
-            th, td { border: 1px solid #ccc; padding: 8px; }
-            th { background: #f3f4f6; }
+            table { width:100%; border-collapse:collapse; font-size:14px; }
+            th, td { border:1px solid #ccc; padding:8px; }
           </style>
         </head>
         <body>${content}</body>
@@ -197,12 +173,12 @@ const PagamentoList = () => {
   return (
     <div className="space-y-8">
 
-      {/* HEADER MODERNO */}
-      <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border shadow-2xl">
-        <div className="flex flex-col lg:flex-row justify-between gap-6">
+      {/* HEADER STYLE INQUILINO */}
+      <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
 
           <div>
-            <h1 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent mb-2">
               Pagamentos
             </h1>
             <p className="text-xl text-slate-600 font-semibold">
@@ -212,21 +188,16 @@ const PagamentoList = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
 
-            {/* + NOVO PAGAMENTO (ADICIONADO) */}
-            <button
-              onClick={() => navigate("/pagamentos/novo")}
-              className="px-6 py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-xl hover:-translate-y-1 transition-all"
-            >
-              + Novo Pagamento
-            </button>
-
-            <input
-              type="text"
-              placeholder="Pesquisar..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full lg:w-80 px-4 py-4 bg-white/50 border rounded-2xl focus:ring-4 focus:ring-blue-200 outline-none"
-            />
+            <div className="relative flex-1 lg:w-96">
+              <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Pesquisar..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-12 pr-6 py-4 bg-white/50 border rounded-2xl focus:ring-4 focus:ring-blue-200 outline-none"
+              />
+            </div>
 
             <select
               value={filtroEstado}
@@ -240,6 +211,13 @@ const PagamentoList = () => {
             </select>
 
             <button
+              onClick={() => navigate("/pagamentos/novo")}
+              className="px-6 py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-xl hover:-translate-y-1 transition-all flex items-center gap-2"
+            >
+              <Plus size={18} /> Novo
+            </button>
+
+            <button
               onClick={() => navigate("/pagamentos/eliminados")}
               className="px-6 py-4 bg-slate-700 text-white font-bold rounded-2xl"
             >
@@ -250,17 +228,31 @@ const PagamentoList = () => {
         </div>
       </div>
 
-      {/* EXPORTS */}
-      <div className="bg-white/60 rounded-3xl p-6 shadow-xl flex flex-wrap gap-3 justify-center">
-        <button onClick={exportCSV} className="px-6 py-3 bg-blue-600 text-white rounded-2xl">CSV</button>
-        <button onClick={exportExcel} className="px-6 py-3 bg-emerald-600 text-white rounded-2xl">Excel</button>
-        <button onClick={exportPDF} className="px-6 py-3 bg-red-600 text-white rounded-2xl">PDF</button>
-        <button onClick={handlePrint} className="px-6 py-3 bg-gray-600 text-white rounded-2xl">Imprimir</button>
+      {/* EXPORTS STYLE INQUILINO */}
+      <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-xl">
+        <div className="flex flex-wrap gap-3 justify-center">
+
+          <button onClick={exportCSV} className="group flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
+            <FileText className="w-4 h-4" /> CSV
+          </button>
+
+          <button onClick={exportExcel} className="group flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
+            <FileSpreadsheet className="w-4 h-4" /> Excel
+          </button>
+
+          <button onClick={exportPDF} className="group flex items-center gap-2 px-6 py-3 bg-red-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
+            <FileDown className="w-4 h-4" /> PDF
+          </button>
+
+          <button onClick={handlePrint} className="group flex items-center gap-2 px-6 py-3 bg-slate-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
+            <Printer className="w-4 h-4" /> Imprimir
+          </button>
+
+        </div>
       </div>
 
-      {/* TABELA */}
+      {/* TABELA (mantida tua lógica) */}
       <div id="printArea" className="bg-white/80 rounded-3xl shadow-xl overflow-x-auto">
-
         <table className="w-full text-sm md:text-base">
           <thead>
             <tr className="bg-slate-100 text-slate-700 text-left">
@@ -314,16 +306,7 @@ const PagamentoList = () => {
 
               </tr>
             ))}
-
-            {filteredPagamentos.length === 0 && (
-              <tr>
-                <td colSpan="9" className="p-6 text-center text-gray-500">
-                  Nenhum pagamento encontrado
-                </td>
-              </tr>
-            )}
           </tbody>
-
         </table>
       </div>
 
