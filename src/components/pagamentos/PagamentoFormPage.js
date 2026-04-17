@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api";
 import dayjs from "dayjs";
 import { formatCurrency } from "../../utils/formatCurrency";
-import { User, Save, ChevronLeft } from "lucide-react";
+import { DollarSign, Save, ChevronLeft } from "lucide-react";
 
 const PagamentoFormPage = () => {
   const { id } = useParams();
@@ -19,7 +19,6 @@ const PagamentoFormPage = () => {
 
   const [usuarios, setUsuarios] = useState([]);
   const [fracoes, setFracoes] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   const handleValorChange = (e) => {
     const raw = e.target.value.replace(/[^\d]/g, "");
@@ -63,7 +62,6 @@ const PagamentoFormPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
     const payload = {
       valor: parseFloat(valor) || 0,
@@ -83,22 +81,21 @@ const PagamentoFormPage = () => {
       navigate("/pagamentos");
     } catch (err) {
       console.error("Erro ao salvar pagamento:", err);
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-5xl mx-auto">
       <div className="bg-white/40 backdrop-blur-xl rounded-3xl p-8 lg:p-12 border border-slate-200/40 shadow-2xl">
 
         {/* HEADER */}
         <div className="flex items-center gap-4 mb-10 pb-8 border-b border-slate-200/30">
-          <div className="p-4 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 rounded-2xl border border-blue-200/50">
-            <User className="w-8 h-8 text-blue-600" />
+          <div className="p-4 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-2xl border border-green-200/50">
+            <DollarSign className="w-8 h-8 text-green-600" />
           </div>
+
           <div>
-            <h2 className="text-3xl lg:text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
+            <h2 className="text-3xl lg:text-4xl font-black bg-gradient-to-r from-slate-900 to-green-800 bg-clip-text text-transparent">
               {id ? "Editar Pagamento" : "Novo Pagamento"}
             </h2>
             <p className="text-xl text-slate-600 font-semibold mt-1">
@@ -121,8 +118,8 @@ const PagamentoFormPage = () => {
                 type="text"
                 value={valor ? formatCurrency(Number(valor)) : ""}
                 onChange={handleValorChange}
-                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-xl"
-                placeholder="Ex: 5.000,00 Kz"
+                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-green-200 shadow-xl"
+                placeholder="Ex: 150.000,00 Kz"
                 required
               />
             </div>
@@ -136,7 +133,7 @@ const PagamentoFormPage = () => {
                 type="text"
                 value={descricao}
                 onChange={(e) => setDescricao(e.target.value)}
-                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-xl"
+                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-green-200 shadow-xl"
               />
             </div>
 
@@ -148,7 +145,7 @@ const PagamentoFormPage = () => {
               <select
                 value={estado}
                 onChange={(e) => setEstado(e.target.value)}
-                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-xl"
+                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-green-200 shadow-xl"
                 required
               >
                 <option value="PAGO">Pago</option>
@@ -165,7 +162,7 @@ const PagamentoFormPage = () => {
               <select
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
-                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-xl"
+                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-green-200 shadow-xl"
                 required
               >
                 <option value="">Selecione</option>
@@ -185,7 +182,7 @@ const PagamentoFormPage = () => {
               <select
                 value={fracaoId}
                 onChange={(e) => setFracaoId(e.target.value)}
-                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-xl"
+                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-green-200 shadow-xl"
                 required
               >
                 <option value="">Selecione</option>
@@ -206,7 +203,7 @@ const PagamentoFormPage = () => {
                 type="date"
                 value={data}
                 onChange={(e) => setData(e.target.value)}
-                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-xl"
+                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-green-200 shadow-xl"
                 required
               />
             </div>
@@ -226,15 +223,10 @@ const PagamentoFormPage = () => {
 
             <button
               type="submit"
-              disabled={loading}
-              className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-bold text-white ${
-                loading
-                  ? "bg-gray-400"
-                  : "bg-gradient-to-r from-blue-600 to-emerald-600"
-              }`}
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-green-600 to-emerald-600"
             >
               <Save />
-              {loading ? "Salvando..." : "Salvar Pagamento"}
+              {id ? "Salvar Alterações" : "Cadastrar Pagamento"}
             </button>
 
           </div>
