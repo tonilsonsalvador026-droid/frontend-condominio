@@ -309,7 +309,6 @@ const PagamentoList = () => {
             </button>
 
         </div>
-      </div>
 
     </div>
   );
