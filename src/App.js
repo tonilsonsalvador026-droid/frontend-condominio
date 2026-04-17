@@ -76,8 +76,6 @@ function App() {
 
           {/* Pagamentos */}
           <Route path="/pagamentos" element={<PagamentoPage />} />
-          <Route path="/pagamentos/novo" element={<PagamentoFormPage />} />
-          <Route path="/pagamentos/:id/editar" element={<PagamentoFormPage />} />
           <Route path="/pagamentos/:id/detalhe" element={<PagamentoDetalhe />} />
           <Route path="/pagamentos/:id/historico" element={<HistoricoPagamento />} />
           <Route path="/pagamentos/eliminados" element={<PagamentoEliminado />} />
