@@ -288,7 +288,7 @@ const PagamentoList = () => {
       </div>
 
       {/* EXPORTS */}
-      {filteredPagamentos.length > 0 && !showForm && (
+      {filteredPagamentos.length > 0 && (
         <div id="printArea" className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-xl">
           <div className="flex flex-wrap gap-3 justify-center">
 
