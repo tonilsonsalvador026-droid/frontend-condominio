@@ -105,11 +105,81 @@ const PagamentoList = () => {
     }
   };
 
-  // EXPORTS (igual)
-  const exportCSV = () => { /* igual */ };
-  const exportExcel = () => { /* igual */ };
-  const exportPDF = () => { /* igual */ };
-  const handlePrint = () => { /* igual */ };
+  // ✅ EXPORT CSV
+  const exportCSV = () => {
+    const header = ["ID", "Valor", "Descrição", "Estado"];
+
+    const rows = filteredPagamentos.map((p) => [
+      p.id,
+      formatCurrency(p.valor),
+      p.descricao || "-",
+      calcularTipificacao(p),
+    ]);
+
+    const csv = [header, ...rows].map((r) => r.join(",")).join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "pagamentos.csv";
+    link.click();
+  };
+
+  // ✅ EXPORT EXCEL
+  const exportExcel = () => {
+    const data = filteredPagamentos.map((p) => ({
+      ID: p.id,
+      Valor: formatCurrency(p.valor),
+      Descrição: p.descricao || "-",
+      Estado: calcularTipificacao(p),
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Pagamentos");
+    XLSX.writeFile(wb, "pagamentos.xlsx");
+  };
+
+  // ✅ EXPORT PDF
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    doc.text("Relatório de Pagamentos", 14, 15);
+
+    autoTable(doc, {
+      startY: 25,
+      head: [["ID", "Valor", "Descrição", "Estado"]],
+      body: filteredPagamentos.map((p) => [
+        p.id,
+        formatCurrency(p.valor),
+        p.descricao || "-",
+        calcularTipificacao(p),
+      ]),
+    });
+
+    doc.save("pagamentos.pdf");
+  };
+
+  // ✅ PRINT
+  const handlePrint = () => {
+    const content = document.getElementById("printArea").innerHTML;
+    const win = window.open("", "", "width=900,height=650");
+
+    win.document.write(`
+      <html>
+        <head>
+          <title>Relatório de Pagamentos</title>
+          <style>
+            table { width:100%; border-collapse:collapse; }
+            th, td { border:1px solid #ccc; padding:8px; }
+          </style>
+        </head>
+        <body>${content}</body>
+      </html>
+    `);
+
+    win.document.close();
+    win.print();
+  };
 
   return (
     <div className="space-y-8">
@@ -153,14 +223,14 @@ const PagamentoList = () => {
 
             <button
               onClick={() => navigate("/pagamentos/novo")}
-              className="px-6 py-3 bg-blue-600 text-white rounded-2xl flex items-center gap-2"
+              className="px-6 py-3 bg-blue-600 text-white rounded-2xl flex items-center gap-2 hover:scale-105 hover:shadow-lg transition-all"
             >
               <Plus size={18} /> Novo Pagamento
             </button>
 
             <button
               onClick={() => navigate("/pagamentos/eliminados")}
-              className="px-6 py-3 bg-slate-700 text-white rounded-2xl"
+              className="px-6 py-3 bg-slate-700 text-white rounded-2xl hover:scale-105 transition-all"
             >
               Eliminados
             </button>
@@ -169,23 +239,21 @@ const PagamentoList = () => {
         </div>
       </div>
 
-      {/* 📊 RESUMO NO MEIO */}
+      {/* RESUMO */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-        <div className="bg-green-100 p-6 rounded-2xl shadow">
+        <div className="bg-green-100 p-6 rounded-2xl shadow hover:scale-105 transition">
           <p className="text-sm text-green-700">Total Pago</p>
           <h2 className="text-2xl font-bold text-green-800">
             {formatCurrency(totalPago)}
           </h2>
         </div>
 
-        <div className="bg-yellow-100 p-6 rounded-2xl shadow">
+        <div className="bg-yellow-100 p-6 rounded-2xl shadow hover:scale-105 transition">
           <p className="text-sm text-yellow-700">Total Pendente</p>
           <h2 className="text-2xl font-bold text-yellow-800">
             {formatCurrency(totalPendente)}
           </h2>
         </div>
-
       </div>
 
       {/* TABELA */}
@@ -193,7 +261,7 @@ const PagamentoList = () => {
         <table className="w-full text-sm">
           <tbody>
             {filteredPagamentos.map((p) => (
-              <tr key={p.id} className="border-b">
+              <tr key={p.id} className="border-b hover:bg-slate-50">
 
                 <td className="p-3">#{p.id}</td>
                 <td className="p-3 font-semibold">{formatCurrency(p.valor)}</td>
@@ -219,23 +287,23 @@ const PagamentoList = () => {
         </table>
       </div>
 
-      {/* 📤 EXPORTS NO FINAL */}
+      {/* EXPORTS FINAL */}
       <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border shadow-xl">
         <div className="flex flex-wrap gap-3 justify-center">
 
-          <button onClick={exportCSV} className="px-6 py-3 bg-blue-600 text-white rounded-2xl flex gap-2">
+          <button onClick={exportCSV} className="px-6 py-3 bg-blue-600 text-white rounded-2xl flex gap-2 hover:scale-105 hover:shadow-lg transition-all">
             <FileText size={16} /> CSV
           </button>
 
-          <button onClick={exportExcel} className="px-6 py-3 bg-green-600 text-white rounded-2xl flex gap-2">
+          <button onClick={exportExcel} className="px-6 py-3 bg-green-600 text-white rounded-2xl flex gap-2 hover:scale-105 hover:shadow-lg transition-all">
             <FileSpreadsheet size={16} /> Excel
           </button>
 
-          <button onClick={exportPDF} className="px-6 py-3 bg-red-600 text-white rounded-2xl flex gap-2">
+          <button onClick={exportPDF} className="px-6 py-3 bg-red-600 text-white rounded-2xl flex gap-2 hover:scale-105 hover:shadow-lg transition-all">
             <FileDown size={16} /> PDF
           </button>
 
-          <button onClick={handlePrint} className="px-6 py-3 bg-gray-600 text-white rounded-2xl flex gap-2">
+          <button onClick={handlePrint} className="px-6 py-3 bg-gray-600 text-white rounded-2xl flex gap-2 hover:scale-105 hover:shadow-lg transition-all">
             <Printer size={16} /> Imprimir
           </button>
 
