@@ -312,6 +312,7 @@ const PagamentoList = () => {
 
     </div>
        )}
+ </div>
   );
 };
 
