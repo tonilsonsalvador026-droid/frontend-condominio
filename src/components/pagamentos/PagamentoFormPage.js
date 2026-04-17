@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api";
 import dayjs from "dayjs";
-import { formatCurrency } from "../../utils/formatCurrency"; // ✅ import correto da tua função
+import { formatCurrency } from "../../utils/formatCurrency";
+import { DollarSign, Save, ChevronLeft } from "lucide-react";
 
 const PagamentoFormPage = () => {
   const { id } = useParams();
@@ -19,9 +20,8 @@ const PagamentoFormPage = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [fracoes, setFracoes] = useState([]);
 
-  // ✅ Formata o valor dinamicamente
   const handleValorChange = (e) => {
-    const raw = e.target.value.replace(/[^\d]/g, ""); // remove tudo que não for número
+    const raw = e.target.value.replace(/[^\d]/g, "");
     const numeric = parseFloat(raw) / 100;
     setValor(isNaN(numeric) ? "" : numeric.toFixed(2));
   };
@@ -62,6 +62,7 @@ const PagamentoFormPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const payload = {
       valor: parseFloat(valor) || 0,
       descricao,
@@ -84,118 +85,154 @@ const PagamentoFormPage = () => {
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow flex flex-col h-full">
-      <h2 className="text-lg font-semibold text-gray-700 mb-4">
-        {id ? "Editar Pagamento" : "Novo Pagamento"}
-      </h2>
+    <div className="w-full max-w-5xl mx-auto">
+      <div className="bg-white/40 backdrop-blur-xl rounded-3xl p-8 lg:p-12 border border-slate-200/40 shadow-2xl">
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        {/* Valor e Descrição */}
-        <div className="flex flex-col md:flex-row gap-4">
-          {/* Valor */}
-          <div className="flex-1 flex flex-col">
-            <label className="mb-1 font-semibold text-gray-600">Valor</label>
-            <input
-              type="text"
-              value={valor ? formatCurrency(Number(valor)) : ""}
-              onChange={handleValorChange}
-              className="border rounded p-2"
-              placeholder="Ex: 5.000,00 Kz"
-              required
-            />
+        {/* HEADER */}
+        <div className="flex items-center gap-4 mb-10 pb-8 border-b border-slate-200/30">
+          <div className="p-4 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-2xl border border-green-200/50">
+            <DollarSign className="w-8 h-8 text-green-600" />
           </div>
 
-          {/* Descrição */}
-          <div className="flex-1 flex flex-col">
-            <label className="mb-1 font-semibold text-gray-600">Descrição</label>
-            <input
-              type="text"
-              value={descricao}
-              onChange={(e) => setDescricao(e.target.value)}
-              className="border rounded p-2"
-            />
+          <div>
+            <h2 className="text-3xl lg:text-4xl font-black bg-gradient-to-r from-slate-900 to-green-800 bg-clip-text text-transparent">
+              {id ? "Editar Pagamento" : "Novo Pagamento"}
+            </h2>
+            <p className="text-xl text-slate-600 font-semibold mt-1">
+              Preencha os dados do pagamento
+            </p>
           </div>
         </div>
 
-        {/* Estado e Usuário */}
-        <div className="flex flex-col md:flex-row gap-4">
-          {/* Estado */}
-          <div className="flex-1 flex flex-col">
-            <label className="mb-1 font-semibold text-gray-600">Estado</label>
-            <select
-              value={estado}
-              onChange={(e) => setEstado(e.target.value)}
-              className="border rounded p-2"
-              required
+        {/* FORM */}
+        <form onSubmit={handleSubmit} className="space-y-8">
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            {/* Valor */}
+            <div className="space-y-3">
+              <label className="font-bold text-lg text-slate-800">
+                Valor
+              </label>
+              <input
+                type="text"
+                value={valor ? formatCurrency(Number(valor)) : ""}
+                onChange={handleValorChange}
+                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-green-200 shadow-xl"
+                placeholder="Ex: 150.000,00 Kz"
+                required
+              />
+            </div>
+
+            {/* Descrição */}
+            <div className="space-y-3">
+              <label className="font-bold text-lg text-slate-800">
+                Descrição
+              </label>
+              <input
+                type="text"
+                value={descricao}
+                onChange={(e) => setDescricao(e.target.value)}
+                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-green-200 shadow-xl"
+              />
+            </div>
+
+            {/* Estado */}
+            <div className="space-y-3">
+              <label className="font-bold text-lg text-slate-800">
+                Estado
+              </label>
+              <select
+                value={estado}
+                onChange={(e) => setEstado(e.target.value)}
+                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-green-200 shadow-xl"
+                required
+              >
+                <option value="PAGO">Pago</option>
+                <option value="PENDENTE">Pendente</option>
+                <option value="ATRASADO">Atrasado</option>
+              </select>
+            </div>
+
+            {/* Usuário */}
+            <div className="space-y-3">
+              <label className="font-bold text-lg text-slate-800">
+                Usuário
+              </label>
+              <select
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-green-200 shadow-xl"
+                required
+              >
+                <option value="">Selecione</option>
+                {usuarios.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Fração */}
+            <div className="space-y-3">
+              <label className="font-bold text-lg text-slate-800">
+                Fração
+              </label>
+              <select
+                value={fracaoId}
+                onChange={(e) => setFracaoId(e.target.value)}
+                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-green-200 shadow-xl"
+                required
+              >
+                <option value="">Selecione</option>
+                {fracoes.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.numero}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Data */}
+            <div className="space-y-3">
+              <label className="font-bold text-lg text-slate-800">
+                Data
+              </label>
+              <input
+                type="date"
+                value={data}
+                onChange={(e) => setData(e.target.value)}
+                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-green-200 shadow-xl"
+                required
+              />
+            </div>
+
+          </div>
+
+          {/* BOTÕES */}
+          <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t">
+
+            <button
+              type="button"
+              onClick={() => navigate("/pagamentos")}
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-slate-200 rounded-2xl font-bold"
             >
-              <option value="PAGO">Pago</option>
-              <option value="PENDENTE">Pendente</option>
-              <option value="ATRASADO">Atrasado</option>
-            </select>
-          </div>
+              <ChevronLeft /> Cancelar
+            </button>
 
-          {/* Usuário */}
-          <div className="flex-1 flex flex-col">
-            <label className="mb-1 font-semibold text-gray-600">Usuário</label>
-            <select
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-              className="border rounded p-2"
-              required
+            <button
+              type="submit"
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-green-600 to-emerald-600"
             >
-              <option value="">Selecione um usuário</option>
-              {usuarios.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.nome}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+              <Save />
+              {id ? "Salvar Alterações" : "Cadastrar Pagamento"}
+            </button>
 
-        {/* Fração e Data */}
-        <div className="flex flex-col md:flex-row gap-4">
-          {/* Fração */}
-          <div className="flex-1 flex flex-col">
-            <label className="mb-1 font-semibold text-gray-600">Fração</label>
-            <select
-              value={fracaoId}
-              onChange={(e) => setFracaoId(e.target.value)}
-              className="border rounded p-2"
-              required
-            >
-              <option value="">Selecione uma fração</option>
-              {fracoes.map((f) => (
-                <option key={f.id} value={f.id}>
-                  {f.numero}
-                </option>
-              ))}
-            </select>
           </div>
 
-          {/* Data */}
-          <div className="flex-1 flex flex-col">
-            <label className="mb-1 font-semibold text-gray-600">Data</label>
-            <input
-              type="date"
-              value={data}
-              onChange={(e) => setData(e.target.value)}
-              className="border rounded p-2"
-              required
-            />
-          </div>
-        </div>
-
-        {/* Botão de ação */}
-        <div>
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            {id ? "Salvar Alterações" : "Cadastrar Pagamento"}
-          </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };
