@@ -185,28 +185,28 @@ const PagamentoList = () => {
     <div className="space-y-8">
 
       {/* HEADER */}
-      <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border shadow-2xl">
-        <div className="flex flex-col lg:flex-row justify-between gap-6">
+      <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
 
           <div>
-            <h1 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
-              Pagamentos
+            <h1 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent mb-2">
+              pagamentos
             </h1>
             <p className="text-xl text-slate-600 font-semibold">
               {filteredPagamentos.length} de {pagamentos.length} pagamentos
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4">
+ <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
 
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+            <div className="relative flex-1 lg:w-96">
+              <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 placeholder="Pesquisar..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-12 pr-4 py-3 border rounded-2xl"
+                className="w-full pl-12 pr-6 py-4 bg-white/50 border rounded-2xl focus:ring-4 focus:ring-blue-200 outline-none"
               />
             </div>
 
@@ -287,26 +287,26 @@ const PagamentoList = () => {
         </table>
       </div>
 
-      {/* EXPORTS FINAL */}
-      <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border shadow-xl">
-        <div className="flex flex-wrap gap-3 justify-center">
+      {/* EXPORTS */}
+      {filtered.length > 0 && !showForm && (
+        <div id="printArea" className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-xl">
+          <div className="flex flex-wrap gap-3 justify-center">
 
-          <button onClick={exportCSV} className="px-6 py-3 bg-blue-600 text-white rounded-2xl flex gap-2 hover:scale-105 hover:shadow-lg transition-all">
-            <FileText size={16} /> CSV
-          </button>
+            <button onClick={exportCSV} className="group flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
+              <FileText className="w-4 h-4" /> CSV
+            </button>
 
-          <button onClick={exportExcel} className="px-6 py-3 bg-green-600 text-white rounded-2xl flex gap-2 hover:scale-105 hover:shadow-lg transition-all">
-            <FileSpreadsheet size={16} /> Excel
-          </button>
+            <button onClick={exportExcel} className="group flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
+              <FileSpreadsheet className="w-4 h-4" /> Excel
+            </button>
 
-          <button onClick={exportPDF} className="px-6 py-3 bg-red-600 text-white rounded-2xl flex gap-2 hover:scale-105 hover:shadow-lg transition-all">
-            <FileDown size={16} /> PDF
-          </button>
+            <button onClick={exportPDF} className="group flex items-center gap-2 px-6 py-3 bg-red-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
+              <FileDown className="w-4 h-4" /> PDF
+            </button>
 
-          <button onClick={handlePrint} className="px-6 py-3 bg-gray-600 text-white rounded-2xl flex gap-2 hover:scale-105 hover:shadow-lg transition-all">
-            <Printer size={16} /> Imprimir
-          </button>
-
+            <button onClick={handlePrint} className="group flex items-center gap-2 px-6 py-3 bg-slate-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
+              <Printer className="w-4 h-4" /> Imprimir
+            </button>
         </div>
       </div>
 
