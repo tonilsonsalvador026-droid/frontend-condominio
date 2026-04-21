@@ -223,9 +223,9 @@ const PagamentoList = () => {
 
             <button
               onClick={() => navigate("/pagamentos/novo")}
-              className="px-6 py-3 bg-blue-600 text-white rounded-2xl flex items-center gap-2 hover:scale-105 hover:shadow-lg transition-all"
+               className="px-8 py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-xl flex items-center"
             >
-              <Plus size={18} /> Novo Pagamento
+              <Plus className="w-5 h-5 mr-2" /> Novo Pagamento
             </button>
 
             <button
