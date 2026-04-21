@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import api from "../../api";
 import { formatCurrency } from "../../utils/formatCurrency";
-import { ArrowLeft, FileText, User } from "lucide-react";
+import { ChevronLeft, CreditCard, User, Calendar, AlertCircle } from "lucide-react";
 
 const PagamentoDetalhe = () => {
   const { id } = useParams();
@@ -26,161 +26,180 @@ const PagamentoDetalhe = () => {
     fetchPagamento();
   }, [id]);
 
+  // 🔄 LOADING MODERNO
   if (loading)
     return (
-      <div className="text-center py-10 text-gray-500">
-        Carregando detalhe...
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-12 shadow-2xl text-center">
+          <div className="w-12 h-12 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-lg font-semibold text-slate-600">
+            Carregando detalhe...
+          </p>
+        </div>
       </div>
     );
 
+  // ❌ NÃO ENCONTRADO
   if (!pagamento)
     return (
-      <div className="text-center py-10 text-red-500">
-        Pagamento não encontrado.
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-12 shadow-2xl text-center">
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <p className="text-xl font-bold text-slate-700">
+            Pagamento não encontrado
+          </p>
+        </div>
       </div>
     );
 
-  const estadoClasses =
-    pagamento.estado === "PAGO"
-      ? "bg-green-100 text-green-700"
-      : pagamento.estado === "PENDENTE"
-      ? "bg-yellow-100 text-yellow-700"
-      : "bg-red-100 text-red-700";
-
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-10 px-4 md:px-8">
+      <div className="max-w-6xl mx-auto space-y-8">
 
-      {/* HEADER */}
-      <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl flex justify-between items-center">
-        <div className="flex items-center gap-4">
-          <div className="p-4 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 rounded-2xl">
-            <FileText className="w-8 h-8 text-blue-600" />
+        {/* 🔹 HEADER */}
+        <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 border shadow-2xl flex flex-col lg:flex-row justify-between gap-6">
+          
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate("/pagamentos")}
+              className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl font-semibold"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Voltar
+            </button>
+
+            <div>
+              <h1 className="text-3xl lg:text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
+                Pagamento #{pagamento.id}
+              </h1>
+              <p className="text-slate-600 font-semibold">
+                Detalhes completos do pagamento
+              </p>
+            </div>
           </div>
 
-          <div>
-            <h1 className="text-3xl font-black text-slate-900">
-              Pagamento #{pagamento.id}
-            </h1>
-            <p className="text-slate-600 font-medium">
-              Detalhes completos do pagamento
-            </p>
-          </div>
-        </div>
-
-        <button
-          onClick={() => navigate("/pagamentos")}
-          className="flex items-center gap-2 px-5 py-3 bg-slate-700 text-white rounded-2xl hover:scale-105 transition"
-        >
-          <ArrowLeft size={18} />
-          Voltar
-        </button>
-      </div>
-
-      {/* DADOS PRINCIPAIS */}
-      <div className="bg-white rounded-3xl shadow-xl p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-        <div className="bg-slate-50 p-5 rounded-2xl">
-          <p className="text-sm text-slate-500">Valor</p>
-          <p className="text-xl font-bold text-slate-800">
-            {formatCurrency(pagamento.valor)}
-          </p>
-        </div>
-
-        <div className="bg-slate-50 p-5 rounded-2xl">
-          <p className="text-sm text-slate-500">Estado</p>
-          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${estadoClasses}`}>
+          <div
+            className={`px-6 py-3 rounded-2xl font-bold ${
+              pagamento.estado === "PAGO"
+                ? "bg-green-100 text-green-700"
+                : pagamento.estado === "PENDENTE"
+                ? "bg-yellow-100 text-yellow-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
             {pagamento.estado}
-          </span>
-        </div>
-
-        <div className="bg-slate-50 p-5 rounded-2xl">
-          <p className="text-sm text-slate-500">Descrição</p>
-          <p className="font-medium text-slate-800">
-            {pagamento.descricao || "-"}
-          </p>
-        </div>
-
-        <div className="bg-slate-50 p-5 rounded-2xl">
-          <p className="text-sm text-slate-500">Data</p>
-          <p className="font-medium text-slate-800">
-            {pagamento.data
-              ? dayjs(pagamento.data).format("DD/MM/YYYY")
-              : "-"}
-          </p>
-        </div>
-
-        <div className="bg-slate-50 p-5 rounded-2xl">
-          <p className="text-sm text-slate-500">Vencimento</p>
-          <p className="font-medium text-slate-800">
-            {pagamento.vencimento
-              ? dayjs(pagamento.vencimento).format("DD/MM/YYYY")
-              : "-"}
-          </p>
-        </div>
-
-        <div className="bg-slate-50 p-5 rounded-2xl">
-          <p className="text-sm text-slate-500">Utilizador</p>
-          <p className="font-medium text-slate-800">
-            {pagamento.user?.nome || "-"}
-          </p>
-        </div>
-
-        <div className="bg-slate-50 p-5 rounded-2xl">
-          <p className="text-sm text-slate-500">Fração</p>
-          <p className="font-medium text-slate-800">
-            {pagamento.fracao?.numero || "-"}
-          </p>
-        </div>
-
-        <div className="bg-slate-50 p-5 rounded-2xl">
-          <p className="text-sm text-slate-500">Proprietário</p>
-          <p className="font-medium text-slate-800">
-            {pagamento.proprietario?.nome || "-"}
-          </p>
-        </div>
-
-        <div className="bg-slate-50 p-5 rounded-2xl">
-          <p className="text-sm text-slate-500">Inquilino</p>
-          <p className="font-medium text-slate-800">
-            {pagamento.inquilino?.nome || "-"}
-          </p>
-        </div>
-
-      </div>
-
-      {/* HISTÓRICO */}
-      <div className="bg-white rounded-3xl shadow-xl p-8">
-        <h3 className="text-xl font-bold text-slate-800 mb-6">
-          Histórico de alterações
-        </h3>
-
-        {pagamento.historico && pagamento.historico.length > 0 ? (
-          <div className="space-y-4">
-            {pagamento.historico.map((h) => (
-              <div
-                key={h.id}
-                className="p-5 rounded-2xl bg-slate-50 border flex flex-col gap-2"
-              >
-                <p className="text-sm text-slate-600">
-                  <strong>{h.user?.nome || "Usuário desconhecido"}</strong>{" "}
-                  realizou <strong>{h.acao}</strong>
-                </p>
-
-                <p className="text-sm text-slate-700">{h.detalhe}</p>
-
-                <p className="text-xs text-slate-400">
-                  {dayjs(h.data).format("DD/MM/YYYY HH:mm")}
-                </p>
-              </div>
-            ))}
           </div>
-        ) : (
-          <p className="text-slate-500">
-            Nenhuma alteração registrada.
-          </p>
-        )}
-      </div>
+        </div>
 
+        {/* 🔹 DADOS PRINCIPAIS */}
+        <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 border shadow-2xl">
+          <h2 className="text-2xl font-black text-slate-800 mb-6 flex items-center gap-2">
+            <CreditCard className="w-6 h-6 text-blue-600" />
+            Informações do Pagamento
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <div>
+              <p className="text-sm text-slate-500">Valor</p>
+              <p className="text-xl font-bold text-slate-900">
+                {formatCurrency(pagamento.valor)}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-sm text-slate-500">Descrição</p>
+              <p className="font-semibold text-slate-800">
+                {pagamento.descricao || "-"}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-sm text-slate-500">Data</p>
+              <p className="font-semibold">
+                {pagamento.data
+                  ? dayjs(pagamento.data).format("DD/MM/YYYY")
+                  : "-"}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-sm text-slate-500">Vencimento</p>
+              <p className="font-semibold">
+                {pagamento.vencimento
+                  ? dayjs(pagamento.vencimento).format("DD/MM/YYYY")
+                  : "-"}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-sm text-slate-500">Utilizador</p>
+              <p className="font-semibold">
+                {pagamento.user?.nome || "-"}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-sm text-slate-500">Fração</p>
+              <p className="font-semibold">
+                {pagamento.fracao?.numero || "-"}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-sm text-slate-500">Proprietário</p>
+              <p className="font-semibold">
+                {pagamento.proprietario?.nome || "-"}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-sm text-slate-500">Inquilino</p>
+              <p className="font-semibold">
+                {pagamento.inquilino?.nome || "-"}
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        {/* 🔹 HISTÓRICO */}
+        <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 border shadow-2xl">
+          <h2 className="text-2xl font-black text-slate-800 mb-6 flex items-center gap-2">
+            <Calendar className="w-6 h-6 text-emerald-600" />
+            Histórico de Alterações
+          </h2>
+
+          {pagamento.historico && pagamento.historico.length > 0 ? (
+            <div className="space-y-4">
+              {pagamento.historico.map((h) => (
+                <div
+                  key={h.id}
+                  className="bg-slate-50 rounded-2xl p-4 border shadow-sm"
+                >
+                  <p className="text-sm text-slate-600">
+                    <strong>{h.user?.nome || "Usuário desconhecido"}</strong>{" "}
+                    realizou <strong>{h.acao}</strong>
+                  </p>
+
+                  <p className="text-slate-700 font-medium">
+                    {h.detalhe}
+                  </p>
+
+                  <p className="text-xs text-slate-400">
+                    {dayjs(h.data).format("DD/MM/YYYY HH:mm")}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-slate-500">
+              Nenhuma alteração registrada.
+            </p>
+          )}
+        </div>
+
+      </div>
     </div>
   );
 };
