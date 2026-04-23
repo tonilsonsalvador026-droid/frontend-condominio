@@ -2,7 +2,7 @@
 import ReciboList from "./ReciboList";
 
 const ReciboPage = () => {
-  return <reciboList />;
+  return <ReciboList />;
 };
 
 export default ReciboPage;
