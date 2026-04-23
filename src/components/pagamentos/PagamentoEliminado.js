@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api";
 import dayjs from "dayjs";
-import { Trash2, CreditCard } from "lucide-react";
+import { CreditCard } from "lucide-react";
 
 const PagamentoEliminado = () => {
   const [pagamentos, setPagamentos] = useState([]);
@@ -31,24 +31,24 @@ const PagamentoEliminado = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4 md:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* 🔹 HEADER */}
-         <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 lg:p-12 border border-slate-200/50 shadow-2xl mb-12">
-         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-          </div>
 
-          <div>
+        {/* 🔹 HEADER */}
+        <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 lg:p-12 border border-slate-200/50 shadow-2xl mb-12">
+          <div className="flex flex-col gap-2">
+
             <h1 className="text-3xl lg:text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
               Pagamentos Eliminados
             </h1>
+
             <p className="text-slate-600 font-semibold">
               Histórico de pagamentos removidos do sistema
             </p>
+
           </div>
         </div>
 
         {/* 🔹 TABELA */}
-        <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-6 border shadow-2xl">
+        <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/50 shadow-2xl">
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -92,9 +92,7 @@ const PagamentoEliminado = () => {
                     </td>
 
                     <td className="py-4 px-3 text-slate-600">
-                      {p.data
-                        ? dayjs(p.data).format("DD/MM/YYYY")
-                        : "-"}
+                      {p.data ? dayjs(p.data).format("DD/MM/YYYY") : "-"}
                     </td>
 
                     <td className="py-4 px-3 text-slate-600">
