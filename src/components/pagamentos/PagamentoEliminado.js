@@ -22,9 +22,9 @@ const PagamentoEliminado = () => {
 
   const formatarValor = (valor) => {
     if (valor == null) return "-";
-    return valor.toLocaleString("pt-PT", {
+    return valor.toLocaleString("pt-AO", {
       style: "currency",
-      currency: "EUR",
+      currency: "AOA",
     });
   };
 
