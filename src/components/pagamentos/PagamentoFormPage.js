@@ -247,20 +247,25 @@ const PagamentoFormPage = () => {
           </div>
 
           {/* BOTÕES */}
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t">
             <button
               type="button"
               onClick={() => navigate("/pagamentos")}
-              className="flex-1 bg-gray-200 p-3 rounded-xl"
-            >
-              Cancelar
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-slate-200 rounded-2xl font-bold"
+                >
+              <ChevronLeft/> Cancelar
             </button>
 
             <button
               type="submit"
-              className="flex-1 bg-blue-600 text-white p-3 rounded-xl"
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-bold text-white ${
+                loading
+                ?"bg-gray-400"
+                : "bg-gradient-to-r from-blue-600 to-emerald-600"
+}}
             >
-              {loading ? "Salvando..." : "Salvar"}
+<Save/>
+              {loading ? "Salvando..." : "Salvar Pagamento"}
             </button>
           </div>
 
