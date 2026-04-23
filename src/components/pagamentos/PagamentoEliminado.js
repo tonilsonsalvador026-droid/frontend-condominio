@@ -29,13 +29,12 @@ const PagamentoEliminado = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-red-50 py-10 px-4 md:px-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4 md:px-8">
+      <div className="max-w-7xl mx-auto">
         {/* 🔹 HEADER */}
-        <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 border shadow-2xl flex items-center gap-4">
-          <div className="p-4 bg-gradient-to-br from-red-500/20 to-pink-500/20 rounded-2xl border border-red-200/50">
-            <Trash2 className="w-8 h-8 text-red-600" />
+         <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 lg:p-12 border border-slate-200/50 shadow-2xl mb-12">
+         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
           </div>
 
           <div>
