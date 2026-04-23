@@ -248,27 +248,29 @@ const PagamentoFormPage = () => {
 
           {/* BOTÕES */}
           <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t">
-            <button
-              type="button"
-              onClick={() => navigate("/pagamentos")}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-slate-200 rounded-2xl font-bold"
-                >
-              <ChevronLeft/> Cancelar
-            </button>
 
-            <button
-              type="submit"
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-bold text-white ${
-                loading
-                ?"bg-gray-400"
-                : "bg-gradient-to-r from-blue-600 to-emerald-600"
-}}
-            >
-<Save/>
-              {loading ? "Salvando..." : "Salvar Pagamento"}
-            </button>
-          </div>
+  <button
+    type="button"
+    onClick={() => navigate("/pagamentos")}
+    className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-slate-200 rounded-2xl font-bold hover:bg-slate-300 transition-all"
+  >
+    <ChevronLeft /> Cancelar
+  </button>
 
+  <button
+    type="submit"
+    disabled={loading}
+    className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-bold text-white transition-all ${
+      loading
+        ? "bg-gray-400"
+        : "bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700"
+    }`}
+  >
+    <Save />
+    {loading ? "Salvando..." : "Salvar Pagamento"}
+  </button>
+
+</div>
         </form>
       </div>
     </div>
