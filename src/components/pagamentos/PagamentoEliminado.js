@@ -38,7 +38,7 @@ const PagamentoEliminado = () => {
           </div>
 
           <div>
-            <h1 className="text-3xl lg:text-4xl font-black bg-gradient-to-r from-slate-900 to-red-900 bg-clip-text text-transparent">
+            <h1 className="text-3xl lg:text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
               Pagamentos Eliminados
             </h1>
             <p className="text-slate-600 font-semibold">
