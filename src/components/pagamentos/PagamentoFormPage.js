@@ -17,6 +17,10 @@ const PagamentoFormPage = () => {
   const [fracaoId, setFracaoId] = useState("");
   const [data, setData] = useState("");
 
+  const [proprietarioId, setProprietarioId] = useState("");
+  const [inquilinoId, setInquilinoId] = useState("");
+  const [vencimento, setVencimento] = useState("");
+
   const [usuarios, setUsuarios] = useState([]);
   const [fracoes, setFracoes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -52,6 +56,12 @@ const PagamentoFormPage = () => {
         setUserId(p.user?.id || "");
         setFracaoId(p.fracao?.id || "");
         setData(p.data ? dayjs(p.data).format("YYYY-MM-DD") : "");
+        setVencimento(p.vencimento ? dayjs(p.vencimento).format("YYYY-MM-DD") : "");
+
+        // 🔥 IMPORTANTE
+        setProprietarioId(p.proprietario?.id || "");
+        setInquilinoId(p.inquilino?.id || "");
+
       } catch (err) {
         console.error("Erro ao carregar pagamento:", err);
       }
@@ -60,6 +70,18 @@ const PagamentoFormPage = () => {
     fetchUsuariosEFracoes();
     fetchPagamento();
   }, [id]);
+
+  const handleFracaoChange = (e) => {
+    const id = e.target.value;
+    setFracaoId(id);
+
+    const fracao = fracoes.find(f => f.id === parseInt(id));
+
+    if (fracao) {
+      setProprietarioId(fracao.proprietario?.id || "");
+      setInquilinoId(fracao.inquilino?.id || "");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -72,6 +94,9 @@ const PagamentoFormPage = () => {
       userId,
       fracaoId,
       data,
+      vencimento,
+      proprietarioId,
+      inquilinoId
     };
 
     try {
@@ -87,6 +112,8 @@ const PagamentoFormPage = () => {
       setLoading(false);
     }
   };
+
+  const fracaoSelecionada = fracoes.find(f => f.id === parseInt(fracaoId));
 
   return (
     <div className="w-full max-w-4xl mx-auto">
@@ -107,49 +134,40 @@ const PagamentoFormPage = () => {
           </div>
         </div>
 
-        {/* FORM */}
         <form onSubmit={handleSubmit} className="space-y-8">
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
             {/* Valor */}
-            <div className="space-y-3">
-              <label className="font-bold text-lg text-slate-800">
-                Valor
-              </label>
+            <div>
+              <label className="font-bold">Valor</label>
               <input
                 type="text"
                 value={valor ? formatCurrency(Number(valor)) : ""}
                 onChange={handleValorChange}
-                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-xl"
-                placeholder="Ex: 5.000,00 Kz"
+                className="w-full px-4 py-3 border rounded-xl"
                 required
               />
             </div>
 
             {/* Descrição */}
-            <div className="space-y-3">
-              <label className="font-bold text-lg text-slate-800">
-                Descrição
-              </label>
+            <div>
+              <label className="font-bold">Descrição</label>
               <input
                 type="text"
                 value={descricao}
                 onChange={(e) => setDescricao(e.target.value)}
-                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-xl"
+                className="w-full px-4 py-3 border rounded-xl"
               />
             </div>
 
             {/* Estado */}
-            <div className="space-y-3">
-              <label className="font-bold text-lg text-slate-800">
-                Estado
-              </label>
+            <div>
+              <label className="font-bold">Estado</label>
               <select
                 value={estado}
                 onChange={(e) => setEstado(e.target.value)}
-                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-xl"
-                required
+                className="w-full px-4 py-3 border rounded-xl"
               >
                 <option value="PAGO">Pago</option>
                 <option value="PENDENTE">Pendente</option>
@@ -158,15 +176,12 @@ const PagamentoFormPage = () => {
             </div>
 
             {/* Usuário */}
-            <div className="space-y-3">
-              <label className="font-bold text-lg text-slate-800">
-                Usuário
-              </label>
+            <div>
+              <label className="font-bold">Usuário</label>
               <select
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
-                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-xl"
-                required
+                className="w-full px-4 py-3 border rounded-xl"
               >
                 <option value="">Selecione</option>
                 {usuarios.map((u) => (
@@ -178,15 +193,12 @@ const PagamentoFormPage = () => {
             </div>
 
             {/* Fração */}
-            <div className="space-y-3">
-              <label className="font-bold text-lg text-slate-800">
-                Fração
-              </label>
+            <div>
+              <label className="font-bold">Fração</label>
               <select
                 value={fracaoId}
-                onChange={(e) => setFracaoId(e.target.value)}
-                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-xl"
-                required
+                onChange={handleFracaoChange}
+                className="w-full px-4 py-3 border rounded-xl"
               >
                 <option value="">Selecione</option>
                 {fracoes.map((f) => (
@@ -198,45 +210,58 @@ const PagamentoFormPage = () => {
             </div>
 
             {/* Data */}
-            <div className="space-y-3">
-              <label className="font-bold text-lg text-slate-800">
-                Data
-              </label>
+            <div>
+              <label className="font-bold">Data</label>
               <input
                 type="date"
                 value={data}
                 onChange={(e) => setData(e.target.value)}
-                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-xl"
-                required
+                className="w-full px-4 py-3 border rounded-xl"
               />
             </div>
 
           </div>
 
-          {/* BOTÕES */}
-          <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t">
+          {/* 🔥 RESPONSÁVEL */}
+          {fracaoSelecionada && (
+            <div className="bg-blue-50 p-4 rounded-xl border">
+              <p className="text-sm text-gray-500">Responsável</p>
+              <p className="font-bold">
+                {fracaoSelecionada.proprietario?.nome || "Sem proprietário"}
+              </p>
+              <p className="text-sm">
+                Inquilino: {fracaoSelecionada.inquilino?.nome || "-"}
+              </p>
+            </div>
+          )}
 
+          {/* Vencimento */}
+          <div>
+            <label className="font-bold">Vencimento</label>
+            <input
+              type="date"
+              value={vencimento}
+              onChange={(e) => setVencimento(e.target.value)}
+              className="w-full px-4 py-3 border rounded-xl"
+            />
+          </div>
+
+          {/* BOTÕES */}
+          <div className="flex gap-4">
             <button
               type="button"
               onClick={() => navigate("/pagamentos")}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-slate-200 rounded-2xl font-bold"
+              className="flex-1 bg-gray-200 p-3 rounded-xl"
             >
-              <ChevronLeft /> Cancelar
+              Cancelar
             </button>
 
             <button
               type="submit"
-              disabled={loading}
-              className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-bold text-white ${
-                loading
-                  ? "bg-gray-400"
-                  : "bg-gradient-to-r from-blue-600 to-emerald-600"
-              }`}
+              className="flex-1 bg-blue-600 text-white p-3 rounded-xl"
             >
-              <Save />
-              {loading ? "Salvando..." : "Salvar Pagamento"}
+              {loading ? "Salvando..." : "Salvar"}
             </button>
-
           </div>
 
         </form>
