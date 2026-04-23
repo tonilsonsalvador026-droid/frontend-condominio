@@ -207,7 +207,7 @@ const ReciboList = () => {
           </thead>
 
           <tbody>
-            {filteredRecibos.map((r) => (
+            {filteredRecibos?.map((r) => (
               <tr key={r.id} className="border-b hover:bg-slate-50 transition">
 
                 <td className="py-3 px-2">#{r.id}</td>
