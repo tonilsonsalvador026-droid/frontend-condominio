@@ -1,4 +1,3 @@
-// src/components/recibos/ReciboList.js
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api";
@@ -12,11 +11,13 @@ import {
   Pencil,
   Eye,
   Download,
+  Search,
+  Plus
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { formatCurrency } from "../../utils/formatCurrency"; // ✅ import global
+import { formatCurrency } from "../../utils/formatCurrency";
 
 const ReciboList = () => {
   const [recibos, setRecibos] = useState([]);
@@ -82,7 +83,7 @@ const ReciboList = () => {
     }
   };
 
-  // ---------- EXPORTAÇÕES ----------
+  // EXPORTS (sem alteração)
   const exportCSV = () => {
     const header = ["ID", "Número", "Data", "Proprietário", "Valor"];
     const rows = filteredRecibos.map((r) => [
@@ -92,7 +93,7 @@ const ReciboList = () => {
         ? dayjs(r.data || r.dataEmissao).format("DD/MM/YYYY")
         : "-",
       r.pagamento?.proprietario?.nome || "-",
-      r.pagamento ? formatCurrency(Number(r.pagamento.valor)) : "-", // ✅ formatCurrency
+      r.pagamento ? formatCurrency(Number(r.pagamento.valor)) : "-",
     ]);
     const csv = [header, ...rows].map((r) => r.join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -112,7 +113,7 @@ const ReciboList = () => {
         ? dayjs(r.data || r.dataEmissao).format("DD/MM/YYYY")
         : "-",
       Proprietário: r.pagamento?.proprietario?.nome || "-",
-      Valor: r.pagamento ? formatCurrency(Number(r.pagamento.valor)) : "-", // ✅ formatCurrency
+      Valor: r.pagamento ? formatCurrency(Number(r.pagamento.valor)) : "-",
     }));
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
@@ -133,7 +134,7 @@ const ReciboList = () => {
           ? dayjs(r.data || r.dataEmissao).format("DD/MM/YYYY")
           : "-",
         r.pagamento?.proprietario?.nome || "-",
-        r.pagamento ? formatCurrency(Number(r.pagamento.valor)) : "-", // ✅ formatCurrency
+        r.pagamento ? formatCurrency(Number(r.pagamento.valor)) : "-",
       ]),
     });
     doc.save("recibos.pdf");
@@ -142,169 +143,143 @@ const ReciboList = () => {
   const handlePrint = () => {
     const content = document.getElementById("printArea").innerHTML;
     const win = window.open("", "", "width=900,height=650");
-    win.document.write(`
-      <html>
-        <head>
-          <title>Relatório de Recibos</title>
-          <style>
-            table { width: 100%; border-collapse: collapse; font-size: 14px; }
-            th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-            th { background: #f5f5f5; }
-          </style>
-        </head>
-        <body>${content}</body>
-      </html>
-    `);
+    win.document.write(`<html><body>${content}</body></html>`);
     win.document.close();
     win.print();
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow flex flex-col h-full">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
-        <h2 className="text-lg font-semibold text-gray-700">Lista de Recibos</h2>
-        <div className="flex flex-col md:flex-row gap-3 md:items-center">
-          <input
-            type="text"
-            placeholder="Pesquisar..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="border rounded p-2 w-full md:w-64 text-gray-700"
-          />
-          <button
-            onClick={() => navigate("/recibos/novo")}
-            className="flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 text-sm"
-          >
-            <FileText size={16} /> Novo Recibo
-          </button>
+    <div className="space-y-8 w-full">
+
+      {/* HEADER PREMIUM */}
+      <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-6">
+
+          <div>
+            <h1 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent mb-2">
+              Recibos
+            </h1>
+            <p className="text-xl text-slate-600 font-semibold">
+              {filteredRecibos.length} de {recibos.length} encontrados
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+
+            {/* SEARCH */}
+            <div className="relative flex-1 lg:w-96">
+              <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Pesquisar recibos..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-12 pr-6 py-4 bg-white/70 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-lg"
+              />
+            </div>
+
+            {/* BOTÃO NOVO */}
+            <button
+              onClick={() => navigate("/recibos/novo")}
+              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-2xl shadow-xl hover:-translate-y-1 transition-all flex items-center"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              Novo Recibo
+            </button>
+
+          </div>
         </div>
       </div>
 
-      {/* Botões exportação */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        <button
-          onClick={exportCSV}
-          className="flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 text-sm"
-        >
-          <FileText size={16} /> CSV
-        </button>
-        <button
-          onClick={exportExcel}
-          className="flex items-center gap-2 bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 text-sm"
-        >
-          <FileSpreadsheet size={16} /> Excel
-        </button>
-        <button
-          onClick={exportPDF}
-          className="flex items-center gap-2 bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 text-sm"
-        >
-          <FileDown size={16} /> PDF
-        </button>
-        <button
-          onClick={handlePrint}
-          className="flex items-center gap-2 bg-gray-600 text-white px-3 py-2 rounded hover:bg-gray-700 text-sm"
-        >
-          <Printer size={16} /> Imprimir
-        </button>
-      </div>
+      {/* TABELA PREMIUM */}
+      <div id="printArea" className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border shadow-xl overflow-x-auto">
 
-      {/* Tabela */}
-      <div id="printArea" className="overflow-x-auto flex-grow">
-        <table className="w-full text-sm md:text-base border-collapse">
+        <table className="w-full text-sm">
           <thead>
-            <tr className="bg-gray-100 text-gray-700 text-left">
-              <th className="p-2">ID</th>
-              <th className="p-2">Número</th>
-              <th className="p-2">Data</th>
-              <th className="p-2">Proprietário</th>
-              <th className="p-2">Valor</th>
-              <th className="p-2">Ações</th>
+            <tr className="border-b">
+              <th className="py-3 px-2">ID</th>
+              <th className="py-3 px-2">Número</th>
+              <th className="py-3 px-2">Data</th>
+              <th className="py-3 px-2">Proprietário</th>
+              <th className="py-3 px-2">Valor</th>
+              <th className="py-3 px-2">Ações</th>
             </tr>
           </thead>
+
           <tbody>
             {filteredRecibos.map((r) => (
-              <tr key={r.id} className="hover:bg-gray-50 border-b last:border-none">
-                <td className="p-2 whitespace-nowrap">{r.id}</td>
-                <td className="p-2">{r.numero}</td>
-                <td className="p-2">
+              <tr key={r.id} className="border-b hover:bg-slate-50 transition">
+
+                <td className="py-3 px-2">#{r.id}</td>
+                <td className="py-3 px-2">{r.numero}</td>
+                <td className="py-3 px-2">
                   {r.data || r.dataEmissao
                     ? dayjs(r.data || r.dataEmissao).format("DD/MM/YYYY")
                     : "-"}
                 </td>
-                <td className="p-2">{r.pagamento?.proprietario?.nome || "-"}</td>
-                <td className="p-2">
-                  {r.pagamento
-                    ? formatCurrency(Number(r.pagamento.valor)) // ✅ formatCurrency na tabela
-                    : "-"}
+                <td className="py-3 px-2">{r.pagamento?.proprietario?.nome || "-"}</td>
+                <td className="py-3 px-2 font-bold text-emerald-600">
+                  {r.pagamento ? formatCurrency(Number(r.pagamento.valor)) : "-"}
                 </td>
-                <td className="p-2 flex gap-2">
-                  <button
-                    onClick={() => navigate(`/recibos/${r.id}/editar`)}
-                    className="text-blue-600 hover:text-blue-800"
-                    title="Editar"
-                  >
+
+                <td className="py-3 px-2 flex gap-2">
+                  <button onClick={() => navigate(`/recibos/${r.id}/editar`)}>
                     <Pencil size={18} />
                   </button>
-                  <button
-                    onClick={() => navigate(`/recibos/${r.id}/detalhe`)}
-                    className="text-green-600 hover:text-green-800"
-                    title="Ver Detalhe"
-                  >
+                  <button onClick={() => navigate(`/recibos/${r.id}/detalhe`)}>
                     <Eye size={18} />
                   </button>
-                  <button
-                    onClick={() => handleDownloadPDF(r.id)}
-                    className="text-gray-600 hover:text-gray-800"
-                    title="Baixar PDF"
-                  >
+                  <button onClick={() => handleDownloadPDF(r.id)}>
                     <Download size={18} />
                   </button>
                   <button
                     onClick={() => handleDelete(r.id)}
-                    className={`text-red-600 hover:text-red-800 ${
-                      deletingId === r.id ? "opacity-50 pointer-events-none" : ""
-                    }`}
-                    title="Eliminar"
+                    className="text-red-600"
                   >
                     <Trash2 size={18} />
                   </button>
                 </td>
+
               </tr>
             ))}
+
             {filteredRecibos.length === 0 && (
               <tr>
-                <td colSpan="6" className="p-4 text-center text-gray-500">
-                  Nenhum recibo encontrado.
+                <td colSpan="6" className="text-center py-6 text-slate-500">
+                  Nenhum recibo encontrado
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+
       </div>
 
-      {/* Paginação */}
-      {totalPaginas > 1 && (
-        <div className="flex justify-center items-center gap-3 mt-4">
-          <button
-            onClick={() => setPaginaAtual(paginaAtual - 1)}
-            disabled={paginaAtual === 1}
-            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-          >
-            Anterior
-          </button>
-          <span className="text-gray-700">
-            Página {paginaAtual} de {totalPaginas}
-          </span>
-          <button
-            onClick={() => setPaginaAtual(paginaAtual + 1)}
-            disabled={paginaAtual === totalPaginas}
-            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-          >
-            Próxima
-          </button>
+      {/* EXPORTS PREMIUM */}
+      {filteredRecibos.length > 0 && (
+        <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border shadow-xl">
+          <div className="flex flex-wrap gap-3 justify-center">
+
+            <button onClick={exportCSV} className="px-6 py-3 bg-blue-600 text-white rounded-2xl font-bold flex items-center gap-2">
+              <FileText size={16} /> CSV
+            </button>
+
+            <button onClick={exportExcel} className="px-6 py-3 bg-emerald-600 text-white rounded-2xl font-bold flex items-center gap-2">
+              <FileSpreadsheet size={16} /> Excel
+            </button>
+
+            <button onClick={exportPDF} className="px-6 py-3 bg-red-600 text-white rounded-2xl font-bold flex items-center gap-2">
+              <FileDown size={16} /> PDF
+            </button>
+
+            <button onClick={handlePrint} className="px-6 py-3 bg-slate-600 text-white rounded-2xl font-bold flex items-center gap-2">
+              <Printer size={16} /> Imprimir
+            </button>
+
+          </div>
         </div>
       )}
+
     </div>
   );
 };
