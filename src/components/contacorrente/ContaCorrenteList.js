@@ -21,6 +21,7 @@ import { formatCurrency } from "../../utils/formatCurrency";
 
 const ContaCorrenteList = ({ onEdit, onViewMovimentos }) => {
   const [contas, setContas] = useState([]);
+  const [search, setSearch] = useState("");
 
   const fetchContas = async () => {
     try {
@@ -45,6 +46,11 @@ const ContaCorrenteList = ({ onEdit, onViewMovimentos }) => {
     }
   };
 
+  // ---------------- FILTER (NOVO - NÃO ALTERA LOGICA BASE) ----------------
+  const filteredContas = contas.filter((c) =>
+    c.proprietario?.nome?.toLowerCase().includes(search.toLowerCase())
+  );
+
   // ---------------- EXPORTAÇÕES ----------------
 
   const exportCSV = () => {
@@ -52,7 +58,7 @@ const ContaCorrenteList = ({ onEdit, onViewMovimentos }) => {
     const headers = ["ID", "Proprietário", "Saldo Inicial", "Saldo Atual", "Data de Criação"];
     csvRows.push(headers.join(","));
 
-    contas.forEach((conta) => {
+    filteredContas.forEach((conta) => {
       csvRows.push([
         conta.id,
         conta.proprietario?.nome || "-",
@@ -72,7 +78,7 @@ const ContaCorrenteList = ({ onEdit, onViewMovimentos }) => {
 
   const exportExcel = () => {
     const ws = XLSX.utils.json_to_sheet(
-      contas.map((conta) => ({
+      filteredContas.map((conta) => ({
         ID: conta.id,
         Proprietário: conta.proprietario?.nome || "-",
         "Saldo Inicial": formatCurrency(conta.saldoInicial),
@@ -92,7 +98,7 @@ const ContaCorrenteList = ({ onEdit, onViewMovimentos }) => {
 
     autoTable(doc, {
       head: [["ID", "Proprietário", "Saldo Inicial", "Saldo Atual", "Data"]],
-      body: contas.map((conta) => [
+      body: filteredContas.map((conta) => [
         conta.id,
         conta.proprietario?.nome || "-",
         formatCurrency(conta.saldoInicial),
@@ -117,17 +123,38 @@ const ContaCorrenteList = ({ onEdit, onViewMovimentos }) => {
   return (
     <div className="space-y-8 w-full">
 
-      {/* HEADER (upgrade premium style) */}
+      {/* HEADER IGUAL EDIFÍCIOS (NOVO PADRÃO) */}
       <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
 
+          {/* TITLE */}
           <div>
             <h1 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent mb-2">
               Contas Correntes
             </h1>
+
             <p className="text-xl text-slate-600 font-semibold">
-              {contas.length} contas encontradas
+              {filteredContas.length} de {contas.length} encontrados
             </p>
+          </div>
+
+          {/* SEARCH */}
+          <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+
+            <div className="relative flex-1 lg:w-96">
+              <input
+                type="text"
+                placeholder="Pesquisar por proprietário..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full px-6 py-4 bg-white/70 backdrop-blur-sm border border-slate-200/50 rounded-2xl focus:ring-4 focus:ring-blue-200/50 focus:border-blue-300 outline-none transition-all shadow-lg hover:shadow-xl"
+              />
+            </div>
+
+            <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-2xl shadow-xl hover:-translate-y-1 transition-all">
+              + Nova Conta
+            </button>
+
           </div>
 
         </div>
@@ -136,76 +163,57 @@ const ContaCorrenteList = ({ onEdit, onViewMovimentos }) => {
       {/* LISTA */}
       <div id="printArea" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
 
-        {contas.length > 0 ? contas.map((conta) => (
+        {filteredContas.length > 0 ? filteredContas.map((conta) => (
           <div
             key={conta.id}
             className="group bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-xl hover:shadow-2xl border border-slate-200/40 hover:border-blue-200/60 hover:-translate-y-2 transition-all duration-500 flex flex-col"
           >
 
-            {/* CARD HEADER */}
-            <div className="flex items-start justify-between mb-4">
-              <div className="p-3 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-xl border border-blue-200/50">
-                <Wallet className="w-6 h-6 text-blue-600" />
+            <div className="flex justify-between items-start mb-4">
+              <div className="p-3 bg-blue-100 rounded-xl">
+                <Wallet className="text-blue-600" />
               </div>
-
-              <span className="text-xs font-bold text-slate-500">
-                #{conta.id}
-              </span>
+              <span className="text-xs font-bold text-slate-500">#{conta.id}</span>
             </div>
 
-            {/* NAME */}
             <h3 className="text-xl font-black text-slate-900 mb-3">
-              <User className="inline w-4 h-4 mr-1 text-slate-500" />
+              <User className="inline w-4 h-4 mr-1" />
               {conta.proprietario?.nome || "Sem proprietário"}
             </h3>
 
-            {/* BALANCES */}
-            <div className="grid grid-cols-2 gap-3 mb-5">
+            <div className="grid grid-cols-2 gap-3 mb-4">
 
-              <div className="text-center p-3 bg-slate-50/70 rounded-xl border border-slate-200/30">
-                <div className="text-xs text-slate-500">Saldo Inicial</div>
-                <div className="font-bold text-slate-900">
-                  {formatCurrency(conta.saldoInicial)}
-                </div>
+              <div className="bg-slate-50 rounded-xl p-3 text-center">
+                <p className="text-xs text-slate-500">Saldo Inicial</p>
+                <p className="font-bold">{formatCurrency(conta.saldoInicial)}</p>
               </div>
 
-              <div className="text-center p-3 bg-slate-50/70 rounded-xl border border-slate-200/30">
-                <div className="text-xs text-slate-500">Saldo Atual</div>
-                <div className={`font-bold ${conta.saldoAtual < 0 ? "text-red-600" : "text-emerald-600"}`}>
+              <div className="bg-slate-50 rounded-xl p-3 text-center">
+                <p className="text-xs text-slate-500">Saldo Atual</p>
+                <p className={`font-bold ${conta.saldoAtual < 0 ? "text-red-600" : "text-emerald-600"}`}>
                   {formatCurrency(conta.saldoAtual)}
-                </div>
+                </p>
               </div>
 
             </div>
 
-            {/* DATE */}
             <p className="text-sm text-slate-500 mb-4">
               <Calendar className="inline w-4 h-4 mr-1" />
               {dayjs(conta.criadoEm).format("DD/MM/YYYY")}
             </p>
 
-            {/* ACTIONS */}
-            <div className="flex justify-between items-center pt-4 border-t border-slate-200/50 mt-auto">
+            <div className="flex justify-between pt-4 border-t">
 
               <div className="flex gap-3">
-                <button
-                  onClick={() => onEdit(conta)}
-                  className="hover:scale-110 transition"
-                >
+                <button onClick={() => onEdit(conta)} className="hover:scale-110 transition">
                   <Pencil className="text-blue-600" />
                 </button>
 
-                <button
-                  onClick={() => onViewMovimentos(conta)}
-                  className="hover:scale-110 transition"
-                >
+                <button onClick={() => onViewMovimentos(conta)} className="hover:scale-110 transition">
                   <Eye className="text-emerald-600" />
                 </button>
 
-                <button
-                  onClick={() => handleDelete(conta.id)}
-                  className="hover:scale-110 transition"
-                >
+                <button onClick={() => handleDelete(conta.id)} className="hover:scale-110 transition">
                   <Trash2 className="text-red-600" />
                 </button>
               </div>
@@ -221,24 +229,24 @@ const ContaCorrenteList = ({ onEdit, onViewMovimentos }) => {
 
       </div>
 
-      {/* EXPORTS (com animação estilo EdificioList) */}
-      {contas.length > 0 && (
-        <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-xl">
+      {/* EXPORTS */}
+      {filteredContas.length > 0 && (
+        <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border shadow-xl">
           <div className="flex flex-wrap gap-3 justify-center">
 
-            <button onClick={exportCSV} className="group flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
+            <button onClick={exportCSV} className="group flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-2xl hover:-translate-y-1 transition-all">
               <FileText className="w-4 h-4" /> CSV
             </button>
 
-            <button onClick={exportExcel} className="group flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
+            <button onClick={exportExcel} className="group flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-bold rounded-2xl hover:-translate-y-1 transition-all">
               <FileSpreadsheet className="w-4 h-4" /> Excel
             </button>
 
-            <button onClick={exportPDF} className="group flex items-center gap-2 px-6 py-3 bg-red-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
+            <button onClick={exportPDF} className="group flex items-center gap-2 px-6 py-3 bg-red-600 text-white font-bold rounded-2xl hover:-translate-y-1 transition-all">
               <FileDown className="w-4 h-4" /> PDF
             </button>
 
-            <button onClick={handlePrint} className="group flex items-center gap-2 px-6 py-3 bg-slate-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
+            <button onClick={handlePrint} className="group flex items-center gap-2 px-6 py-3 bg-slate-600 text-white font-bold rounded-2xl hover:-translate-y-1 transition-all">
               <Printer className="w-4 h-4" /> Imprimir
             </button>
 
