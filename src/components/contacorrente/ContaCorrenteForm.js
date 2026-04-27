@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import api from "../../api";
 import { toast } from "sonner";
 import { formatCurrency } from "../../utils/formatCurrency";
-import { Building2, Wallet, User, Save, X } from "lucide-react";
+import {Wallet, User, Save, X } from "lucide-react";
 
 const ContaCorrenteForm = ({ onSave, editingConta, onCancel }) => {
   const [proprietarios, setProprietarios] = useState([]);
