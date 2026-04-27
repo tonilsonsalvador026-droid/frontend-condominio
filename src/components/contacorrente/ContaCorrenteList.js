@@ -51,6 +51,7 @@ const ContaCorrenteList = ({ onEdit, onViewMovimentos }) => {
     const csvRows = [];
     const headers = ["ID", "Proprietário", "Saldo Inicial", "Saldo Atual", "Data de Criação"];
     csvRows.push(headers.join(","));
+
     contas.forEach((conta) => {
       csvRows.push([
         conta.id,
@@ -60,6 +61,7 @@ const ContaCorrenteList = ({ onEdit, onViewMovimentos }) => {
         dayjs(conta.criadoEm).format("DD/MM/YYYY"),
       ].join(","));
     });
+
     const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -78,6 +80,7 @@ const ContaCorrenteList = ({ onEdit, onViewMovimentos }) => {
         "Data de Criação": dayjs(conta.criadoEm).format("DD/MM/YYYY"),
       }))
     );
+
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Contas Correntes");
     XLSX.writeFile(wb, "contas_correntes.xlsx");
@@ -85,7 +88,8 @@ const ContaCorrenteList = ({ onEdit, onViewMovimentos }) => {
 
   const exportPDF = () => {
     const doc = new jsPDF();
-    doc.text("Lista de Contas Correntes", 14, 10);
+    doc.text("Lista de Contas Correntes", 14, 15);
+
     autoTable(doc, {
       head: [["ID", "Proprietário", "Saldo Inicial", "Saldo Atual", "Data"]],
       body: contas.map((conta) => [
@@ -96,6 +100,7 @@ const ContaCorrenteList = ({ onEdit, onViewMovimentos }) => {
         dayjs(conta.criadoEm).format("DD/MM/YYYY"),
       ]),
     });
+
     doc.save("contas_correntes.pdf");
   };
 
@@ -112,9 +117,9 @@ const ContaCorrenteList = ({ onEdit, onViewMovimentos }) => {
   return (
     <div className="space-y-8 w-full">
 
-      {/* HEADER */}
+      {/* HEADER (upgrade premium style) */}
       <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
-        <div className="flex flex-col lg:flex-row lg:items-center gap-6">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
 
           <div>
             <h1 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent mb-2">
@@ -128,7 +133,7 @@ const ContaCorrenteList = ({ onEdit, onViewMovimentos }) => {
         </div>
       </div>
 
-      {/* LISTA CARDS */}
+      {/* LISTA */}
       <div id="printArea" className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
 
         {contas.length > 0 ? contas.map((conta) => (
@@ -137,10 +142,10 @@ const ContaCorrenteList = ({ onEdit, onViewMovimentos }) => {
             className="group bg-white/80 backdrop-blur-xl rounded-3xl p-6 shadow-xl hover:shadow-2xl border border-slate-200/40 hover:border-blue-200/60 hover:-translate-y-2 transition-all duration-500 flex flex-col"
           >
 
-            {/* HEADER CARD */}
-            <div className="flex justify-between items-start mb-4">
-              <div className="p-3 bg-blue-100 rounded-xl">
-                <Wallet className="text-blue-600" />
+            {/* CARD HEADER */}
+            <div className="flex items-start justify-between mb-4">
+              <div className="p-3 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-xl border border-blue-200/50">
+                <Wallet className="w-6 h-6 text-blue-600" />
               </div>
 
               <span className="text-xs font-bold text-slate-500">
@@ -148,52 +153,59 @@ const ContaCorrenteList = ({ onEdit, onViewMovimentos }) => {
               </span>
             </div>
 
-            {/* NOME */}
-            <h3 className="text-xl font-black text-slate-900 mb-2">
-              <User className="inline w-4 h-4 mr-1" />
+            {/* NAME */}
+            <h3 className="text-xl font-black text-slate-900 mb-3">
+              <User className="inline w-4 h-4 mr-1 text-slate-500" />
               {conta.proprietario?.nome || "Sem proprietário"}
             </h3>
 
-            {/* SALDOS */}
-            <div className="grid grid-cols-2 gap-3 my-4">
+            {/* BALANCES */}
+            <div className="grid grid-cols-2 gap-3 mb-5">
 
-              <div className="bg-slate-50 rounded-xl p-3 text-center">
-                <p className="text-xs text-slate-500">Saldo Inicial</p>
-                <p className="font-bold">
+              <div className="text-center p-3 bg-slate-50/70 rounded-xl border border-slate-200/30">
+                <div className="text-xs text-slate-500">Saldo Inicial</div>
+                <div className="font-bold text-slate-900">
                   {formatCurrency(conta.saldoInicial)}
-                </p>
+                </div>
               </div>
 
-              <div className="bg-slate-50 rounded-xl p-3 text-center">
-                <p className="text-xs text-slate-500">Saldo Atual</p>
-                <p className={`font-bold ${
-                  conta.saldoAtual < 0 ? "text-red-600" : "text-emerald-600"
-                }`}>
+              <div className="text-center p-3 bg-slate-50/70 rounded-xl border border-slate-200/30">
+                <div className="text-xs text-slate-500">Saldo Atual</div>
+                <div className={`font-bold ${conta.saldoAtual < 0 ? "text-red-600" : "text-emerald-600"}`}>
                   {formatCurrency(conta.saldoAtual)}
-                </p>
+                </div>
               </div>
 
             </div>
 
-            {/* DATA */}
+            {/* DATE */}
             <p className="text-sm text-slate-500 mb-4">
               <Calendar className="inline w-4 h-4 mr-1" />
               {dayjs(conta.criadoEm).format("DD/MM/YYYY")}
             </p>
 
             {/* ACTIONS */}
-            <div className="flex justify-between pt-4 border-t">
+            <div className="flex justify-between items-center pt-4 border-t border-slate-200/50 mt-auto">
 
               <div className="flex gap-3">
-                <button onClick={() => onEdit(conta)}>
+                <button
+                  onClick={() => onEdit(conta)}
+                  className="hover:scale-110 transition"
+                >
                   <Pencil className="text-blue-600" />
                 </button>
 
-                <button onClick={() => onViewMovimentos(conta)}>
-                  <Eye className="text-green-600" />
+                <button
+                  onClick={() => onViewMovimentos(conta)}
+                  className="hover:scale-110 transition"
+                >
+                  <Eye className="text-emerald-600" />
                 </button>
 
-                <button onClick={() => handleDelete(conta.id)}>
+                <button
+                  onClick={() => handleDelete(conta.id)}
+                  className="hover:scale-110 transition"
+                >
                   <Trash2 className="text-red-600" />
                 </button>
               </div>
@@ -209,25 +221,25 @@ const ContaCorrenteList = ({ onEdit, onViewMovimentos }) => {
 
       </div>
 
-      {/* EXPORTS */}
+      {/* EXPORTS (com animação estilo EdificioList) */}
       {contas.length > 0 && (
-        <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border shadow-xl">
+        <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-xl">
           <div className="flex flex-wrap gap-3 justify-center">
 
-            <button onClick={exportCSV} className="px-6 py-3 bg-blue-600 text-white rounded-2xl font-bold flex items-center gap-2 hover:-translate-y-1 transition">
-              <FileText size={16} /> CSV
+            <button onClick={exportCSV} className="group flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
+              <FileText className="w-4 h-4" /> CSV
             </button>
 
-            <button onClick={exportExcel} className="px-6 py-3 bg-emerald-600 text-white rounded-2xl font-bold flex items-center gap-2 hover:-translate-y-1 transition">
-              <FileSpreadsheet size={16} /> Excel
+            <button onClick={exportExcel} className="group flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
+              <FileSpreadsheet className="w-4 h-4" /> Excel
             </button>
 
-            <button onClick={exportPDF} className="px-6 py-3 bg-red-600 text-white rounded-2xl font-bold flex items-center gap-2 hover:-translate-y-1 transition">
-              <FileDown size={16} /> PDF
+            <button onClick={exportPDF} className="group flex items-center gap-2 px-6 py-3 bg-red-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
+              <FileDown className="w-4 h-4" /> PDF
             </button>
 
-            <button onClick={handlePrint} className="px-6 py-3 bg-slate-600 text-white rounded-2xl font-bold flex items-center gap-2 hover:-translate-y-1 transition">
-              <Printer size={16} /> Imprimir
+            <button onClick={handlePrint} className="group flex items-center gap-2 px-6 py-3 bg-slate-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition-all">
+              <Printer className="w-4 h-4" /> Imprimir
             </button>
 
           </div>
