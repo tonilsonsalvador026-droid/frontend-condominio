@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import api from "../../api";
 import { toast } from "sonner";
 import { formatCurrency } from "../../utils/formatCurrency";
-import {Wallet, User, Save, X } from "lucide-react";
+import { Wallet, User, Save, X } from "lucide-react";
 
 const ContaCorrenteForm = ({ onSave, editingConta, onCancel }) => {
   const [proprietarios, setProprietarios] = useState([]);
@@ -109,19 +109,14 @@ const ContaCorrenteForm = ({ onSave, editingConta, onCancel }) => {
         onSubmit={handleSubmit}
         className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 md:p-10 border border-slate-200/50 shadow-2xl"
       >
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-8">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
-              {editingConta ? "Editar Conta Corrente" : "Nova Conta Corrente"}
-            </h2>
-            <p className="text-slate-600 mt-2">
-              Preencha os dados do proprietário e o saldo inicial.
-            </p>
-          </div>
-
-          <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 shadow-lg">
-            <Building2 className="text-white" size={24} />
-          </div>
+        {/* HEADER (limpo) */}
+        <div className="mb-8">
+          <h2 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
+            {editingConta ? "Editar Conta Corrente" : "Nova Conta Corrente"}
+          </h2>
+          <p className="text-slate-600 mt-2">
+            Preencha os dados do proprietário e o saldo inicial.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
