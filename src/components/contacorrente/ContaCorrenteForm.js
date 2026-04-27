@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import api from "../../api";
 import { toast } from "sonner";
 import { formatCurrency } from "../../utils/formatCurrency";
-import { Building2, Wallet, User, Save, X, Sparkles } from "lucide-react";
+import { Building2, Wallet, User, Save, X } from "lucide-react";
 
 const ContaCorrenteForm = ({ onSave, editingConta, onCancel }) => {
   const [proprietarios, setProprietarios] = useState([]);
@@ -111,10 +111,6 @@ const ContaCorrenteForm = ({ onSave, editingConta, onCancel }) => {
       >
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-8">
           <div>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-700 border border-blue-200/60 mb-4">
-              <Sparkles size={16} />
-              <span className="text-sm font-semibold">Conta Corrente</span>
-            </div>
             <h2 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
               {editingConta ? "Editar Conta Corrente" : "Nova Conta Corrente"}
             </h2>
