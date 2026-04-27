@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { Wallet, User, Save, X } from "lucide-react";
 
-const ContaCorrenteForm = ({ onSave, editingConta, onCancel }) => {
+const ContaCorrenteForm = ({ onSuccess, editingConta, onCancel }) => {
   const [proprietarios, setProprietarios] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -92,7 +92,7 @@ const ContaCorrenteForm = ({ onSave, editingConta, onCancel }) => {
         toast.success("✅ Conta corrente criada com sucesso!");
       }
 
-      if (onSave) onSave();
+      if (onSuccess) onSuccess();
       setFormData({ proprietarioId: "", saldoInicial: "" });
     } catch (error) {
       console.error("Erro ao salvar conta corrente:", error);
