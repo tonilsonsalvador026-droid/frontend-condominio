@@ -10,6 +10,7 @@ import {
   Pencil,
   Trash2,
   Eye,
+  Search,
   ArrowLeft
 } from "lucide-react";
 import * as XLSX from "xlsx";
@@ -62,14 +63,15 @@ const MovimentoList = ({ conta, onBack }) => {
       else if (mov.tipo.toLowerCase() === "credito") totalCredito += mov.valor || 0;
     });
 
-    const saldoAtual = (conta?.saldoInicial || 0) + totalCredito - totalDebito;
+    const saldoAtual =
+      (conta?.saldoInicial || 0) + totalCredito - totalDebito;
 
     return { totalDebito, totalCredito, saldoAtual };
   };
 
   const { totalDebito, totalCredito, saldoAtual } = calcularTotais();
 
-  // ================= EXPORTAÇÕES =================
+  // ===== EXPORTAÇÕES =====
   const exportCSV = () => {
     const csvRows = [];
     const headers = ["Data", "Proprietário", "Descrição", "Tipo", "Valor", "Saldo"];
@@ -175,30 +177,30 @@ const MovimentoList = ({ conta, onBack }) => {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex gap-3 flex-wrap">
 
             {onBack && (
               <button
                 onClick={onBack}
-                className="px-6 py-3 bg-slate-200 hover:bg-slate-300 rounded-2xl font-semibold flex items-center gap-2 transition hover:-translate-y-1"
+                className="px-6 py-3 bg-slate-200 hover:bg-slate-300 rounded-2xl flex items-center gap-2 transition"
               >
                 <ArrowLeft size={16} /> Voltar
               </button>
             )}
 
-            <button onClick={exportCSV} className="px-6 py-3 bg-blue-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition flex items-center gap-2">
+            <button onClick={exportCSV} className="group px-6 py-3 bg-blue-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition flex items-center gap-2">
               <FileText size={16} /> CSV
             </button>
 
-            <button onClick={exportExcel} className="px-6 py-3 bg-emerald-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition flex items-center gap-2">
+            <button onClick={exportExcel} className="group px-6 py-3 bg-emerald-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition flex items-center gap-2">
               <FileSpreadsheet size={16} /> Excel
             </button>
 
-            <button onClick={exportPDF} className="px-6 py-3 bg-red-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition flex items-center gap-2">
+            <button onClick={exportPDF} className="group px-6 py-3 bg-red-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition flex items-center gap-2">
               <FileDown size={16} /> PDF
             </button>
 
-            <button onClick={handlePrint} className="px-6 py-3 bg-slate-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition flex items-center gap-2">
+            <button onClick={handlePrint} className="group px-6 py-3 bg-slate-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition flex items-center gap-2">
               <Printer size={16} /> Imprimir
             </button>
 
@@ -208,7 +210,6 @@ const MovimentoList = ({ conta, onBack }) => {
 
       {/* TABELA */}
       <div id="printAreaMovimentos" className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border shadow-xl overflow-x-auto">
-
         <table className="w-full text-sm md:text-base">
           <thead className="bg-slate-100 text-slate-700">
             <tr>
@@ -226,10 +227,7 @@ const MovimentoList = ({ conta, onBack }) => {
             {movimentosComSaldo.length > 0 ? (
               movimentosComSaldo.map((mov) => (
                 <tr key={mov.id} className="border-t hover:bg-slate-50 transition">
-
-                  <td className="p-3">
-                    {mov.data ? dayjs(mov.data).format("DD/MM/YYYY") : "-"}
-                  </td>
+                  <td className="p-3">{mov.data ? dayjs(mov.data).format("DD/MM/YYYY") : "-"}</td>
 
                   {!conta && (
                     <td className="p-3">{mov.contaCorrente?.proprietario?.nome || "-"}</td>
@@ -251,18 +249,11 @@ const MovimentoList = ({ conta, onBack }) => {
 
                   <td className="p-3">
                     <div className="flex justify-center gap-4">
-                      <button className="text-blue-600 hover:scale-110 transition">
-                        <Eye size={18} />
-                      </button>
-                      <button className="text-yellow-600 hover:scale-110 transition">
-                        <Pencil size={18} />
-                      </button>
-                      <button onClick={() => handleDelete(mov.id)} className="text-red-600 hover:scale-110 transition">
-                        <Trash2 size={18} />
-                      </button>
+                      <button className="text-blue-600 hover:scale-110 transition"><Eye size={18} /></button>
+                      <button className="text-yellow-600 hover:scale-110 transition"><Pencil size={18} /></button>
+                      <button onClick={() => handleDelete(mov.id)} className="text-red-600 hover:scale-110 transition"><Trash2 size={18} /></button>
                     </div>
                   </td>
-
                 </tr>
               ))
             ) : (
@@ -275,21 +266,19 @@ const MovimentoList = ({ conta, onBack }) => {
           </tbody>
         </table>
 
-        {/* TOTAIS PREMIUM */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-
-          <div className="p-4 bg-red-50 rounded-2xl font-bold text-red-600 shadow">
-            Débito: {formatCurrency(totalDebito)}
+        {/* TOTAIS */}
+        <div className="mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+            <div className="p-4 bg-red-50 rounded-2xl font-bold text-red-600">
+              Débito: {formatCurrency(totalDebito)}
+            </div>
+            <div className="p-4 bg-green-50 rounded-2xl font-bold text-green-600">
+              Crédito: {formatCurrency(totalCredito)}
+            </div>
+            <div className="p-4 bg-slate-100 rounded-2xl font-bold">
+              Saldo: {formatCurrency(saldoAtual)}
+            </div>
           </div>
-
-          <div className="p-4 bg-emerald-50 rounded-2xl font-bold text-emerald-600 shadow">
-            Crédito: {formatCurrency(totalCredito)}
-          </div>
-
-          <div className="p-4 bg-slate-100 rounded-2xl font-bold shadow">
-            Saldo: {formatCurrency(saldoAtual)}
-          </div>
-
         </div>
       </div>
     </div>
