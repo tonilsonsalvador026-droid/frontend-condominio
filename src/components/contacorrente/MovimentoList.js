@@ -3,15 +3,15 @@ import React, { useEffect, useState, useCallback } from "react";
 import api from "../../api";
 import dayjs from "dayjs";
 import {
+  FileText,
+  FileSpreadsheet,
+  FileDown,
+  Printer,
   Pencil,
   Trash2,
   Eye,
   ArrowLeft,
   Plus,
-  FileText,
-  FileSpreadsheet,
-  FileDown,
-  Printer,
   Search
 } from "lucide-react";
 import * as XLSX from "xlsx";
@@ -43,7 +43,7 @@ const MovimentoList = ({ conta, onBack, onNew, onEdit }) => {
     fetchMovimentos();
   }, [fetchMovimentos]);
 
-  // 🔍 FILTRO
+  // 🔍 FILTRO (SEM MEXER NA LÓGICA BASE)
   const filtered = movimentos.filter((mov) =>
     mov.descricao?.toLowerCase().includes(search.toLowerCase())
   );
@@ -53,7 +53,8 @@ const MovimentoList = ({ conta, onBack, onNew, onEdit }) => {
     return filtered.map((mov) => {
       const valor = mov.valor || 0;
       if (mov.tipo.toLowerCase() === "debito") saldo -= valor;
-      else saldo += valor;
+      else if (mov.tipo.toLowerCase() === "credito") saldo += valor;
+
       return { ...mov, saldoAcumulado: saldo };
     });
   };
@@ -66,7 +67,7 @@ const MovimentoList = ({ conta, onBack, onNew, onEdit }) => {
 
     filtered.forEach((mov) => {
       if (mov.tipo.toLowerCase() === "debito") totalDebito += mov.valor || 0;
-      else totalCredito += mov.valor || 0;
+      else if (mov.tipo.toLowerCase() === "credito") totalCredito += mov.valor || 0;
     });
 
     const saldoAtual = (conta?.saldoInicial || 0) + totalCredito - totalDebito;
@@ -76,17 +77,18 @@ const MovimentoList = ({ conta, onBack, onNew, onEdit }) => {
 
   const { totalDebito, totalCredito, saldoAtual } = calcularTotais();
 
-  // ---------------- EXPORTS ----------------
+  // ---------------- EXPORTAÇÕES ----------------
 
   const exportCSV = () => {
     const csvRows = [];
-    const headers = ["Data", "Descrição", "Tipo", "Valor", "Saldo"];
+    const headers = ["Data", "Proprietário", "Descrição", "Tipo", "Valor", "Saldo"];
     csvRows.push(headers.join(","));
 
     movimentosComSaldo.forEach((mov) => {
       csvRows.push([
-        dayjs(mov.data).format("DD/MM/YYYY"),
-        mov.descricao,
+        mov.data ? dayjs(mov.data).format("DD/MM/YYYY") : "-",
+        mov.contaCorrente?.proprietario?.nome || "-",
+        mov.descricao || "-",
         mov.tipo,
         mov.valor,
         mov.saldoAcumulado,
@@ -102,7 +104,17 @@ const MovimentoList = ({ conta, onBack, onNew, onEdit }) => {
   };
 
   const exportExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(movimentosComSaldo);
+    const ws = XLSX.utils.json_to_sheet(
+      movimentosComSaldo.map((mov) => ({
+        Data: mov.data ? dayjs(mov.data).format("DD/MM/YYYY") : "-",
+        Proprietário: mov.contaCorrente?.proprietario?.nome || "-",
+        Descrição: mov.descricao || "-",
+        Tipo: mov.tipo,
+        Valor: mov.valor,
+        Saldo: mov.saldoAcumulado,
+      }))
+    );
+
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Movimentos");
     XLSX.writeFile(wb, "movimentos.xlsx");
@@ -110,17 +122,18 @@ const MovimentoList = ({ conta, onBack, onNew, onEdit }) => {
 
   const exportPDF = () => {
     const doc = new jsPDF();
-    doc.text("Movimentos", 14, 15);
+    doc.text("Relatório de Movimentos", 14, 15);
 
     autoTable(doc, {
       startY: 25,
-      head: [["Data", "Descrição", "Tipo", "Valor", "Saldo"]],
+      head: [["Data", "Proprietário", "Descrição", "Tipo", "Valor", "Saldo"]],
       body: movimentosComSaldo.map((mov) => [
-        dayjs(mov.data).format("DD/MM/YYYY"),
-        mov.descricao,
+        mov.data ? dayjs(mov.data).format("DD/MM/YYYY") : "-",
+        mov.contaCorrente?.proprietario?.nome || "-",
+        mov.descricao || "-",
         mov.tipo,
-        formatCurrency(mov.valor),
-        formatCurrency(mov.saldoAcumulado),
+        formatCurrency(mov.valor || 0),
+        formatCurrency(mov.saldoAcumulado || 0),
       ]),
     });
 
@@ -137,26 +150,34 @@ const MovimentoList = ({ conta, onBack, onNew, onEdit }) => {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Tem certeza que deseja excluir este movimento?")) return;
-    await api.delete(`/movimentos/${id}`);
-    fetchMovimentos();
+    try {
+      await api.delete(`/movimentos/${id}`);
+      fetchMovimentos();
+    } catch (error) {
+      alert("Erro ao excluir movimento.");
+    }
   };
 
   if (erro) {
-    return <div className="text-red-600 p-4">{erro}</div>;
+    return (
+      <div className="bg-red-50 border border-red-300 text-red-600 rounded-2xl p-4 mt-6">
+        {erro}
+      </div>
+    );
   }
 
   return (
     <div className="space-y-8 w-full">
 
-      {/* HEADER */}
-      <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border shadow-2xl">
+      {/* HEADER PREMIUM (IGUAL AO PADRÃO) */}
+      <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
         <div className="flex flex-col lg:flex-row lg:items-center gap-6">
 
           <div>
-            <h1 className="text-4xl font-black">
+            <h1 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent mb-2">
               Movimentos
             </h1>
-            <p className="text-lg text-slate-600">
+            <p className="text-xl text-slate-600 font-semibold">
               {filtered.length} registos
             </p>
           </div>
@@ -164,27 +185,36 @@ const MovimentoList = ({ conta, onBack, onNew, onEdit }) => {
           <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
 
             {/* PESQUISA */}
-            <div className="relative flex-1 lg:w-80">
-              <Search className="absolute left-3 top-3 text-slate-400" />
+            <div className="relative flex-1 lg:w-96">
+              <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
-                placeholder="Pesquisar..."
+                placeholder="Pesquisar descrição..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 pr-4 py-3 w-full border rounded-xl"
+                className="w-full pl-12 pr-6 py-4 bg-white/70 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-lg"
               />
             </div>
 
-            {/* BOTÕES */}
-            {onBack && (
-              <button onClick={onBack} className="px-4 py-3 bg-slate-200 rounded-xl flex items-center gap-2">
-                <ArrowLeft size={16} /> Voltar
+            {/* BOTÃO NOVO */}
+            {onNew && (
+              <button
+                onClick={onNew}
+                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-2xl shadow-xl hover:-translate-y-1 transition flex items-center justify-center"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Novo Movimento
               </button>
             )}
 
-            {onNew && (
-              <button onClick={onNew} className="px-6 py-3 bg-blue-600 text-white rounded-xl flex items-center gap-2">
-                <Plus size={16} /> Novo
+            {/* VOLTAR (posicionado corretamente) */}
+            {onBack && (
+              <button
+                onClick={onBack}
+                className="px-6 py-4 bg-slate-200 hover:bg-slate-300 rounded-2xl font-semibold flex items-center gap-2 transition"
+              >
+                <ArrowLeft size={18} />
+                Voltar
               </button>
             )}
 
@@ -193,61 +223,94 @@ const MovimentoList = ({ conta, onBack, onNew, onEdit }) => {
       </div>
 
       {/* TABELA */}
-      <div id="printAreaMovimentos" className="bg-white rounded-3xl p-6 shadow-xl overflow-x-auto">
-
-        <table className="w-full">
-          <thead>
+      <div id="printAreaMovimentos" className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border shadow-xl overflow-x-auto">
+        <table className="w-full text-sm md:text-base">
+          <thead className="bg-slate-100 text-slate-700">
             <tr>
-              <th>Data</th>
-              <th>Descrição</th>
-              <th>Débito</th>
-              <th>Crédito</th>
-              <th>Saldo</th>
-              <th>Ações</th>
+              <th className="p-3 text-left">Data</th>
+              {!conta && <th className="p-3 text-left">Proprietário</th>}
+              <th className="p-3 text-left">Descrição</th>
+              <th className="p-3 text-left">Débito</th>
+              <th className="p-3 text-left">Crédito</th>
+              <th className="p-3 text-left">Saldo</th>
+              <th className="p-3 text-center">Ações</th>
             </tr>
           </thead>
 
           <tbody>
-            {movimentosComSaldo.map((mov) => (
-              <tr key={mov.id}>
-                <td>{dayjs(mov.data).format("DD/MM/YYYY")}</td>
-                <td>{mov.descricao}</td>
+            {movimentosComSaldo.length > 0 ? (
+              movimentosComSaldo.map((mov) => (
+                <tr key={mov.id} className="border-t hover:bg-slate-50 transition">
+                  <td className="p-3">{dayjs(mov.data).format("DD/MM/YYYY")}</td>
 
-                <td className="text-red-600">
-                  {mov.tipo === "debito" && formatCurrency(mov.valor)}
-                </td>
+                  {!conta && (
+                    <td className="p-3">{mov.contaCorrente?.proprietario?.nome || "-"}</td>
+                  )}
 
-                <td className="text-green-600">
-                  {mov.tipo === "credito" && formatCurrency(mov.valor)}
-                </td>
+                  <td className="p-3">{mov.descricao || "-"}</td>
 
-                <td>{formatCurrency(mov.saldoAcumulado)}</td>
+                  <td className="p-3 text-red-600">
+                    {mov.tipo === "debito" ? formatCurrency(mov.valor) : ""}
+                  </td>
 
-                <td className="flex gap-2">
-                  <Eye size={16} />
-                  {onEdit && <Pencil size={16} onClick={() => onEdit(mov)} />}
-                  <Trash2 size={16} onClick={() => handleDelete(mov.id)} />
+                  <td className="p-3 text-emerald-600">
+                    {mov.tipo === "credito" ? formatCurrency(mov.valor) : ""}
+                  </td>
+
+                  <td className="p-3 font-bold">
+                    {formatCurrency(mov.saldoAcumulado)}
+                  </td>
+
+                  <td className="p-3">
+                    <div className="flex justify-center gap-4">
+                      <Eye size={18} className="text-blue-600" />
+
+                      {onEdit && (
+                        <button onClick={() => onEdit(mov)} className="text-yellow-600 hover:scale-110">
+                          <Pencil size={18} />
+                        </button>
+                      )}
+
+                      <button onClick={() => handleDelete(mov.id)} className="text-red-600 hover:scale-110">
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="7" className="text-center p-6 text-slate-400">
+                  Nenhum movimento encontrado.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
-
-        {/* TOTAIS */}
-        <div className="mt-6 flex gap-4">
-          <div>Débito: {formatCurrency(totalDebito)}</div>
-          <div>Crédito: {formatCurrency(totalCredito)}</div>
-          <div>Saldo: {formatCurrency(saldoAtual)}</div>
-        </div>
       </div>
 
-      {/* EXPORTS */}
+      {/* EXPORTS PREMIUM (IGUAL AO PADRÃO) */}
       {filtered.length > 0 && (
-        <div className="bg-white/60 p-6 rounded-3xl flex gap-3 justify-center">
-          <button onClick={exportCSV}><FileText /> CSV</button>
-          <button onClick={exportExcel}><FileSpreadsheet /> Excel</button>
-          <button onClick={exportPDF}><FileDown /> PDF</button>
-          <button onClick={handlePrint}><Printer /> Print</button>
+        <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border shadow-xl">
+          <div className="flex flex-wrap gap-3 justify-center">
+
+            <button onClick={exportCSV} className="px-6 py-3 bg-blue-600 text-white font-bold rounded-2xl shadow-lg flex items-center gap-2">
+              <FileText size={16} /> CSV
+            </button>
+
+            <button onClick={exportExcel} className="px-6 py-3 bg-emerald-600 text-white font-bold rounded-2xl shadow-lg flex items-center gap-2">
+              <FileSpreadsheet size={16} /> Excel
+            </button>
+
+            <button onClick={exportPDF} className="px-6 py-3 bg-red-600 text-white font-bold rounded-2xl shadow-lg flex items-center gap-2">
+              <FileDown size={16} /> PDF
+            </button>
+
+            <button onClick={handlePrint} className="px-6 py-3 bg-slate-600 text-white font-bold rounded-2xl shadow-lg flex items-center gap-2">
+              <Printer size={16} /> Imprimir
+            </button>
+
+          </div>
         </div>
       )}
 
