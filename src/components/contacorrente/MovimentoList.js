@@ -10,14 +10,15 @@ import {
   Pencil,
   Trash2,
   Eye,
-  ArrowLeft
+  ArrowLeft,
+  Plus   // ✅ ADICIONADO
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { formatCurrency } from "../../utils/formatCurrency";
 
-const MovimentoList = ({ conta, onBack }) => {
+const MovimentoList = ({ conta, onBack, onNew, onEdit }) => { // ✅ ADICIONADO
   const [movimentos, setMovimentos] = useState([]);
   const [erro, setErro] = useState(null);
 
@@ -186,6 +187,16 @@ const MovimentoList = ({ conta, onBack }) => {
               </button>
             )}
 
+            {/* ✅ BOTÃO NOVO MOVIMENTO */}
+            {onNew && (
+              <button
+                onClick={onNew}
+                className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition flex items-center gap-2"
+              >
+                <Plus size={16} /> Novo
+              </button>
+            )}
+
             <button onClick={exportCSV} className="px-6 py-3 bg-blue-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition flex items-center gap-2">
               <FileText size={16} /> CSV
             </button>
@@ -251,15 +262,28 @@ const MovimentoList = ({ conta, onBack }) => {
 
                   <td className="p-3">
                     <div className="flex justify-center gap-4">
+
                       <button className="text-blue-600 hover:scale-110 transition">
                         <Eye size={18} />
                       </button>
-                      <button className="text-yellow-600 hover:scale-110 transition">
-                        <Pencil size={18} />
-                      </button>
-                      <button onClick={() => handleDelete(mov.id)} className="text-red-600 hover:scale-110 transition">
+
+                      {/* ✅ EDITAR FUNCIONAL */}
+                      {onEdit && (
+                        <button
+                          onClick={() => onEdit(mov)}
+                          className="text-yellow-600 hover:scale-110 transition"
+                        >
+                          <Pencil size={18} />
+                        </button>
+                      )}
+
+                      <button
+                        onClick={() => handleDelete(mov.id)}
+                        className="text-red-600 hover:scale-110 transition"
+                      >
                         <Trash2 size={18} />
                       </button>
+
                     </div>
                   </td>
 
@@ -275,7 +299,7 @@ const MovimentoList = ({ conta, onBack }) => {
           </tbody>
         </table>
 
-        {/* TOTAIS PREMIUM */}
+        {/* TOTAIS */}
         <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
 
           <div className="p-4 bg-red-50 rounded-2xl font-bold text-red-600 shadow">
