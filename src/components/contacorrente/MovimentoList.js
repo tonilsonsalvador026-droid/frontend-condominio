@@ -10,17 +10,18 @@ import {
   Pencil,
   Trash2,
   Eye,
+  Search,
+  ArrowLeft
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { formatCurrency } from "../../utils/formatCurrency"; // ✅ Import adicionado
+import { formatCurrency } from "../../utils/formatCurrency";
 
 const MovimentoList = ({ conta, onBack }) => {
   const [movimentos, setMovimentos] = useState([]);
   const [erro, setErro] = useState(null);
 
-  // buscar movimentos
   const fetchMovimentos = useCallback(async () => {
     try {
       let res;
@@ -40,44 +41,42 @@ const MovimentoList = ({ conta, onBack }) => {
     fetchMovimentos();
   }, [fetchMovimentos]);
 
-  // calcular saldo acumulado
   const calcularSaldo = () => {
     let saldo = conta?.saldoInicial || 0;
     return movimentos.map((mov) => {
       const valor = mov.valor || 0;
-      if (mov.tipo.toLowerCase() === "debito") {
-        saldo -= valor;
-      } else if (mov.tipo.toLowerCase() === "credito") {
-        saldo += valor;
-      }
+      if (mov.tipo.toLowerCase() === "debito") saldo -= valor;
+      else if (mov.tipo.toLowerCase() === "credito") saldo += valor;
+
       return { ...mov, saldoAcumulado: saldo };
     });
   };
+
   const movimentosComSaldo = calcularSaldo();
 
-  // calcular totais
   const calcularTotais = () => {
     let totalDebito = 0;
     let totalCredito = 0;
 
     movimentos.forEach((mov) => {
-      if (mov.tipo.toLowerCase() === "debito") {
-        totalDebito += mov.valor || 0;
-      } else if (mov.tipo.toLowerCase() === "credito") {
-        totalCredito += mov.valor || 0;
-      }
+      if (mov.tipo.toLowerCase() === "debito") totalDebito += mov.valor || 0;
+      else if (mov.tipo.toLowerCase() === "credito") totalCredito += mov.valor || 0;
     });
 
-    const saldoAtual = (conta?.saldoInicial || 0) + totalCredito - totalDebito;
+    const saldoAtual =
+      (conta?.saldoInicial || 0) + totalCredito - totalDebito;
+
     return { totalDebito, totalCredito, saldoAtual };
   };
+
   const { totalDebito, totalCredito, saldoAtual } = calcularTotais();
 
-  // ==== EXPORTAÇÕES ====
+  // ===== EXPORTAÇÕES =====
   const exportCSV = () => {
     const csvRows = [];
     const headers = ["Data", "Proprietário", "Descrição", "Tipo", "Valor", "Saldo"];
     csvRows.push(headers.join(","));
+
     movimentosComSaldo.forEach((mov) => {
       csvRows.push([
         mov.data ? dayjs(mov.data).format("DD/MM/YYYY") : "-",
@@ -88,6 +87,7 @@ const MovimentoList = ({ conta, onBack }) => {
         mov.saldoAcumulado,
       ].join(","));
     });
+
     const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -107,6 +107,7 @@ const MovimentoList = ({ conta, onBack }) => {
         Saldo: mov.saldoAcumulado,
       }))
     );
+
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Movimentos");
     XLSX.writeFile(wb, "movimentos.xlsx");
@@ -114,162 +115,150 @@ const MovimentoList = ({ conta, onBack }) => {
 
   const exportPDF = () => {
     const doc = new jsPDF();
-    doc.text("Relatório de Movimentos", 14, 10);
+    doc.text("Relatório de Movimentos", 14, 15);
+
     autoTable(doc, {
+      startY: 25,
       head: [["Data", "Proprietário", "Descrição", "Tipo", "Valor", "Saldo"]],
       body: movimentosComSaldo.map((mov) => [
         mov.data ? dayjs(mov.data).format("DD/MM/YYYY") : "-",
         mov.contaCorrente?.proprietario?.nome || "-",
         mov.descricao || "-",
         mov.tipo,
-        formatCurrency(mov.valor || 0), // ✅ aplicado aqui
-        formatCurrency(mov.saldoAcumulado || 0), // ✅ aplicado aqui
+        formatCurrency(mov.valor || 0),
+        formatCurrency(mov.saldoAcumulado || 0),
       ]),
     });
+
     doc.save("movimentos.pdf");
   };
 
   const handlePrint = () => {
-    const printContent = document.getElementById("printAreaMovimentos").innerHTML;
-    const w = window.open("", "", "width=900,height=650");
-    w.document.write(printContent);
-    w.document.close();
-    w.print();
+    const content = document.getElementById("printAreaMovimentos").innerHTML;
+    const win = window.open("", "", "width=900,height=650");
+    win.document.write(`<html><body>${content}</body></html>`);
+    win.document.close();
+    win.print();
   };
 
-  // ==== AÇÕES ====
   const handleDelete = async (id) => {
     if (!window.confirm("Tem certeza que deseja excluir este movimento?")) return;
     try {
       await api.delete(`/movimentos/${id}`);
       fetchMovimentos();
     } catch (error) {
-      console.error("Erro ao excluir movimento:", error);
       alert("Erro ao excluir movimento.");
     }
   };
 
   if (erro) {
     return (
-      <div className="bg-red-50 border border-red-300 text-red-600 rounded-xl p-4 mt-6">
+      <div className="bg-red-50 border border-red-300 text-red-600 rounded-2xl p-4 mt-6">
         {erro}
       </div>
     );
   }
 
   return (
-    <div className="bg-white shadow-md rounded-2xl p-6 mt-6 flex flex-col h-full">
-      {/* Título e botões */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
-        <h2 className="text-lg font-semibold text-gray-700">
-          {conta
-            ? `Extrato da Conta Corrente – ${conta?.proprietario?.nome || "Desconhecido"}`
-            : "Lista de Todos os Movimentos"}
-        </h2>
-        <div className="flex gap-2">
-          <button
-            onClick={exportCSV}
-            className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 text-sm rounded hover:bg-blue-700 transition"
-          >
-            <FileText size={16} /> CSV
-          </button>
-          <button
-            onClick={exportExcel}
-            className="flex items-center gap-1 bg-green-600 text-white px-3 py-2 text-sm rounded hover:bg-green-700 transition"
-          >
-            <FileSpreadsheet size={16} /> Excel
-          </button>
-          <button
-            onClick={exportPDF}
-            className="flex items-center gap-1 bg-red-600 text-white px-3 py-2 text-sm rounded hover:bg-red-700 transition"
-          >
-            <FileDown size={16} /> PDF
-          </button>
-          <button
-            onClick={handlePrint}
-            className="flex items-center gap-1 bg-gray-600 text-white px-3 py-2 text-sm rounded hover:bg-gray-700 transition"
-          >
-            <Printer size={16} /> Imprimir
-          </button>
-          {onBack && (
-            <button
-              onClick={onBack}
-              className="bg-gray-200 px-3 py-2 text-sm rounded hover:bg-gray-300"
-            >
-              Voltar
+    <div className="space-y-8 w-full">
+
+      {/* HEADER PREMIUM */}
+      <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+
+          <div>
+            <h1 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
+              Extrato de Movimentos
+            </h1>
+            <p className="text-xl text-slate-600 font-semibold mt-1">
+              {conta
+                ? `Conta de ${conta?.proprietario?.nome || "Desconhecido"}`
+                : "Todos os movimentos"}
+            </p>
+          </div>
+
+          <div className="flex gap-3 flex-wrap">
+
+            {onBack && (
+              <button
+                onClick={onBack}
+                className="px-6 py-3 bg-slate-200 hover:bg-slate-300 rounded-2xl flex items-center gap-2 transition"
+              >
+                <ArrowLeft size={16} /> Voltar
+              </button>
+            )}
+
+            <button onClick={exportCSV} className="group px-6 py-3 bg-blue-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition flex items-center gap-2">
+              <FileText size={16} /> CSV
             </button>
-          )}
+
+            <button onClick={exportExcel} className="group px-6 py-3 bg-emerald-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition flex items-center gap-2">
+              <FileSpreadsheet size={16} /> Excel
+            </button>
+
+            <button onClick={exportPDF} className="group px-6 py-3 bg-red-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition flex items-center gap-2">
+              <FileDown size={16} /> PDF
+            </button>
+
+            <button onClick={handlePrint} className="group px-6 py-3 bg-slate-600 text-white font-bold rounded-2xl shadow-lg hover:-translate-y-1 transition flex items-center gap-2">
+              <Printer size={16} /> Imprimir
+            </button>
+
+          </div>
         </div>
       </div>
 
-      {/* Área de impressão */}
-      <div id="printAreaMovimentos" className="overflow-x-auto flex-grow">
-        <table className="w-full border-collapse text-sm md:text-base">
-          <thead>
-            <tr className="bg-gray-100 text-left text-gray-700">
-              <th className="px-4 py-2 border">Data</th>
-              {!conta && <th className="px-4 py-2 border">Proprietário</th>}
-              <th className="px-4 py-2 border">Descrição</th>
-              <th className="px-4 py-2 border">Débito</th>
-              <th className="px-4 py-2 border">Crédito</th>
-              <th className="px-4 py-2 border">Saldo</th>
-              <th className="px-4 py-2 border text-center">Ações</th>
+      {/* TABELA */}
+      <div id="printAreaMovimentos" className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border shadow-xl overflow-x-auto">
+        <table className="w-full text-sm md:text-base">
+          <thead className="bg-slate-100 text-slate-700">
+            <tr>
+              <th className="p-3 text-left">Data</th>
+              {!conta && <th className="p-3 text-left">Proprietário</th>}
+              <th className="p-3 text-left">Descrição</th>
+              <th className="p-3 text-left">Débito</th>
+              <th className="p-3 text-left">Crédito</th>
+              <th className="p-3 text-left">Saldo</th>
+              <th className="p-3 text-center">Ações</th>
             </tr>
           </thead>
+
           <tbody>
             {movimentosComSaldo.length > 0 ? (
               movimentosComSaldo.map((mov) => (
-                <tr key={mov.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 border">
-                    {mov.data ? dayjs(mov.data).format("DD/MM/YYYY") : "-"}
-                  </td>
+                <tr key={mov.id} className="border-t hover:bg-slate-50 transition">
+                  <td className="p-3">{mov.data ? dayjs(mov.data).format("DD/MM/YYYY") : "-"}</td>
+
                   {!conta && (
-                    <td className="px-4 py-2 border">
-                      {mov.contaCorrente?.proprietario?.nome || "-"}
-                    </td>
+                    <td className="p-3">{mov.contaCorrente?.proprietario?.nome || "-"}</td>
                   )}
-                  <td className="px-4 py-2 border">{mov.descricao || "-"}</td>
-                  <td className="px-4 py-2 border text-red-600">
-                    {mov.tipo.toLowerCase() === "debito"
-                      ? formatCurrency(mov.valor)
-                      : ""}
+
+                  <td className="p-3">{mov.descricao || "-"}</td>
+
+                  <td className="p-3 text-red-600">
+                    {mov.tipo.toLowerCase() === "debito" ? formatCurrency(mov.valor) : ""}
                   </td>
-                  <td className="px-4 py-2 border text-green-600">
-                    {mov.tipo.toLowerCase() === "credito"
-                      ? formatCurrency(mov.valor)
-                      : ""}
+
+                  <td className="p-3 text-emerald-600">
+                    {mov.tipo.toLowerCase() === "credito" ? formatCurrency(mov.valor) : ""}
                   </td>
-                  <td
-                    className={`px-4 py-2 border font-semibold ${
-                      mov.saldoAcumulado < 0 ? "text-red-600" : "text-green-600"
-                    }`}
-                  >
+
+                  <td className={`p-3 font-bold ${mov.saldoAcumulado < 0 ? "text-red-600" : "text-emerald-600"}`}>
                     {formatCurrency(mov.saldoAcumulado)}
                   </td>
-                  <td className="px-4 py-2 border text-center">
-                    <div className="flex gap-3 justify-center">
-                      <button className="text-blue-600 hover:text-blue-800">
-                        <Eye size={18} />
-                      </button>
-                      <button className="text-yellow-600 hover:text-yellow-800">
-                        <Pencil size={18} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(mov.id)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+
+                  <td className="p-3">
+                    <div className="flex justify-center gap-4">
+                      <button className="text-blue-600 hover:scale-110 transition"><Eye size={18} /></button>
+                      <button className="text-yellow-600 hover:scale-110 transition"><Pencil size={18} /></button>
+                      <button onClick={() => handleDelete(mov.id)} className="text-red-600 hover:scale-110 transition"><Trash2 size={18} /></button>
                     </div>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td
-                  className="px-4 py-2 border text-center text-gray-500"
-                  colSpan={conta ? 6 : 7}
-                >
+                <td colSpan="7" className="text-center p-6 text-slate-400">
                   Nenhum movimento encontrado.
                 </td>
               </tr>
@@ -277,34 +266,19 @@ const MovimentoList = ({ conta, onBack }) => {
           </tbody>
         </table>
 
-        {/* Totais dentro da área de impressão */}
+        {/* TOTAIS */}
         <div className="mt-6">
-          <table className="w-full border-collapse text-sm md:text-base">
-            <thead>
-              <tr className="bg-gray-200 text-gray-700">
-                <th className="px-4 py-2 border">Total Débito</th>
-                <th className="px-4 py-2 border">Total Crédito</th>
-                <th className="px-4 py-2 border">Saldo Atual</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="px-4 py-2 border text-red-600 font-semibold">
-                  {formatCurrency(totalDebito)}
-                </td>
-                <td className="px-4 py-2 border text-green-600 font-semibold">
-                  {formatCurrency(totalCredito)}
-                </td>
-                <td
-                  className={`px-4 py-2 border font-bold ${
-                    saldoAtual < 0 ? "text-red-600" : "text-green-600"
-                  }`}
-                >
-                  {formatCurrency(saldoAtual)}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+            <div className="p-4 bg-red-50 rounded-2xl font-bold text-red-600">
+              Débito: {formatCurrency(totalDebito)}
+            </div>
+            <div className="p-4 bg-green-50 rounded-2xl font-bold text-green-600">
+              Crédito: {formatCurrency(totalCredito)}
+            </div>
+            <div className="p-4 bg-slate-100 rounded-2xl font-bold">
+              Saldo: {formatCurrency(saldoAtual)}
+            </div>
+          </div>
         </div>
       </div>
     </div>
