@@ -3,9 +3,9 @@ import React, { useEffect, useState } from "react";
 import api from "../../api";
 import { toast } from "sonner";
 import { formatCurrency } from "../../utils/formatCurrency";
-import { DollarSign, Calendar, FileText, User, ChevronLeft, Save } from "lucide-react";
+import { Calendar, FileText, User, ChevronLeft, Save } from "lucide-react";
 
-const MovimentoForm = ({ onSave }) => {
+const MovimentoForm = ({ onSave, onCancel }) => {
   const [proprietarios, setProprietarios] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -41,12 +41,12 @@ const MovimentoForm = ({ onSave }) => {
       const res = await api.get(`/contas-correntes/proprietario/${proprietarioId}`);
       if (res.data && res.data.id) {
         setForm((prev) => ({ ...prev, contaCorrenteId: res.data.id }));
-        toast.success(`Conta corrente encontrada para ${res.data.proprietario?.nome || ""}`);
+        toast.success(`Conta encontrada para ${res.data.proprietario?.nome || ""}`);
       } else {
-        toast.error("⚠️ Este proprietário não possui conta corrente.");
+        toast.error("⚠️ Este proprietário não possui conta.");
       }
     } catch (error) {
-      toast.error("❌ Erro ao buscar conta corrente.");
+      toast.error("❌ Erro ao buscar conta.");
     }
   };
 
@@ -117,12 +117,14 @@ const MovimentoForm = ({ onSave }) => {
 
         {/* HEADER */}
         <div className="flex items-center gap-4 mb-10 pb-8 border-b border-slate-200/30">
-          <div className="p-4 bg-gradient-to-br from-emerald-500/20 to-blue-500/20 rounded-2xl border border-emerald-200/50">
-            <DollarSign className="w-8 h-8 text-emerald-600" />
+          
+          {/* ÍCONE AZUL (SEM $) */}
+          <div className="p-4 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 rounded-2xl border border-blue-200/50">
+            <FileText className="w-8 h-8 text-blue-600" />
           </div>
 
           <div>
-            <h2 className="text-3xl lg:text-4xl font-black bg-gradient-to-r from-slate-900 to-emerald-800 bg-clip-text text-transparent">
+            <h2 className="text-3xl lg:text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
               Novo Movimento
             </h2>
             <p className="text-xl text-slate-600 font-semibold mt-1">
@@ -231,21 +233,23 @@ const MovimentoForm = ({ onSave }) => {
           {/* BOTÕES */}
           <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-slate-200/30">
 
+            {/* CANCELAR CORRIGIDO */}
             <button
               type="button"
-              onClick={onSave}
-              className="flex-1 flex items-center justify-center gap-3 px-8 py-5 bg-slate-200 rounded-2xl font-bold hover:-translate-y-1 transition"
+              onClick={onCancel}
+              className="flex-1 flex items-center justify-center gap-3 px-8 py-5 bg-gradient-to-r from-slate-100/80 to-slate-200/80 rounded-2xl shadow-xl hover:-translate-y-1 transition font-bold"
             >
               <ChevronLeft className="w-5 h-5" />
               Cancelar
             </button>
 
+            {/* SALVAR */}
             <button
               type="submit"
               disabled={loading}
               className={`flex-1 flex items-center justify-center gap-3 px-8 py-5 rounded-2xl font-bold transition ${
                 loading
-                  ? "bg-gray-400"
+                  ? "bg-gray-400 cursor-not-allowed"
                   : "bg-gradient-to-r from-blue-600 to-emerald-600 text-white hover:-translate-y-1"
               }`}
             >
