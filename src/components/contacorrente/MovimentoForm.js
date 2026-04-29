@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api";
 import { toast } from "sonner";
-import { formatCurrency } from "../../utils/formatCurrency"; // ✅ import da função
+import { formatCurrency } from "../../utils/formatCurrency";
+import { DollarSign, Calendar, FileText, User, ChevronLeft, Save } from "lucide-react";
 
 const MovimentoForm = ({ onSave }) => {
   const [proprietarios, setProprietarios] = useState([]);
@@ -17,7 +18,6 @@ const MovimentoForm = ({ onSave }) => {
     valor: "",
   });
 
-  // 🔹 Buscar lista de proprietários
   useEffect(() => {
     const fetchProprietarios = async () => {
       try {
@@ -31,7 +31,6 @@ const MovimentoForm = ({ onSave }) => {
     fetchProprietarios();
   }, []);
 
-  // 🔹 Selecionar proprietário → buscar conta corrente
   const handleSelectProprietario = async (e) => {
     const proprietarioId = e.target.value;
     setForm((prev) => ({ ...prev, proprietarioId, contaCorrenteId: "" }));
@@ -42,46 +41,40 @@ const MovimentoForm = ({ onSave }) => {
       const res = await api.get(`/contas-correntes/proprietario/${proprietarioId}`);
       if (res.data && res.data.id) {
         setForm((prev) => ({ ...prev, contaCorrenteId: res.data.id }));
-        toast.success(
-          `Conta corrente encontrada para ${res.data.proprietario?.nome || "este proprietário"}`
-        );
+        toast.success(`Conta corrente encontrada para ${res.data.proprietario?.nome || ""}`);
       } else {
-        toast.error("⚠️ Este proprietário não possui conta corrente ativa.");
+        toast.error("⚠️ Este proprietário não possui conta corrente.");
       }
     } catch (error) {
-      console.error("Erro ao buscar conta corrente:", error);
       toast.error("❌ Erro ao buscar conta corrente.");
     }
   };
 
-  // 🔹 Normalizar valor → float
   const normalizarValor = (valor) => {
     if (!valor) return 0;
     return parseFloat(valor.toString().replace(/\s/g, "").replace(/\./g, "").replace(",", "."));
   };
 
-  // 🔹 Atualizar valor e aplicar formatação visual
   const handleChangeValor = (e) => {
-    let valor = e.target.value.replace(/[^\d,]/g, ""); // permite apenas dígitos e vírgula
+    let valor = e.target.value.replace(/[^\d,]/g, "");
     setForm((prev) => ({ ...prev, valor }));
   };
 
-  // 🔹 Atualizar campos genéricos
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 🔹 Submeter formulário
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!form.contaCorrenteId) {
-      toast.error("⚠️ Selecione um proprietário com conta corrente ativa.");
+      toast.error("Selecione um proprietário com conta.");
       return;
     }
+
     if (!form.valor || normalizarValor(form.valor) <= 0) {
-      toast.error("⚠️ Informe um valor válido para o movimento.");
+      toast.error("Valor inválido.");
       return;
     }
 
@@ -97,9 +90,8 @@ const MovimentoForm = ({ onSave }) => {
 
       await api.post(`/contas-correntes/${form.contaCorrenteId}/movimentos`, payload);
 
-      toast.success("✅ Movimento registrado com sucesso!");
+      toast.success("Movimento registrado!");
 
-      // Resetar formulário
       setForm({
         proprietarioId: "",
         contaCorrenteId: "",
@@ -109,111 +101,166 @@ const MovimentoForm = ({ onSave }) => {
         valor: "",
       });
 
-      if (onSave) onSave();
+      onSave?.();
     } catch (error) {
-      console.error("Erro ao registrar movimento:", error);
-      toast.error("❌ Erro ao registrar movimento!");
+      toast.error("Erro ao registrar.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form
-      id="printArea"
-      onSubmit={handleSubmit}
-      className="bg-white p-6 rounded-2xl shadow-md border mb-6"
-    >
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">Registrar Novo Movimento</h2>
+    <div className="w-full max-w-4xl mx-auto">
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Proprietário */}
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">Proprietário</label>
-          <select
-            name="proprietarioId"
-            value={form.proprietarioId}
-            onChange={handleSelectProprietario}
-            required
-            className="border rounded-lg p-2 w-full text-gray-700 focus:ring focus:ring-blue-200"
-          >
-            <option value="">Selecione...</option>
-            {proprietarios.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.nome}
-              </option>
-            ))}
-          </select>
+      {/* CONTAINER GLASS */}
+      <div className="bg-white/40 backdrop-blur-xl rounded-3xl p-8 lg:p-12 border border-slate-200/40 shadow-2xl">
+
+        {/* HEADER */}
+        <div className="flex items-center gap-4 mb-10 pb-8 border-b border-slate-200/30">
+          <div className="p-4 bg-gradient-to-br from-emerald-500/20 to-blue-500/20 rounded-2xl border border-emerald-200/50">
+            <DollarSign className="w-8 h-8 text-emerald-600" />
+          </div>
+
+          <div>
+            <h2 className="text-3xl lg:text-4xl font-black bg-gradient-to-r from-slate-900 to-emerald-800 bg-clip-text text-transparent">
+              Novo Movimento
+            </h2>
+            <p className="text-xl text-slate-600 font-semibold mt-1">
+              Registre um débito ou crédito
+            </p>
+          </div>
         </div>
 
-        {/* Data */}
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">Data</label>
-          <input
-            type="date"
-            name="data"
-            value={form.data}
-            onChange={handleChange}
-            required
-            className="border rounded-lg p-2 w-full text-gray-700 focus:ring focus:ring-blue-200"
-          />
-        </div>
+        {/* FORM */}
+        <form onSubmit={handleSubmit} className="space-y-8">
 
-        {/* Descrição */}
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-600 mb-1">Descrição</label>
-          <input
-            type="text"
-            name="descricao"
-            value={form.descricao}
-            onChange={handleChange}
-            placeholder="Ex: Quota Mensal, Multa, Pagamento..."
-            required
-            className="border rounded-lg p-2 w-full text-gray-700 focus:ring focus:ring-blue-200"
-          />
-        </div>
+          {/* GRID */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-        {/* Tipo */}
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">Tipo</label>
-          <select
-            name="tipo"
-            value={form.tipo}
-            onChange={handleChange}
-            className="border rounded-lg p-2 w-full text-gray-700 focus:ring focus:ring-blue-200"
-          >
-            <option value="DEBITO">Débito</option>
-            <option value="CREDITO">Crédito</option>
-          </select>
-        </div>
+            {/* Proprietário */}
+            <div className="space-y-3">
+              <label className="font-bold text-lg text-slate-800 flex items-center gap-2">
+                <User className="w-5 h-5" />
+                Proprietário
+              </label>
+              <select
+                name="proprietarioId"
+                value={form.proprietarioId}
+                onChange={handleSelectProprietario}
+                required
+                className="w-full px-6 py-5 bg-white/60 backdrop-blur-xl border border-slate-200/50 rounded-2xl focus:ring-4 focus:ring-blue-200/60 shadow-xl"
+              >
+                <option value="">Selecione...</option>
+                {proprietarios.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {/* Valor */}
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">Valor (Kz)</label>
-          <input
-            type="text"
-            name="valor"
-            value={form.valor ? formatCurrency(normalizarValor(form.valor)).replace("Kz", "").trim() : ""}
-            onChange={handleChangeValor}
-            required
-            placeholder="Ex: 15 000,00 Kz"
-            className="border rounded-lg p-2 w-full text-gray-700 focus:ring focus:ring-blue-200 text-right"
-          />
-        </div>
+            {/* Data */}
+            <div className="space-y-3">
+              <label className="font-bold text-lg text-slate-800 flex items-center gap-2">
+                <Calendar className="w-5 h-5" />
+                Data
+              </label>
+              <input
+                type="date"
+                name="data"
+                value={form.data}
+                onChange={handleChange}
+                required
+                className="w-full px-6 py-5 bg-white/60 backdrop-blur-xl border border-slate-200/50 rounded-2xl focus:ring-4 focus:ring-blue-200/60 shadow-xl"
+              />
+            </div>
+
+            {/* Descrição */}
+            <div className="lg:col-span-2 space-y-3">
+              <label className="font-bold text-lg text-slate-800 flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                Descrição
+              </label>
+              <input
+                type="text"
+                name="descricao"
+                value={form.descricao}
+                onChange={handleChange}
+                required
+                className="w-full px-6 py-5 bg-white/60 backdrop-blur-xl border border-slate-200/50 rounded-2xl shadow-xl"
+              />
+            </div>
+
+            {/* Tipo */}
+            <div className="space-y-3">
+              <label className="font-bold text-lg text-slate-800">
+                Tipo
+              </label>
+              <select
+                name="tipo"
+                value={form.tipo}
+                onChange={handleChange}
+                className="w-full px-6 py-5 bg-white/60 border rounded-2xl shadow-xl"
+              >
+                <option value="DEBITO">Débito</option>
+                <option value="CREDITO">Crédito</option>
+              </select>
+            </div>
+
+            {/* Valor */}
+            <div className="space-y-3">
+              <label className="font-bold text-lg text-slate-800">
+                Valor (Kz)
+              </label>
+              <input
+                type="text"
+                name="valor"
+                value={
+                  form.valor
+                    ? formatCurrency(normalizarValor(form.valor)).replace("Kz", "").trim()
+                    : ""
+                }
+                onChange={handleChangeValor}
+                required
+                className="w-full px-6 py-5 bg-white/60 border rounded-2xl shadow-xl text-right"
+              />
+            </div>
+
+          </div>
+
+          {/* BOTÕES */}
+          <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-slate-200/30">
+
+            <button
+              type="button"
+              onClick={onSave}
+              className="flex-1 flex items-center justify-center gap-3 px-8 py-5 bg-slate-200 rounded-2xl font-bold hover:-translate-y-1 transition"
+            >
+              <ChevronLeft className="w-5 h-5" />
+              Cancelar
+            </button>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className={`flex-1 flex items-center justify-center gap-3 px-8 py-5 rounded-2xl font-bold transition ${
+                loading
+                  ? "bg-gray-400"
+                  : "bg-gradient-to-r from-blue-600 to-emerald-600 text-white hover:-translate-y-1"
+              }`}
+            >
+              {loading ? "Salvando..." : (
+                <>
+                  <Save className="w-5 h-5" />
+                  Salvar Movimento
+                </>
+              )}
+            </button>
+
+          </div>
+        </form>
       </div>
-
-      <div className="mt-5">
-        <button
-          type="submit"
-          disabled={loading}
-          className={`px-5 py-2 rounded-lg transition text-white ${
-            loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
-          }`}
-        >
-          {loading ? "Salvando..." : "Registrar Movimento"}
-        </button>
-      </div>
-    </form>
+    </div>
   );
 };
 
