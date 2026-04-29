@@ -42,16 +42,21 @@ const MovimentoList = ({ conta, onBack, onNew, onEdit }) => {
     fetchMovimentos();
   }, [fetchMovimentos]);
 
-  const calcularSaldo = () => {
-    let saldo = conta?.saldoInicial || 0;
-    return movimentos.map((mov) => {
-      const valor = mov.valor || 0;
-      if (mov.tipo.toLowerCase() === "debito") saldo -= valor;
-      else if (mov.tipo.toLowerCase() === "credito") saldo += valor;
+const calcularSaldo = () => {
+  let saldo = 0;
 
-      return { ...mov, saldoAcumulado: saldo };
-    });
-  };
+  return movimentos.map((mov) => {
+    const valor = mov.valor || 0;
+
+    if (mov.tipo.toLowerCase() === "debito") {
+      saldo -= valor;
+    } else if (mov.tipo.toLowerCase() === "credito") {
+      saldo += valor;
+    }
+
+    return { ...mov, saldoAcumulado: saldo };
+  });
+};
 
   const movimentosComSaldo = calcularSaldo();
 
@@ -63,9 +68,7 @@ const MovimentoList = ({ conta, onBack, onNew, onEdit }) => {
       if (mov.tipo.toLowerCase() === "debito") totalDebito += mov.valor || 0;
       else if (mov.tipo.toLowerCase() === "credito") totalCredito += mov.valor || 0;
     });
-
-    const saldoAtual = (conta?.saldoInicial || 0) + totalCredito - totalDebito;
-
+    
     return { totalDebito, totalCredito, saldoAtual };
   };
 
