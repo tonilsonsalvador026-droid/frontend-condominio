@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { Calendar, FileText, User, ChevronLeft, Save } from "lucide-react";
 
-const MovimentoForm = ({ onSave, onCancel }) => {
+const MovimentoForm = ({ onSuccess, onCancel }) => {
   const [proprietarios, setProprietarios] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -24,8 +24,7 @@ const MovimentoForm = ({ onSave, onCancel }) => {
         const res = await api.get("/proprietarios");
         setProprietarios(res.data || []);
       } catch (error) {
-        console.error("Erro ao carregar proprietários:", error);
-        toast.error("❌ Erro ao carregar proprietários.");
+        toast.error("Erro ao carregar proprietários.");
       }
     };
     fetchProprietarios();
@@ -39,14 +38,14 @@ const MovimentoForm = ({ onSave, onCancel }) => {
 
     try {
       const res = await api.get(`/contas-correntes/proprietario/${proprietarioId}`);
-      if (res.data && res.data.id) {
+      if (res.data?.id) {
         setForm((prev) => ({ ...prev, contaCorrenteId: res.data.id }));
         toast.success(`Conta encontrada para ${res.data.proprietario?.nome || ""}`);
       } else {
-        toast.error("⚠️ Este proprietário não possui conta.");
+        toast.error("Este proprietário não possui conta.");
       }
-    } catch (error) {
-      toast.error("❌ Erro ao buscar conta.");
+    } catch {
+      toast.error("Erro ao buscar conta.");
     }
   };
 
@@ -101,8 +100,8 @@ const MovimentoForm = ({ onSave, onCancel }) => {
         valor: "",
       });
 
-      onSave?.();
-    } catch (error) {
+      onSuccess?.(); // ✅ AGORA FUNCIONA
+    } catch {
       toast.error("Erro ao registrar.");
     } finally {
       setLoading(false);
@@ -112,13 +111,10 @@ const MovimentoForm = ({ onSave, onCancel }) => {
   return (
     <div className="w-full max-w-4xl mx-auto">
 
-      {/* CONTAINER GLASS */}
       <div className="bg-white/40 backdrop-blur-xl rounded-3xl p-8 lg:p-12 border border-slate-200/40 shadow-2xl">
 
-        {/* HEADER */}
+        {/* HEADER AZUL (CORRIGIDO) */}
         <div className="flex items-center gap-4 mb-10 pb-8 border-b border-slate-200/30">
-          
-          {/* ÍCONE AZUL (SEM $) */}
           <div className="p-4 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 rounded-2xl border border-blue-200/50">
             <FileText className="w-8 h-8 text-blue-600" />
           </div>
@@ -133,10 +129,8 @@ const MovimentoForm = ({ onSave, onCancel }) => {
           </div>
         </div>
 
-        {/* FORM */}
         <form onSubmit={handleSubmit} className="space-y-8">
 
-          {/* GRID */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
             {/* Proprietário */}
@@ -150,13 +144,11 @@ const MovimentoForm = ({ onSave, onCancel }) => {
                 value={form.proprietarioId}
                 onChange={handleSelectProprietario}
                 required
-                className="w-full px-6 py-5 bg-white/60 backdrop-blur-xl border border-slate-200/50 rounded-2xl focus:ring-4 focus:ring-blue-200/60 shadow-xl"
+                className="w-full px-6 py-5 bg-white/60 border rounded-2xl shadow-xl"
               >
                 <option value="">Selecione...</option>
                 {proprietarios.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.nome}
-                  </option>
+                  <option key={p.id} value={p.id}>{p.nome}</option>
                 ))}
               </select>
             </div>
@@ -173,7 +165,7 @@ const MovimentoForm = ({ onSave, onCancel }) => {
                 value={form.data}
                 onChange={handleChange}
                 required
-                className="w-full px-6 py-5 bg-white/60 backdrop-blur-xl border border-slate-200/50 rounded-2xl focus:ring-4 focus:ring-blue-200/60 shadow-xl"
+                className="w-full px-6 py-5 bg-white/60 border rounded-2xl shadow-xl"
               />
             </div>
 
@@ -189,15 +181,13 @@ const MovimentoForm = ({ onSave, onCancel }) => {
                 value={form.descricao}
                 onChange={handleChange}
                 required
-                className="w-full px-6 py-5 bg-white/60 backdrop-blur-xl border border-slate-200/50 rounded-2xl shadow-xl"
+                className="w-full px-6 py-5 bg-white/60 border rounded-2xl shadow-xl"
               />
             </div>
 
             {/* Tipo */}
             <div className="space-y-3">
-              <label className="font-bold text-lg text-slate-800">
-                Tipo
-              </label>
+              <label className="font-bold text-lg text-slate-800">Tipo</label>
               <select
                 name="tipo"
                 value={form.tipo}
@@ -211,17 +201,11 @@ const MovimentoForm = ({ onSave, onCancel }) => {
 
             {/* Valor */}
             <div className="space-y-3">
-              <label className="font-bold text-lg text-slate-800">
-                Valor (Kz)
-              </label>
+              <label className="font-bold text-lg text-slate-800">Valor (Kz)</label>
               <input
                 type="text"
                 name="valor"
-                value={
-                  form.valor
-                    ? formatCurrency(normalizarValor(form.valor)).replace("Kz", "").trim()
-                    : ""
-                }
+                value={form.valor ? formatCurrency(normalizarValor(form.valor)).replace("Kz","").trim() : ""}
                 onChange={handleChangeValor}
                 required
                 className="w-full px-6 py-5 bg-white/60 border rounded-2xl shadow-xl text-right"
@@ -233,23 +217,21 @@ const MovimentoForm = ({ onSave, onCancel }) => {
           {/* BOTÕES */}
           <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-slate-200/30">
 
-            {/* CANCELAR CORRIGIDO */}
             <button
               type="button"
-              onClick={onCancel}
+              onClick={onCancel} // ✅ AGORA FUNCIONA
               className="flex-1 flex items-center justify-center gap-3 px-8 py-5 bg-gradient-to-r from-slate-100/80 to-slate-200/80 rounded-2xl shadow-xl hover:-translate-y-1 transition font-bold"
             >
               <ChevronLeft className="w-5 h-5" />
               Cancelar
             </button>
 
-            {/* SALVAR */}
             <button
               type="submit"
               disabled={loading}
-              className={`flex-1 flex items-center justify-center gap-3 px-8 py-5 rounded-2xl font-bold transition ${
+              className={`flex-1 flex items-center justify-center gap-3 px-8 py-5 rounded-2xl font-bold ${
                 loading
-                  ? "bg-gray-400 cursor-not-allowed"
+                  ? "bg-gray-400"
                   : "bg-gradient-to-r from-blue-600 to-emerald-600 text-white hover:-translate-y-1"
               }`}
             >
