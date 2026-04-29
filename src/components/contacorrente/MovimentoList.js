@@ -60,17 +60,19 @@ const calcularSaldo = () => {
 
   const movimentosComSaldo = calcularSaldo();
 
-  const calcularTotais = () => {
-    let totalDebito = 0;
-    let totalCredito = 0;
+const calcularTotais = () => {
+  let totalDebito = 0;
+  let totalCredito = 0;
 
-    movimentos.forEach((mov) => {
-      if (mov.tipo.toLowerCase() === "debito") totalDebito += mov.valor || 0;
-      else if (mov.tipo.toLowerCase() === "credito") totalCredito += mov.valor || 0;
-    });
-    
-    return { totalDebito, totalCredito, saldoAtual };
-  };
+  movimentos.forEach((mov) => {
+    if (mov.tipo.toLowerCase() === "debito") totalDebito += mov.valor || 0;
+    else if (mov.tipo.toLowerCase() === "credito") totalCredito += mov.valor || 0;
+  });
+
+  const saldoAtual = totalCredito - totalDebito;
+
+  return { totalDebito, totalCredito, saldoAtual };
+};
 
   const { totalDebito, totalCredito, saldoAtual } = calcularTotais();
 
