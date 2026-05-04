@@ -60,18 +60,16 @@ const calcularSaldo = () => {
 
   const movimentosComSaldo = calcularSaldo();
 
-const calcularTotais = () => {
-  let totalDebito = 0;
-  let totalCredito = 0;
+const totalDebito = movimentos
+  .filter(mov => mov.tipo.toLowerCase() === "debito")
+  .reduce((acc, mov) => acc + (mov.valor || 0), 0);
 
-  movimentos.forEach((mov) => {
-    if (mov.tipo.toLowerCase() === "debito") totalDebito += mov.valor || 0;
-    else if (mov.tipo.toLowerCase() === "credito") totalCredito += mov.valor || 0;
-  });
+const totalCredito = movimentos
+  .filter(mov => mov.tipo.toLowerCase() === "credito")
+  .reduce((acc, mov) => acc + (mov.valor || 0), 0);
 
-  const saldoAtual = totalCredito - totalDebito;
-
-  return { totalDebito, totalCredito, saldoAtual };
+// 🔥 AGORA vem do backend
+const saldoAtual = conta?.saldoAtual || 0;
 };
 
   const { totalDebito, totalCredito, saldoAtual } = calcularTotais();
