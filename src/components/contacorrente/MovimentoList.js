@@ -42,38 +42,44 @@ const MovimentoList = ({ conta, onBack, onNew, onEdit }) => {
     fetchMovimentos();
   }, [fetchMovimentos]);
 
-const calcularSaldo = () => {
-  let saldo = 0;
+const [totais, setTotais] = useState({
+  totalDebito: 0,
+  totalCredito: 0,
+  saldoFinal: 0,
+});
 
-  return movimentos.map((mov) => {
-    const valor = mov.valor || 0;
+const fetchMovimentos = useCallback(async () => {
+  try {
+    let res;
 
-    if (mov.tipo.toLowerCase() === "debito") {
-      saldo -= valor;
-    } else if (mov.tipo.toLowerCase() === "credito") {
-      saldo += valor;
+    if (conta?.id) {
+      res = await api.get(`/contas-correntes/${conta.id}/movimentos`);
+
+      // 🔥 NOVO FORMATO DO BACKEND
+      setMovimentos(res.data.movimentos || []);
+      setTotais(res.data.totais || {});
+    } else {
+      res = await api.get(`/movimentos`);
+
+      setMovimentos(res.data || []);
     }
 
-    return { ...mov, saldoAcumulado: saldo };
-  });
-};
+  } catch (error) {
+    console.error("Erro ao buscar movimentos:", error);
+    setErro("Não foi possível carregar os movimentos.");
+  }
+}, [conta?.id]);
 
-  const movimentosComSaldo = calcularSaldo();
+useEffect(() => {
+  fetchMovimentos();
+}, [fetchMovimentos]);
 
-const totalDebito = movimentos
-  .filter(mov => mov.tipo.toLowerCase() === "debito")
-  .reduce((acc, mov) => acc + (mov.valor || 0), 0);
+// 🔥 agora saldo já vem do backend
+const movimentosComSaldo = movimentos;
 
-const totalCredito = movimentos
-  .filter(mov => mov.tipo.toLowerCase() === "credito")
-  .reduce((acc, mov) => acc + (mov.valor || 0), 0);
-
-// 🔥 AGORA vem do backend
-const saldoAtual = conta?.saldoAtual || 0;
-};
-
-  const { totalDebito, totalCredito, saldoAtual } = calcularTotais();
-
+const totalDebito = totais.totalDebito || 0;
+const totalCredito = totais.totalCredito || 0;
+const saldoAtual = totais.saldoFinal || 0;
   // ================= EXPORTAÇÕES =================
 
   const exportCSV = () => {
