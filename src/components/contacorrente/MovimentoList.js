@@ -21,26 +21,7 @@ import { formatCurrency } from "../../utils/formatCurrency";
 const MovimentoList = ({ conta, onBack, onNew, onEdit }) => {
 
   const [movimentos, setMovimentos] = useState([]);
-  const [erro, setErro] = useState(null);
-
-  const fetchMovimentos = useCallback(async () => {
-    try {
-      let res;
-      if (conta?.id) {
-        res = await api.get(`/contas-correntes/${conta.id}/movimentos`);
-      } else {
-        res = await api.get(`/movimentos`);
-      }
-      setMovimentos(res.data || []);
-    } catch (error) {
-      console.error("Erro ao buscar movimentos:", error);
-      setErro("Não foi possível carregar os movimentos.");
-    }
-  }, [conta?.id]);
-
-  useEffect(() => {
-    fetchMovimentos();
-  }, [fetchMovimentos]);
+const [erro, setErro] = useState(null);
 
 const [totais, setTotais] = useState({
   totalDebito: 0,
@@ -55,7 +36,7 @@ const fetchMovimentos = useCallback(async () => {
     if (conta?.id) {
       res = await api.get(`/contas-correntes/${conta.id}/movimentos`);
 
-      // 🔥 NOVO FORMATO DO BACKEND
+      // 🔥 DADOS VINDOS DO BACKEND
       setMovimentos(res.data.movimentos || []);
       setTotais(res.data.totais || {});
     } else {
@@ -74,7 +55,7 @@ useEffect(() => {
   fetchMovimentos();
 }, [fetchMovimentos]);
 
-// 🔥 agora saldo já vem do backend
+// 🔥 saldo já vem calculado do backend
 const movimentosComSaldo = movimentos;
 
 const totalDebito = totais.totalDebito || 0;
