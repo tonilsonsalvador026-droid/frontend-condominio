@@ -79,33 +79,40 @@ const MovimentoForm = ({ onSuccess, onCancel }) => {
 
     setLoading(true);
 
-    try {
-      const payload = {
-        descricao: form.descricao,
-        tipo: form.tipo.toLowerCase(),
-        valor: normalizarValor(form.valor),
-        data: form.data || new Date().toISOString(),
-      };
+try {
+  const payload = {
+    descricao: form.descricao,
+    tipo: form.tipo.toLowerCase(),
+    valor: normalizarValor(form.valor),
+    data: form.data || new Date().toISOString(),
+  };
 
-      await api.post(`/contas-correntes/${form.contaCorrenteId}/movimentos`, payload);
+  await api.post(`/contas-correntes/${form.contaCorrenteId}/movimentos`, payload);
 
-      toast.success("Movimento registrado!");
+  toast.success("Movimento registrado!");
 
-      setForm({
-        proprietarioId: "",
-        contaCorrenteId: "",
-        data: "",
-        descricao: "",
-        tipo: "DEBITO",
-        valor: "",
-      });
+  setForm({
+    proprietarioId: "",
+    contaCorrenteId: "",
+    data: "",
+    descricao: "",
+    tipo: "DEBITO",
+    valor: "",
+  });
 
-      onSuccess?.(); // ✅ AGORA FUNCIONA
-    } catch {
-      toast.error("Erro ao registrar.");
-    } finally {
-      setLoading(false);
-    }
+  onSuccess?.();
+
+} catch (error) {
+
+  const mensagem =
+    error?.response?.data?.error ||
+    "Erro ao registrar movimento.";
+
+  toast.error(mensagem);
+
+} finally {
+  setLoading(false);
+}
   };
 
   return (
