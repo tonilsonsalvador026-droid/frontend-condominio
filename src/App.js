@@ -2,6 +2,9 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
+// 🔔 TOAST NOTIFICATIONS
+import { Toaster } from "sonner";
+
 // Autenticação (rotas públicas)
 import LoginPage from "./components/auth/LoginPage";
 import RecuperarPasswordPage from "./components/Recuperar/RecuperarPasswordPage";
@@ -54,6 +57,10 @@ import InquilinoForm from "./components/inquilinos/InquilinoForm";
 function App() {
   return (
     <Router>
+    
+     {/* 🔥 TOAST GLOBAL (OBRIGATÓRIO PARA FUNCIONAR OS ALERTS) */}
+      <Toaster richColors position="top-right" />
+    
       <Routes>
         {/* 🔓 ROTAS PÚBLICAS */}
         <Route path="/" element={<LoginPage />} />
