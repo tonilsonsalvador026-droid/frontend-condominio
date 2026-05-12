@@ -1,6 +1,5 @@
 import React from "react";
 import { Trash2, Pencil } from "lucide-react";
-import { toast } from "sonner";
 const ServicoExtraTable = ({
   servicos,
   onDelete,
