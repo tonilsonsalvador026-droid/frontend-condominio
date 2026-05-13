@@ -41,7 +41,6 @@ import EnviarMensagem from "./components/mensagens/EnviarMensagem";
 import EdificioDetalhes from "./components/edificios/EdificioDetalhes";
 import EventosPage from "./components/eventos/EventosPage";
 import ServicosPage from "./components/servicos/ServicosPage";
-import ServicosAgendadosPage from "./components/servicos/ServicosAgendadosPage";
 import FracoesPage from "./components/fracao/FracoesPage";
 import FracaoEditPage from "./components/fracao/FracaoEditPage";
 import EdificioPage from "./components/edificios/EdificioPage";
