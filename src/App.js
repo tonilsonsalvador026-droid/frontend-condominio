@@ -103,7 +103,7 @@ function App() {
           <Route path="/fracoes/editar/:id" element={<FracaoEditPage />} />
 
           <Route path="/eventos" element={<EventosPage />} />
-          <Route path="/servicos-extras" element={<ServicosExtrasPage />} />
+          <Route path="/servicos-extras" element={<ServicosPage />} />
           <Route path="/servicos-agendados" element={<ServicosAgendadosPage />} />
 
           <Route path="/proprietarios" element={<ProprietarioPage />} />
