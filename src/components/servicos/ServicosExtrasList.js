@@ -1,4 +1,5 @@
 import React from "react";
+import ServicosExtrasForm from "./ServicosExtrasForm";
 import { Trash2, Edit, FileText } from "lucide-react";
 import { formatCurrency } from "../../utils/formatCurrency";
 
