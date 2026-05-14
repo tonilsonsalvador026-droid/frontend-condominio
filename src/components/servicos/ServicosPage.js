@@ -78,11 +78,37 @@ const ServicosPage = () => {
     }
   };
 
-  return (
-    <div className="space-y-8">
+ return (
+  <div className="space-y-8">
 
-      {/* HEADER */}
+    {/* HEADER PREMIUM */}
+    <div className="bg-white/40 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
+
       <div className="flex items-center justify-between">
+
+        <div>
+          <h1 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
+            Serviços Extras
+          </h1>
+
+          <p className="text-slate-600 mt-2">
+            Gestão completa de serviços extras.
+          </p>
+        </div>
+
+        {!mostrarForm && (
+          <button
+            onClick={() => setMostrarForm(true)}
+            className="flex items-center gap-2 px-6 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-emerald-600 text-white font-bold"
+          >
+            <Plus size={20} />
+            Novo Serviço
+          </button>
+        )}
+
+      </div>
+
+    </div>
 
         <div>
           <h1 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
