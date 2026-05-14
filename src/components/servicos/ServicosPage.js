@@ -99,7 +99,7 @@ const ServicosPage = () => {
           {!mostrarForm && (
             <button
               onClick={() => setMostrarForm(true)}
-              className="flex items-center gap-2 px-6 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-emerald-600 text-white font-bold"
+              className="flex items-center gap-2 px-6 py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition"
             >
               <Plus size={20} />
               Novo Serviço
