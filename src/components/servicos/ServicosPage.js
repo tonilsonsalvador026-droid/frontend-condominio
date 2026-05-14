@@ -12,11 +12,8 @@ const ServicosPage = () => {
   const [servicos, setServicos] = useState([]);
   const [mostrarForm, setMostrarForm] = useState(false);
 
-  const [formData, setFormData] = useState({
-    nome: "",
-    descricao: "",
-    valor: "",
-  });
+  // NOVO
+  const [servicoEditando, setServicoEditando] = useState(null);
 
   // Buscar serviços
   const fetchServicos = async () => {
@@ -33,32 +30,23 @@ const ServicosPage = () => {
     fetchServicos();
   }, []);
 
-  // Salvar serviço
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // SUCESSO AO SALVAR
+  const handleSuccess = () => {
+    setMostrarForm(false);
+    setServicoEditando(null);
+    fetchServicos();
+  };
 
-    try {
-      await api.post("/servicos-extras", {
-        ...formData,
-        valor: Number(formData.valor),
-      });
+  // NOVO SERVIÇO
+  const handleNovoServico = () => {
+    setServicoEditando(null);
+    setMostrarForm(true);
+  };
 
-      toast.success("Serviço criado com sucesso!");
-
-      setFormData({
-        nome: "",
-        descricao: "",
-        valor: "",
-      });
-
-      setMostrarForm(false);
-
-      fetchServicos();
-
-    } catch (err) {
-      console.error(err);
-      toast.error("Erro ao salvar serviço.");
-    }
+  // EDITAR SERVIÇO
+  const handleEdit = (servico) => {
+    setServicoEditando(servico);
+    setMostrarForm(true);
   };
 
   // Eliminar serviço
@@ -98,7 +86,7 @@ const ServicosPage = () => {
 
           {!mostrarForm && (
             <button
-              onClick={() => setMostrarForm(true)}
+              onClick={handleNovoServico}
               className="flex items-center gap-2 px-6 py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition"
             >
               <Plus size={20} />
@@ -113,15 +101,18 @@ const ServicosPage = () => {
       {/* FORMULÁRIO */}
       {mostrarForm ? (
         <ServicosExtrasForm
-          formData={formData}
-          setFormData={setFormData}
-          handleSubmit={handleSubmit}
-          onCancel={() => setMostrarForm(false)}
+          servicoEditando={servicoEditando}
+          onSuccess={handleSuccess}
+          onCancel={() => {
+            setMostrarForm(false);
+            setServicoEditando(null);
+          }}
         />
       ) : (
         <ServicosExtrasList
           servicos={servicos}
           onDelete={handleDelete}
+          onEdit={handleEdit}
         />
       )}
 
