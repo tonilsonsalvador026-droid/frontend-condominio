@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import api from "../../api";
 import { toast } from "sonner";
-import { Plus, Save, ChevronLeft, FileText, DollarSign } from "lucide-react";
+import { Plus, Save, ChevronLeft, FileText } from "lucide-react";
 
 const ServicosExtrasForm = ({ onSuccess, onCancel, servicoEditando }) => {
   const [loading, setLoading] = useState(false);
@@ -113,7 +113,6 @@ const ServicosExtrasForm = ({ onSuccess, onCancel, servicoEditando }) => {
             {/* Valor */}
             <div className="space-y-3">
               <label className="font-bold text-lg text-slate-800 flex items-center gap-2">
-                <DollarSign className="w-5 h-5" />
                 Valor (Kz)
               </label>
               <input
