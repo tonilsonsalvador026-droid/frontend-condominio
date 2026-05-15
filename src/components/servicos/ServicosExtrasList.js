@@ -20,14 +20,6 @@ const ServicosExtrasList = ({ servicos, onDelete, onEdit }) => {
 
   const data = servicos || [];
 
-  // ---------------- PESQUISA ----------------
-  const [search, setSearch] = useState("");
-
-  const filtered = data.filter((srv) =>
-    srv.nome?.toLowerCase().includes(search.toLowerCase()) ||
-    srv.descricao?.toLowerCase().includes(search.toLowerCase())
-  );
-
   // ---------------- EXPORT CSV ----------------
   const exportCSV = () => {
     const headers = ["Nome", "Valor", "Descrição"];
