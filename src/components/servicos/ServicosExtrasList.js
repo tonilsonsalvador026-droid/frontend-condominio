@@ -105,25 +105,6 @@ const ServicosExtrasList = ({ servicos, onDelete, onEdit }) => {
   return (
     <div className="space-y-8 w-full">
 
-      {/* PESQUISA PREMIUM */}
-      <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border shadow-xl">
-
-        <div className="relative max-w-xl">
-
-          <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-
-          <input
-            type="text"
-            placeholder="Pesquisar serviço..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-12 pr-6 py-4 bg-white/70 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-lg"
-          />
-
-        </div>
-
-      </div>
-
       {/* TABLE */}
       <div
         id="printAreaServicosExtras"
