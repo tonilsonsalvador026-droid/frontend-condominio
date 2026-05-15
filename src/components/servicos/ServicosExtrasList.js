@@ -77,23 +77,7 @@ const ServicosExtrasList = ({ servicos, onDelete, onEdit }) => {
 
   return (
     <div className="space-y-8 w-full">
-
-      {/* HEADER PREMIUM */}
-      <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-
-          <div>
-            <h1 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
-              Serviços Extras
-            </h1>
-            <p className="text-xl text-slate-600 font-semibold">
-              {data.length} registos encontrados
-            </p>
-          </div>
-
-        </div>
-      </div>
-
+    
       {/* TABLE */}
       <div
         id="printAreaServicosExtras"
