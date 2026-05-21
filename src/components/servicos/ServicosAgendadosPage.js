@@ -12,7 +12,6 @@ const ServicosAgendadosPage = () => {
   const [agendamentos, setAgendamentos] = useState([]);
   const [servicosExtras, setServicosExtras] = useState([]);
 
-  // Buscar lista de serviços extras
   const fetchServicosExtras = async () => {
     try {
       const res = await axios.get("http://localhost:4000/servicos-extras");
@@ -23,7 +22,6 @@ const ServicosAgendadosPage = () => {
     }
   };
 
-  // Buscar lista de agendamentos
   const fetchAgendamentos = async () => {
     try {
       const res = await axios.get("http://localhost:4000/servicos-agendados");
@@ -39,19 +37,22 @@ const ServicosAgendadosPage = () => {
     fetchAgendamentos();
   }, []);
 
-  // Submeter formulário
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!formData.servicoExtraId) {
       toast.error("Selecione um serviço extra!");
       return;
     }
+
     try {
       await axios.post("http://localhost:4000/servicos-agendados", {
         ...formData,
         servicoExtraId: parseInt(formData.servicoExtraId, 10),
       });
-      toast.success("✅ Serviço agendado com sucesso!");
+
+      toast.success("Serviço agendado com sucesso!");
+
       setFormData({ data: "", observacoes: "", servicoExtraId: "" });
       fetchAgendamentos();
     } catch (err) {
@@ -60,13 +61,13 @@ const ServicosAgendadosPage = () => {
     }
   };
 
-  // Eliminar agendamento
   const handleDelete = async (id) => {
     if (!window.confirm("Tem certeza que deseja eliminar este agendamento?"))
       return;
+
     try {
       await axios.delete(`http://localhost:4000/servicos-agendados/${id}`);
-      toast.success("🗑️ Agendamento eliminado com sucesso!");
+      toast.success("Agendamento eliminado com sucesso!");
       fetchAgendamentos();
     } catch (err) {
       console.error("Erro ao eliminar agendamento:", err);
@@ -75,104 +76,149 @@ const ServicosAgendadosPage = () => {
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6">📅 Gestão de Serviços Agendados</h2>
+    <div className="space-y-8">
 
-      {/* Formulário */}
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white shadow-md rounded-lg p-6 mb-8"
-      >
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block font-medium">Serviço Extra</label>
-            <select
-              value={formData.servicoExtraId}
-              onChange={(e) =>
-                setFormData({ ...formData, servicoExtraId: e.target.value })
-              }
-              className="w-full border p-2 rounded"
-              required
-            >
-              <option value="">-- Selecione --</option>
-              {servicosExtras.map((srv) => (
-                <option key={srv.id} value={srv.id}>
-                  {srv.nome} ({srv.valor.toLocaleString("pt-PT", {
-                    style: "currency",
-                    currency: "EUR",
-                  })})
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block font-medium">Data</label>
-            <input
-              type="date"
-              value={formData.data}
-              onChange={(e) => setFormData({ ...formData, data: e.target.value })}
-              className="w-full border p-2 rounded"
-              required
-            />
-          </div>
-          <div className="col-span-2">
-            <label className="block font-medium">Observações</label>
-            <textarea
-              value={formData.observacoes}
-              onChange={(e) =>
-                setFormData({ ...formData, observacoes: e.target.value })
-              }
-              className="w-full border p-2 rounded"
-              rows={3}
-            ></textarea>
-          </div>
-        </div>
-        <button
-          type="submit"
-          className="mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-        >
-          ➕ Agendar Serviço
-        </button>
-      </form>
+      {/* HEADER PREMIUM */}
+      <div className="bg-white/40 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
+        <h2 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
+          Serviços Agendados
+        </h2>
 
-      {/* Lista */}
-      <h3 className="text-xl font-semibold mb-4">📋 Lista de Serviços Agendados</h3>
-      <table className="w-full border-collapse bg-white shadow-md rounded-lg">
-        <thead>
-          <tr className="bg-gray-200 text-left">
-            <th className="p-3 border">Serviço</th>
-            <th className="p-3 border">Data</th>
-            <th className="p-3 border">Observações</th>
-            <th className="p-3 border">Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {agendamentos.map((ag) => (
-            <tr key={ag.id} className="hover:bg-gray-50">
-              <td className="p-3 border">{ag.servicoExtra?.nome}</td>
-              <td className="p-3 border">
-                {new Date(ag.data).toLocaleDateString("pt-PT")}
-              </td>
-              <td className="p-3 border">{ag.observacoes}</td>
-              <td className="p-3 border">
-                <button
-                  onClick={() => handleDelete(ag.id)}
-                  className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-                >
-                  🗑️ Eliminar
-                </button>
-              </td>
-            </tr>
-          ))}
-          {agendamentos.length === 0 && (
+        <p className="text-slate-600 mt-2">
+          Gestão de agendamentos de serviços extras.
+        </p>
+      </div>
+
+      {/* FORM CARD */}
+      <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-8 border shadow-xl">
+        <form onSubmit={handleSubmit} className="space-y-6">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            {/* Serviço Extra */}
+            <div>
+              <label className="block font-semibold text-slate-700 mb-2">
+                Serviço Extra
+              </label>
+
+              <select
+                value={formData.servicoExtraId}
+                onChange={(e) =>
+                  setFormData({ ...formData, servicoExtraId: e.target.value })
+                }
+                className="w-full px-4 py-3 rounded-2xl border bg-white/70 shadow focus:ring-4 focus:ring-blue-200"
+                required
+              >
+                <option value="">-- Selecione --</option>
+                {servicosExtras.map((srv) => (
+                  <option key={srv.id} value={srv.id}>
+                    {srv.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Data */}
+            <div>
+              <label className="block font-semibold text-slate-700 mb-2">
+                Data
+              </label>
+
+              <input
+                type="date"
+                value={formData.data}
+                onChange={(e) =>
+                  setFormData({ ...formData, data: e.target.value })
+                }
+                className="w-full px-4 py-3 rounded-2xl border bg-white/70 shadow focus:ring-4 focus:ring-blue-200"
+                required
+              />
+            </div>
+
+            {/* Observações */}
+            <div className="md:col-span-2">
+              <label className="block font-semibold text-slate-700 mb-2">
+                Observações
+              </label>
+
+              <textarea
+                value={formData.observacoes}
+                onChange={(e) =>
+                  setFormData({ ...formData, observacoes: e.target.value })
+                }
+                rows={4}
+                className="w-full px-4 py-3 rounded-2xl border bg-white/70 shadow focus:ring-4 focus:ring-blue-200"
+              />
+            </div>
+
+          </div>
+
+          <button
+            type="submit"
+            className="px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-xl transition"
+          >
+            ➕ Agendar Serviço
+          </button>
+
+        </form>
+      </div>
+
+      {/* LISTA CARD */}
+      <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border shadow-xl overflow-x-auto">
+
+        <h3 className="text-2xl font-bold text-slate-800 mb-6">
+          Lista de Serviços Agendados
+        </h3>
+
+        <table className="w-full text-sm md:text-base">
+          <thead className="bg-slate-100 text-slate-700">
             <tr>
-              <td colSpan="4" className="text-center p-4 text-gray-500">
-                Nenhum agendamento registado.
-              </td>
+              <th className="p-3 text-left">Serviço</th>
+              <th className="p-3 text-left">Data</th>
+              <th className="p-3 text-left">Observações</th>
+              <th className="p-3 text-center">Ações</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {agendamentos.map((ag) => (
+              <tr key={ag.id} className="border-t hover:bg-slate-50 transition">
+
+                <td className="p-3 font-semibold">
+                  {ag.servicoExtra?.nome}
+                </td>
+
+                <td className="p-3">
+                  {new Date(ag.data).toLocaleDateString("pt-PT")}
+                </td>
+
+                <td className="p-3 text-slate-600">
+                  {ag.observacoes}
+                </td>
+
+                <td className="p-3 text-center">
+                  <button
+                    onClick={() => handleDelete(ag.id)}
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition"
+                  >
+                    🗑️ Eliminar
+                  </button>
+                </td>
+
+              </tr>
+            ))}
+
+            {agendamentos.length === 0 && (
+              <tr>
+                <td colSpan="4" className="text-center p-6 text-slate-400">
+                  Nenhum agendamento registado.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+
+      </div>
     </div>
   );
 };
