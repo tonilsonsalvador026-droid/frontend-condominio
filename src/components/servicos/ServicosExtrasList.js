@@ -1,14 +1,13 @@
 // src/components/servicos/ServicosExtrasList.js
 
-import React, { useState } from "react";
+import React from "react";
 import {
   Trash2,
   Edit,
   FileText,
   FileSpreadsheet,
   FileDown,
-  Printer,
-  Search
+  Printer
 } from "lucide-react";
 
 import { formatCurrency } from "../../utils/formatCurrency";
@@ -24,7 +23,7 @@ const ServicosExtrasList = ({ servicos, onDelete, onEdit }) => {
   const exportCSV = () => {
     const headers = ["Nome", "Valor", "Descrição"];
 
-    const rows = filtered.map((s) =>
+    const rows = data.map((s) =>
       [
         s.nome,
         formatCurrency(Number(s.valor || 0)).replace("Kz", "").trim() + " Kz",
@@ -48,7 +47,7 @@ const ServicosExtrasList = ({ servicos, onDelete, onEdit }) => {
   // ---------------- EXPORT EXCEL ----------------
   const exportExcel = () => {
     const ws = XLSX.utils.json_to_sheet(
-      filtered.map((s) => ({
+      data.map((s) => ({
         Nome: s.nome,
         Valor: formatCurrency(Number(s.valor || 0)),
         Descrição: s.descricao || "-"
@@ -71,7 +70,7 @@ const ServicosExtrasList = ({ servicos, onDelete, onEdit }) => {
     autoTable(doc, {
       startY: 25,
       head: [["Nome", "Valor", "Descrição"]],
-      body: filtered.map((s) => [
+      body: data.map((s) => [
         s.nome,
         formatCurrency(Number(s.valor || 0)),
         s.descricao || "-"
@@ -114,8 +113,8 @@ const ServicosExtrasList = ({ servicos, onDelete, onEdit }) => {
           </thead>
 
           <tbody>
-            {filtered.length > 0 ? (
-              filtered.map((srv) => (
+            {data.length > 0 ? (
+              data.map((srv) => (
                 <tr
                   key={srv.id}
                   className="border-t hover:bg-slate-50 transition"
@@ -171,7 +170,7 @@ const ServicosExtrasList = ({ servicos, onDelete, onEdit }) => {
       </div>
 
       {/* EXPORTS PREMIUM */}
-      {filtered.length > 0 && (
+      {data.length > 0 && (
         <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border shadow-xl">
 
           <div className="flex flex-wrap gap-3 justify-center">
