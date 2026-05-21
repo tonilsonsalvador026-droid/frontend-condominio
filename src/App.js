@@ -52,6 +52,7 @@ import RolePage from "./components/roles/RolePage";
 import PermissaoPage from "./components/permissoes/PermissaoPage";
 import AtribuirRolePage from "./components/roles/AtribuirRolePage";
 import InquilinoForm from "./components/inquilinos/InquilinoForm";
+import ServicosAgendadosPage from "./components/servicosagendados/ServicosAgendadosPage";
 
 function App() {
   return (
@@ -103,7 +104,7 @@ function App() {
 
           <Route path="/eventos" element={<EventosPage />} />
           <Route path="/servicos-extras" element={<ServicosPage />} />
-          <Route path="/servicos-agendados" element={<ServicosPage />} />
+          <Route path="/servicos-agendados" element={<ServicosAgendadosPage />} />
 
           <Route path="/proprietarios" element={<ProprietarioPage />} />
           <Route path="/inquilinos" element={<InquilinoPage />} />
