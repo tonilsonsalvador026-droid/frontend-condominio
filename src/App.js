@@ -52,7 +52,7 @@ import RolePage from "./components/roles/RolePage";
 import PermissaoPage from "./components/permissoes/PermissaoPage";
 import AtribuirRolePage from "./components/roles/AtribuirRolePage";
 import InquilinoForm from "./components/inquilinos/InquilinoForm";
-import ServicosAgendadosPage from "./components/servicosagendados/ServicosAgendadosPage";
+import ServicosAgendadosPage from "./components/servicos/ServicosAgendadosPage";
 
 function App() {
   return (
