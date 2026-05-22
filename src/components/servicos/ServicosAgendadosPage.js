@@ -28,9 +28,9 @@ const ServicosAgendadosPage = () => {
 
     try {
 
-      const res = await axios.get(
-        "http://localhost:4000/servicos-agendados"
-      );
+const res = await api.get(
+  "/servicos-agendados"
+);
 
       setAgendamentos(res.data);
 
@@ -95,9 +95,9 @@ const ServicosAgendadosPage = () => {
 
     try {
 
-      await axios.delete(
-        `http://localhost:4000/servicos-agendados/${id}`
-      );
+await api.delete(
+  `/servicos-agendados/${id}`
+);
 
       toast.success(
         "Agendamento eliminado com sucesso!"
