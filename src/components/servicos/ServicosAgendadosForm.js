@@ -1,7 +1,7 @@
 // src/components/servicos/ServicosAgendadosForm.js
 
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../api";
 import { toast } from "sonner";
 
 import {
@@ -34,9 +34,9 @@ const ServicosAgendadosForm = ({
 
     try {
 
-      const res = await axios.get(
-        "http://localhost:4000/servicos-extras"
-      );
+const res = await api.get(
+  "/servicos-extras"
+);
 
       setServicosExtras(res.data);
 
@@ -114,10 +114,10 @@ const ServicosAgendadosForm = ({
       // EDITAR
       if (agendamentoEditando) {
 
-        await axios.put(
-          `http://localhost:4000/servicos-agendados/${agendamentoEditando.id}`,
-          payload
-        );
+await api.put(
+  `/servicos-agendados/${agendamentoEditando.id}`,
+  payload
+);
 
         toast.success(
           "Agendamento atualizado com sucesso!"
@@ -128,10 +128,10 @@ const ServicosAgendadosForm = ({
       // NOVO
       else {
 
-        await axios.post(
-          "http://localhost:4000/servicos-agendados",
-          payload
-        );
+await api.post(
+  "/servicos-agendados",
+  payload
+);
 
         toast.success(
           "Serviço agendado com sucesso!"
