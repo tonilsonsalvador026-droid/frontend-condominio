@@ -40,12 +40,13 @@ const res = await api.get(
 
       setServicosExtras(res.data);
 
-    } catch (err) {
+} catch (err) {
 
-      console.error(err);
+  console.error(err.response?.data || err.message);
 
-      toast.error("Erro ao carregar serviços extras.");
-    }
+  toast.error("Erro ao salvar agendamento.");
+
+}
   };
 
   useEffect(() => {
