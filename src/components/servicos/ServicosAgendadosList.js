@@ -25,7 +25,7 @@ const ServicosAgendadosList = ({ agendamentos, onDelete }) => {
 
     const rows = data.map((a) =>
       [
-        a.servicoExtra?.nome || "-",
+        a.servico?.nome || "-",
         new Date(a.data).toLocaleDateString("pt-PT"),
         a.observacoes || "-"
       ].join(",")
@@ -49,7 +49,7 @@ const ServicosAgendadosList = ({ agendamentos, onDelete }) => {
 
     const ws = XLSX.utils.json_to_sheet(
       data.map((a) => ({
-        Serviço: a.servicoExtra?.nome || "-",
+        Serviço: a.servico?.nome || "-",
         Data: new Date(a.data).toLocaleDateString("pt-PT"),
         Observações: a.observacoes || "-"
       }))
@@ -75,7 +75,7 @@ const ServicosAgendadosList = ({ agendamentos, onDelete }) => {
       head: [["Serviço", "Data", "Observações"]],
 
       body: data.map((a) => [
-        a.servicoExtra?.nome || "-",
+        a.servico?.nome || "-",
         new Date(a.data).toLocaleDateString("pt-PT"),
         a.observacoes || "-"
       ]),
@@ -170,7 +170,7 @@ const ServicosAgendadosList = ({ agendamentos, onDelete }) => {
                       <div>
 
                         <p className="font-semibold text-slate-800">
-                          {ag.servicoExtra?.nome || "-"}
+                          {ag.servico?.nome || "-"}
                         </p>
 
                       </div>
