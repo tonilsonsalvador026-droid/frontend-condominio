@@ -51,7 +51,7 @@ const res = await api.get(
   // ---------------- FILTRO PESQUISA ----------------
   const agendamentosFiltrados =
     agendamentos.filter((ag) =>
-      ag.servicoExtra?.nome
+      ag.servico?.nome
         ?.toLowerCase()
         .includes(search.toLowerCase())
     );
