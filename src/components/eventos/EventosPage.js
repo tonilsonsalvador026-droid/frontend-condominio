@@ -1,25 +1,43 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
+import api from "../../api";
 import { toast } from "sonner";
 
+import {
+  Plus,
+  Search,
+} from "lucide-react";
+
+import EventosForm from "./EventosForm";
+import EventosList from "./EventosList";
+
 const EventosPage = () => {
-  const [formData, setFormData] = useState({
-    titulo: "",
-    descricao: "",
-    data: "",
-    local: "",
-  });
 
   const [eventos, setEventos] = useState([]);
 
-  // Carregar lista de eventos
+  const [mostrarForm, setMostrarForm] =
+    useState(false);
+
+  const [search, setSearch] = useState("");
+
+  const [eventoEditando, setEventoEditando] =
+    useState(null);
+
+  // ---------------- FETCH ----------------
   const fetchEventos = async () => {
+
     try {
-      const res = await axios.get("http://localhost:5000/eventos");
+
+      const res = await api.get("/eventos");
+
       setEventos(res.data);
+
     } catch (err) {
-      console.error("Erro ao carregar eventos:", err);
-      toast.error("Erro ao carregar eventos");
+
+      console.error(err);
+
+      toast.error(
+        "Erro ao carregar eventos."
+      );
     }
   };
 
@@ -27,126 +45,161 @@ const EventosPage = () => {
     fetchEventos();
   }, []);
 
-  // Submeter formulário
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post("http://localhost:4000/eventos", formData);
-      toast.success("✅ Evento criado com sucesso!");
-      setFormData({ titulo: "", descricao: "", data: "", local: "" });
-      fetchEventos();
-    } catch (err) {
-      console.error("Erro ao criar evento:", err);
-      toast.error("Erro ao criar evento");
-    }
+  // ---------------- FILTRO ----------------
+  const eventosFiltrados = eventos.filter(
+    (ev) =>
+      ev.titulo
+        ?.toLowerCase()
+        .includes(search.toLowerCase())
+  );
+
+  // ---------------- SUCCESS ----------------
+  const handleSuccess = () => {
+
+    setMostrarForm(false);
+
+    setEventoEditando(null);
+
+    fetchEventos();
   };
 
-  // Eliminar evento
+  // ---------------- NOVO ----------------
+  const handleNovo = () => {
+
+    setEventoEditando(null);
+
+    setMostrarForm(true);
+  };
+
+  // ---------------- EDIT ----------------
+  const handleEdit = (evento) => {
+
+    setEventoEditando(evento);
+
+    setMostrarForm(true);
+  };
+
+  // ---------------- DELETE ----------------
   const handleDelete = async (id) => {
-    if (!window.confirm("Tem certeza que deseja eliminar este evento?")) return;
+
+    if (
+      !window.confirm(
+        "Deseja eliminar este evento?"
+      )
+    ) {
+      return;
+    }
+
     try {
-      await axios.delete(`http://localhost:4000/eventos/${id}`);
-      toast.success("🗑️ Evento eliminado com sucesso!");
+
+      await api.delete(`/eventos/${id}`);
+
+      toast.success(
+        "Evento eliminado com sucesso!"
+      );
+
       fetchEventos();
+
     } catch (err) {
-      console.error("Erro ao eliminar evento:", err);
-      toast.error("Erro ao eliminar evento");
+
+      console.error(err);
+
+      toast.error(
+        "Erro ao eliminar evento."
+      );
     }
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6">📅 Gestão de Eventos</h2>
+    <div className="space-y-8">
 
-      {/* Formulário */}
-      <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-6 mb-8">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block font-medium">Título</label>
-            <input
-              type="text"
-              value={formData.titulo}
-              onChange={(e) => setFormData({ ...formData, titulo: e.target.value })}
-              className="w-full border p-2 rounded"
-              required
-            />
-          </div>
-          <div>
-            <label className="block font-medium">Local</label>
-            <input
-              type="text"
-              value={formData.local}
-              onChange={(e) => setFormData({ ...formData, local: e.target.value })}
-              className="w-full border p-2 rounded"
-              required
-            />
-          </div>
-          <div>
-            <label className="block font-medium">Data</label>
-            <input
-              type="date"
-              value={formData.data}
-              onChange={(e) => setFormData({ ...formData, data: e.target.value })}
-              className="w-full border p-2 rounded"
-              required
-            />
-          </div>
-          <div className="col-span-2">
-            <label className="block font-medium">Descrição</label>
-            <textarea
-              value={formData.descricao}
-              onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-              className="w-full border p-2 rounded"
-              rows={3}
-            ></textarea>
-          </div>
-        </div>
-        <button
-          type="submit"
-          className="mt-4 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-        >
-          ➕ Adicionar Evento
-        </button>
-      </form>
+      {/* HEADER */}
+      <div className="bg-white/40 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
 
-      {/* Lista de eventos */}
-      <h3 className="text-xl font-semibold mb-4">📋 Lista de Eventos</h3>
-      <table className="w-full border-collapse bg-white shadow-md rounded-lg">
-        <thead>
-          <tr className="bg-gray-200 text-left">
-            <th className="p-3 border">Título</th>
-            <th className="p-3 border">Local</th>
-            <th className="p-3 border">Data</th>
-            <th className="p-3 border">Descrição</th>
-            <th className="p-3 border">Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {eventos.map((ev) => (
-            <tr key={ev.id} className="hover:bg-gray-50">
-              <td className="p-3 border">{ev.titulo}</td>
-              <td className="p-3 border">{ev.local}</td>
-              <td className="p-3 border">{new Date(ev.data).toLocaleDateString()}</td>
-              <td className="p-3 border">{ev.descricao}</td>
-              <td className="p-3 border">
-                <button
-                  onClick={() => handleDelete(ev.id)}
-                  className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-                >
-                  🗑️ Eliminar
-                </button>
-              </td>
-            </tr>
-          ))}
-          {eventos.length === 0 && (
-            <tr>
-              <td colSpan="5" className="text-center p-4 text-gray-500">
-                Nenhum evento registado.
-              </td>
-            </tr>
+        <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
+
+          {/* ESQUERDA */}
+          <div>
+
+            <h1 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
+              Eventos
+            </h1>
+
+            <p className="text-slate-600 mt-2">
+              Gestão completa de eventos.
+            </p>
+
+            {!mostrarForm && (
+              <p className="text-sm text-slate-500 mt-3 font-medium">
+                {eventosFiltrados.length} registos encontrados
+              </p>
+            )}
+
+          </div>
+
+          {/* DIREITA */}
+          {!mostrarForm && (
+
+            <div className="flex flex-col sm:flex-row gap-4 w-full xl:w-auto">
+
+              {/* PESQUISA */}
+              <div className="relative w-full xl:w-80">
+
+                <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+
+                <input
+                  type="text"
+                  placeholder="Pesquisar evento..."
+                  value={search}
+                  onChange={(e) =>
+                    setSearch(e.target.value)
+                  }
+                  className="w-full pl-12 pr-4 py-4 bg-white/70 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-lg"
+                />
+
+              </div>
+
+              {/* BOTÃO */}
+              <button
+                onClick={handleNovo}
+                className="flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow-xl"
+              >
+
+                <Plus size={20} />
+
+                Novo Evento
+
+              </button>
+
+            </div>
           )}
-        </tbody>
-      </table>
+
+        </div>
+
+      </div>
+
+      {/* FORM */}
+      {mostrarForm ? (
+
+        <EventosForm
+          eventoEditando={eventoEditando}
+          onSuccess={handleSuccess}
+          onCancel={() => {
+            setMostrarForm(false);
+            setEventoEditando(null);
+          }}
+        />
+
+      ) : (
+
+        <EventosList
+          eventos={eventosFiltrados}
+          onDelete={handleDelete}
+          onEdit={handleEdit}
+        />
+
+      )}
+
     </div>
   );
 };
