@@ -229,7 +229,7 @@ const ServicosAgendadosForm = ({
               }`}
             >
               <Save />
-              {loading ? "Salvando..." : "Guardar"}
+              {loading ? "Salvando..." : "Salvar Agendamento"}
             </button>
 
           </div>
