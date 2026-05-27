@@ -40,7 +40,6 @@ const EventosForm = ({
         data: eventoEditando.data
           ? eventoEditando.data.split("T")[0]
           : "",
-        local: eventoEditando.local || "",
         condominioId:
           eventoEditando.condominioId?.toString() || "1",
         criadoPor:
@@ -53,7 +52,6 @@ const EventosForm = ({
         titulo: "",
         descricao: "",
         data: "",
-        local: "",
         condominioId: "1",
         criadoPor: "1",
       });
@@ -83,7 +81,6 @@ const EventosForm = ({
         titulo: formData.titulo,
         descricao: formData.descricao,
         data: formData.data,
-        local: formData.local,
         condominioId: Number(formData.condominioId),
         criadoPor: Number(formData.criadoPor),
       };
@@ -112,7 +109,6 @@ const EventosForm = ({
         titulo: "",
         descricao: "",
         data: "",
-        local: "",
         condominioId: "1",
         criadoPor: "1",
       });
@@ -197,29 +193,6 @@ const EventosForm = ({
               />
 
             </div>
-
-            {/* LOCAL */}
-            <div className="space-y-3">
-
-              <label className="font-bold text-lg text-slate-800 flex items-center gap-2">
-
-                <MapPin className="w-5 h-5" />
-
-                Local
-
-              </label>
-
-              <input
-                type="text"
-                name="local"
-                value={formData.local}
-                onChange={handleChange}
-                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-xl"
-                required
-              />
-
-            </div>
-
             {/* DATA */}
             <div className="space-y-3">
 
@@ -294,7 +267,7 @@ const EventosForm = ({
 
               {loading
                 ? "Salvando..."
-                : "Guardar"}
+                : "Salvar Evento"}
 
             </button>
 
