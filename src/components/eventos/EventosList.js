@@ -31,7 +31,6 @@ const EventosList = ({
     const headers = [
       "Título",
       "Data",
-      "Local",
       "Descrição",
     ];
 
@@ -41,8 +40,6 @@ const EventosList = ({
 
         new Date(ev.data)
           .toLocaleDateString("pt-PT"),
-
-        ev.local || "-",
 
         ev.descricao || "-",
       ].join(",")
@@ -87,9 +84,6 @@ const EventosList = ({
             new Date(ev.data)
               .toLocaleDateString("pt-PT"),
 
-          Local:
-            ev.local || "-",
-
           Descrição:
             ev.descricao || "-",
         }))
@@ -127,7 +121,6 @@ const EventosList = ({
       head: [[
         "Título",
         "Data",
-        "Local",
         "Descrição",
       ]],
 
@@ -136,9 +129,7 @@ const EventosList = ({
 
         new Date(ev.data)
           .toLocaleDateString("pt-PT"),
-
-        ev.local || "-",
-
+        
         ev.descricao || "-",
       ]),
     });
@@ -259,19 +250,6 @@ const EventosList = ({
 
                     {new Date(ev.data)
                       .toLocaleDateString("pt-PT")}
-
-                  </td>
-
-                  {/* LOCAL */}
-                  <td className="p-4">
-
-                    <div className="flex items-center gap-2 text-slate-700">
-
-                      <MapPin size={16} />
-
-                      {ev.local || "-"}
-
-                    </div>
 
                   </td>
 
