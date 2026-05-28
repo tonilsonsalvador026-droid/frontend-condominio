@@ -8,7 +8,6 @@ import {
   FileDown,
   Printer,
   CalendarDays,
-  MapPin,
 } from "lucide-react";
 
 import * as XLSX from "xlsx";
@@ -129,7 +128,7 @@ const EventosList = ({
 
         new Date(ev.data)
           .toLocaleDateString("pt-PT"),
-        
+
         ev.descricao || "-",
       ]),
     });
@@ -190,10 +189,6 @@ const EventosList = ({
 
               <th className="p-4 text-left">
                 Data
-              </th>
-
-              <th className="p-4 text-left">
-                Local
               </th>
 
               <th className="p-4 text-left">
@@ -301,7 +296,7 @@ const EventosList = ({
               <tr>
 
                 <td
-                  colSpan="5"
+                  colSpan="4"
                   className="text-center p-10 text-slate-400"
                 >
 
