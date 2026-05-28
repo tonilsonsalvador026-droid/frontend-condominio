@@ -8,7 +8,6 @@ import {
   ChevronLeft,
   CalendarDays,
   FileText,
-  MapPin,
   Type,
 } from "lucide-react";
 
@@ -24,9 +23,7 @@ const EventosForm = ({
     titulo: "",
     descricao: "",
     data: "",
-    local: "",
     condominioId: "1",
-    criadoPor: "1",
   });
 
   // ---------------- EDIT ----------------
@@ -42,8 +39,6 @@ const EventosForm = ({
           : "",
         condominioId:
           eventoEditando.condominioId?.toString() || "1",
-        criadoPor:
-          eventoEditando.criadoPor?.toString() || "1",
       });
 
     } else {
@@ -53,7 +48,6 @@ const EventosForm = ({
         descricao: "",
         data: "",
         condominioId: "1",
-        criadoPor: "1",
       });
     }
 
@@ -82,7 +76,6 @@ const EventosForm = ({
         descricao: formData.descricao,
         data: formData.data,
         condominioId: Number(formData.condominioId),
-        criadoPor: Number(formData.criadoPor),
       };
 
       if (eventoEditando) {
@@ -110,7 +103,6 @@ const EventosForm = ({
         descricao: "",
         data: "",
         condominioId: "1",
-        criadoPor: "1",
       });
 
       onSuccess?.();
@@ -193,6 +185,7 @@ const EventosForm = ({
               />
 
             </div>
+
             {/* DATA */}
             <div className="space-y-3">
 
