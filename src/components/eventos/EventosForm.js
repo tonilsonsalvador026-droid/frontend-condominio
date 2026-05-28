@@ -9,6 +9,7 @@ import {
   CalendarDays,
   FileText,
   Type,
+  Building2,
 } from "lucide-react";
 
 const EventosForm = ({
@@ -23,7 +24,7 @@ const EventosForm = ({
     titulo: "",
     descricao: "",
     data: "",
-    condominioId: "1",
+    condominioId: "",
   });
 
   // ---------------- EDIT ----------------
@@ -38,7 +39,7 @@ const EventosForm = ({
           ? eventoEditando.data.split("T")[0]
           : "",
         condominioId:
-          eventoEditando.condominioId?.toString() || "1",
+          eventoEditando.condominioId?.toString() || "",
       });
 
     } else {
@@ -47,7 +48,7 @@ const EventosForm = ({
         titulo: "",
         descricao: "",
         data: "",
-        condominioId: "1",
+        condominioId: "",
       });
     }
 
@@ -91,7 +92,10 @@ const EventosForm = ({
 
       } else {
 
-        await api.post("/eventos", payload);
+        await api.post(
+          "/eventos",
+          payload
+        );
 
         toast.success(
           "Evento criado com sucesso!"
@@ -102,7 +106,7 @@ const EventosForm = ({
         titulo: "",
         descricao: "",
         data: "",
-        condominioId: "1",
+        condominioId: "",
       });
 
       onSuccess?.();
@@ -205,6 +209,45 @@ const EventosForm = ({
                 className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-xl"
                 required
               />
+
+            </div>
+
+            {/* CONDOMÍNIO */}
+            <div className="lg:col-span-2 space-y-3">
+
+              <label className="font-bold text-lg text-slate-800 flex items-center gap-2">
+
+                <Building2 className="w-5 h-5" />
+
+                Condomínio
+
+              </label>
+
+              <select
+                name="condominioId"
+                value={formData.condominioId}
+                onChange={handleChange}
+                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-xl"
+                required
+              >
+
+                <option value="">
+                  Selecione o condomínio
+                </option>
+
+                <option value="1">
+                  Condomínio Principal
+                </option>
+
+                <option value="2">
+                  Condomínio Talatona
+                </option>
+
+                <option value="3">
+                  Condomínio Kilamba
+                </option>
+
+              </select>
 
             </div>
 
