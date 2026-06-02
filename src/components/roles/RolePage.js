@@ -1,267 +1,661 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api";
+
 import {
+  ShieldCheck,
   Plus,
-  Edit3,
+  Pencil,
   Trash2,
   FileSpreadsheet,
   FileText,
   Printer,
   Download,
+  Search,
+  Save,
+  X,
 } from "lucide-react";
+
 import { format } from "date-fns";
+
 import * as XLSX from "xlsx";
+
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+
+import autoTable from "jspdf-autotable";
 
 export default function RolesPage() {
+
   const [roles, setRoles] = useState([]);
+
   const [nome, setNome] = useState("");
+
   const [descricao, setDescricao] = useState("");
+
+  const [pesquisa, setPesquisa] = useState("");
+
   const [loading, setLoading] = useState(false);
+
   const [editingRole, setEditingRole] = useState(null);
 
-  // Buscar funções
+  // -----------------------------------
+  // BUSCAR ROLES
+  // -----------------------------------
   const fetchRoles = async () => {
+
     try {
+
       const res = await api.get("/roles");
+
       setRoles(res.data);
+
     } catch (error) {
-      console.error("Erro ao carregar funções:", error);
+
+      console.error(
+        "Erro ao carregar funções:",
+        error
+      );
     }
   };
 
   useEffect(() => {
+
     fetchRoles();
+
   }, []);
 
-  // Criar ou editar função
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      if (editingRole) {
-        await api.put(`/roles/${editingRole.id}`, { nome, descricao });
-      } else {
-        await api.post("/roles", { nome, descricao });
-      }
-      setNome("");
-      setDescricao("");
-      setEditingRole(null);
-      fetchRoles();
-    } catch (error) {
-      console.error("Erro ao salvar função:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Editar função
-  const handleEdit = (role) => {
-    setEditingRole(role);
-    setNome(role.nome);
-    setDescricao(role.descricao);
-  };
-
-  // Eliminar função
-  const handleDelete = async (id) => {
-    if (!window.confirm("Tens certeza que queres eliminar esta função?")) return;
-    try {
-      await api.delete(`/roles/${id}`);
-      fetchRoles();
-    } catch (error) {
-      console.error("Erro ao eliminar função:", error);
-    }
-  };
-
-  // Função auxiliar para formatação segura da data
+  // -----------------------------------
+  // FORMATAR DATA
+  // -----------------------------------
   const formatDate = (date) => {
+
     if (!date) return "—";
+
     try {
-      return format(new Date(date), "dd/MM/yyyy HH:mm");
+
+      return format(
+        new Date(date),
+        "dd/MM/yyyy HH:mm"
+      );
+
     } catch {
+
       return "—";
     }
   };
 
-  // Exportar CSV
+  // -----------------------------------
+  // SUBMIT
+  // -----------------------------------
+  const handleSubmit = async (e) => {
+
+    e.preventDefault();
+
+    setLoading(true);
+
+    try {
+
+      if (editingRole) {
+
+        await api.put(
+          `/roles/${editingRole.id}`,
+          {
+            nome,
+            descricao,
+          }
+        );
+
+      } else {
+
+        await api.post("/roles", {
+          nome,
+          descricao,
+        });
+      }
+
+      setNome("");
+
+      setDescricao("");
+
+      setEditingRole(null);
+
+      fetchRoles();
+
+    } catch (error) {
+
+      console.error(
+        "Erro ao salvar função:",
+        error
+      );
+
+    } finally {
+
+      setLoading(false);
+    }
+  };
+
+  // -----------------------------------
+  // EDITAR
+  // -----------------------------------
+  const handleEdit = (role) => {
+
+    setEditingRole(role);
+
+    setNome(role.nome);
+
+    setDescricao(role.descricao || "");
+  };
+
+  // -----------------------------------
+  // CANCELAR EDIÇÃO
+  // -----------------------------------
+  const cancelarEdicao = () => {
+
+    setEditingRole(null);
+
+    setNome("");
+
+    setDescricao("");
+  };
+
+  // -----------------------------------
+  // ELIMINAR
+  // -----------------------------------
+  const handleDelete = async (id) => {
+
+    const confirmar = window.confirm(
+      "Tens certeza que queres eliminar esta função?"
+    );
+
+    if (!confirmar) return;
+
+    try {
+
+      await api.delete(`/roles/${id}`);
+
+      fetchRoles();
+
+    } catch (error) {
+
+      console.error(
+        "Erro ao eliminar função:",
+        error
+      );
+    }
+  };
+
+  // -----------------------------------
+  // PESQUISA
+  // -----------------------------------
+  const filteredRoles = roles.filter((role) =>
+    role.nome
+      ?.toLowerCase()
+      .includes(
+        pesquisa.toLowerCase()
+      )
+  );
+
+  // -----------------------------------
+  // EXPORTAR CSV
+  // -----------------------------------
   const exportToCSV = () => {
-    const csvData = roles.map((r) => ({
+
+    const csvData = filteredRoles.map((r) => ({
       Nome: r.nome,
       Descrição: r.descricao,
       Criado: formatDate(r.createdAt),
     }));
 
-    const worksheet = XLSX.utils.json_to_sheet(csvData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Funções");
-    XLSX.writeFile(workbook, "funcoes.csv");
-  };
+    const worksheet =
+      XLSX.utils.json_to_sheet(csvData);
 
-  // Exportar Excel
-  const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(
-      roles.map((r) => ({
-        Nome: r.nome,
-        Descrição: r.descricao,
-        Criado: formatDate(r.createdAt),
-      }))
+    const workbook =
+      XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      "Funções"
     );
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Funções");
-    XLSX.writeFile(workbook, "funcoes.xlsx");
+
+    XLSX.writeFile(
+      workbook,
+      "funcoes.csv"
+    );
   };
 
-  // Exportar PDF
+  // -----------------------------------
+  // EXPORTAR EXCEL
+  // -----------------------------------
+  const exportToExcel = () => {
+
+    const worksheet =
+      XLSX.utils.json_to_sheet(
+
+        filteredRoles.map((r) => ({
+          Nome: r.nome,
+          Descrição: r.descricao,
+          Criado: formatDate(r.createdAt),
+        }))
+      );
+
+    const workbook =
+      XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      "Funções"
+    );
+
+    XLSX.writeFile(
+      workbook,
+      "funcoes.xlsx"
+    );
+  };
+
+  // -----------------------------------
+  // EXPORTAR PDF
+  // -----------------------------------
   const exportToPDF = () => {
+
     const doc = new jsPDF();
-    doc.text("Lista de Funções (Roles)", 14, 10);
-    doc.autoTable({
-      head: [["Nome", "Descrição", "Criado"]],
-      body: roles.map((r) => [r.nome, r.descricao, formatDate(r.createdAt)]),
+
+    doc.text(
+      "Lista de Funções",
+      14,
+      15
+    );
+
+    autoTable(doc, {
+
+      startY: 25,
+
+      head: [[
+        "Nome",
+        "Descrição",
+        "Criado em",
+      ]],
+
+      body: filteredRoles.map((r) => [
+
+        r.nome,
+
+        r.descricao || "-",
+
+        formatDate(r.createdAt),
+      ]),
     });
+
     doc.save("funcoes.pdf");
   };
 
-  // Imprimir
+  // -----------------------------------
+  // IMPRIMIR
+  // -----------------------------------
   const printTable = () => {
-    const content = document.getElementById("roles-table").outerHTML;
-    const printWindow = window.open("", "_blank");
+
+    const content =
+      document.getElementById(
+        "roles-table"
+      ).outerHTML;
+
+    const printWindow =
+      window.open(
+        "",
+        "_blank"
+      );
+
     printWindow.document.write(`
       <html>
-        <head><title>Impressão - Funções</title></head>
+        <head>
+          <title>Lista de Funções</title>
+        </head>
+
         <body>
           <h2>Lista de Funções</h2>
           ${content}
         </body>
       </html>
     `);
+
     printWindow.document.close();
+
     printWindow.print();
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-semibold mb-4">Gestão de Funções (Roles)</h2>
 
-      {/* Formulário */}
+    <div className="space-y-8 p-6">
+
+      {/* HEADER */}
+      <div className="bg-white/70 backdrop-blur-xl rounded-3xl border border-slate-200 shadow-xl p-8">
+
+        <div className="flex items-center gap-4">
+
+          <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center shadow-lg">
+
+            <ShieldCheck className="text-white" size={30} />
+
+          </div>
+
+          <div>
+
+            <h1 className="text-3xl font-black text-slate-800">
+              Gestão de Funções
+            </h1>
+
+            <p className="text-slate-500 font-medium mt-1">
+              Gerencie papéis e permissões do sistema.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* FORM */}
       <form
         onSubmit={handleSubmit}
-        className="bg-white shadow-md rounded-lg p-4 mb-6 w-full md:w-1/2"
+        className="bg-white/80 backdrop-blur-xl rounded-3xl border border-slate-200 shadow-xl p-8"
       >
-        <h3 className="text-lg font-semibold mb-3">
-          {editingRole ? "Editar Função" : "Nova Função"}
-        </h3>
-        <div className="mb-3">
-          <label className="block text-sm font-medium mb-1">Nome</label>
-          <input
-            type="text"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring"
-            required
-          />
+
+        <div className="flex items-center justify-between mb-8">
+
+          <h2 className="text-2xl font-bold text-slate-800">
+
+            {editingRole
+              ? "Editar Função"
+              : "Nova Função"}
+
+          </h2>
+
         </div>
-        <div className="mb-3">
-          <label className="block text-sm font-medium mb-1">Descrição</label>
-          <textarea
-            value={descricao}
-            onChange={(e) => setDescricao(e.target.value)}
-            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring"
-            rows="3"
-          />
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          {/* NOME */}
+          <div>
+
+            <label className="block text-sm font-bold text-slate-700 mb-2">
+
+              Nome da Função
+
+            </label>
+
+            <input
+              type="text"
+              value={nome}
+              onChange={(e) =>
+                setNome(e.target.value)
+              }
+              className="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-white shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-200"
+              placeholder="Ex: Administrador"
+              required
+            />
+
+          </div>
+
+          {/* DESCRIÇÃO */}
+          <div>
+
+            <label className="block text-sm font-bold text-slate-700 mb-2">
+
+              Descrição
+
+            </label>
+
+            <textarea
+              value={descricao}
+              onChange={(e) =>
+                setDescricao(e.target.value)
+              }
+              rows="4"
+              className="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-white shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-200 resize-none"
+              placeholder="Descrição da função..."
+            />
+
+          </div>
+
         </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
-        >
-          <Plus size={18} />
-          {editingRole ? "Atualizar" : "Salvar"}
-        </button>
+
+        {/* BOTÕES */}
+        <div className="flex flex-wrap gap-4 mt-8">
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-6 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold flex items-center gap-2 hover:scale-105 transition-all"
+          >
+
+            <Save size={18} />
+
+            {loading
+              ? "Salvando..."
+              : editingRole
+              ? "Atualizar Função"
+              : "Salvar Função"}
+
+          </button>
+
+          {editingRole && (
+
+            <button
+              type="button"
+              onClick={cancelarEdicao}
+              className="px-6 py-4 rounded-2xl bg-slate-200 text-slate-700 font-bold flex items-center gap-2 hover:bg-slate-300 transition-all"
+            >
+
+              <X size={18} />
+
+              Cancelar
+
+            </button>
+          )}
+
+        </div>
+
       </form>
 
-      {/* Botões de exportação */}
-      <div className="flex flex-wrap gap-3 mb-4">
-        <button
-          onClick={exportToCSV}
-          className="flex items-center bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 text-sm"
-        >
-          <FileText size={16} className="mr-2" /> CSV
-        </button>
-        <button
-          onClick={exportToExcel}
-          className="flex items-center bg-emerald-600 text-white px-3 py-2 rounded hover:bg-emerald-700 text-sm"
-        >
-          <FileSpreadsheet size={16} className="mr-2" /> Excel
-        </button>
-        <button
-          onClick={exportToPDF}
-          className="flex items-center bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 text-sm"
-        >
-          <Download size={16} className="mr-2" /> PDF
-        </button>
-        <button
-          onClick={printTable}
-          className="flex items-center bg-gray-600 text-white px-3 py-2 rounded hover:bg-gray-700 text-sm"
-        >
-          <Printer size={16} className="mr-2" /> Imprimir
-        </button>
+      {/* PESQUISA */}
+      <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-slate-200 shadow-xl p-6">
+
+        <div className="relative">
+
+          <Search
+            className="absolute left-4 top-4 text-slate-400"
+            size={20}
+          />
+
+          <input
+            type="text"
+            placeholder="Pesquisar função..."
+            value={pesquisa}
+            onChange={(e) =>
+              setPesquisa(e.target.value)
+            }
+            className="w-full pl-12 pr-4 py-4 rounded-2xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-blue-200"
+          />
+
+        </div>
+
       </div>
 
-      {/* Tabela */}
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table
-          id="roles-table"
-          className="min-w-full border border-gray-200 text-sm"
-        >
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-4 py-2 border">#</th>
-              <th className="px-4 py-2 border">Nome</th>
-              <th className="px-4 py-2 border">Descrição</th>
-              <th className="px-4 py-2 border">Criado em</th>
-              <th className="px-4 py-2 border text-center">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {roles.length > 0 ? (
-              roles.map((role, index) => (
-                <tr key={role.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 border">{index + 1}</td>
-                  <td className="px-4 py-2 border">{role.nome}</td>
-                  <td className="px-4 py-2 border">{role.descricao}</td>
-                  <td className="px-4 py-2 border">{formatDate(role.createdAt)}</td>
-                  <td className="px-4 py-2 border text-center">
-                    <button
-                      onClick={() => handleEdit(role)}
-                      className="text-blue-600 hover:text-blue-800 mr-2"
-                    >
-                      <Edit3 size={18} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(role.id)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
+      {/* TABELA */}
+      <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+
+        <div className="overflow-x-auto">
+
+          <table
+            id="roles-table"
+            className="w-full"
+          >
+
+            <thead className="bg-slate-100">
+
               <tr>
-                <td
-                  colSpan="5"
-                  className="text-center py-4 text-gray-500 border"
-                >
-                  Nenhuma função encontrada.
-                </td>
+
+                <th className="p-4 text-left">
+                  #
+                </th>
+
+                <th className="p-4 text-left">
+                  Nome
+                </th>
+
+                <th className="p-4 text-left">
+                  Descrição
+                </th>
+
+                <th className="p-4 text-left">
+                  Criado em
+                </th>
+
+                <th className="p-4 text-center">
+                  Ações
+                </th>
+
               </tr>
-            )}
-          </tbody>
-        </table>
+
+            </thead>
+
+            <tbody>
+
+              {filteredRoles.length > 0 ? (
+
+                filteredRoles.map((role, index) => (
+
+                  <tr
+                    key={role.id}
+                    className="border-t hover:bg-slate-50 transition-all"
+                  >
+
+                    <td className="p-4">
+                      {index + 1}
+                    </td>
+
+                    <td className="p-4 font-semibold text-slate-800">
+                      {role.nome}
+                    </td>
+
+                    <td className="p-4 text-slate-600">
+                      {role.descricao || "—"}
+                    </td>
+
+                    <td className="p-4 text-slate-600">
+                      {formatDate(role.createdAt)}
+                    </td>
+
+                    <td className="p-4">
+
+                      <div className="flex items-center justify-center gap-3">
+
+                        <button
+                          onClick={() =>
+                            handleEdit(role)
+                          }
+                          className="text-blue-600 hover:scale-110 transition"
+                        >
+
+                          <Pencil size={18} />
+
+                        </button>
+
+                        <button
+                          onClick={() =>
+                            handleDelete(role.id)
+                          }
+                          className="text-red-600 hover:scale-110 transition"
+                        >
+
+                          <Trash2 size={18} />
+
+                        </button>
+
+                      </div>
+
+                    </td>
+
+                  </tr>
+                ))
+
+              ) : (
+
+                <tr>
+
+                  <td
+                    colSpan="5"
+                    className="p-10 text-center text-slate-400"
+                  >
+
+                    Nenhuma função encontrada.
+
+                  </td>
+
+                </tr>
+              )}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
       </div>
+
+      {/* EXPORTAÇÕES */}
+      <div className="bg-white/80 backdrop-blur-xl rounded-3xl border border-slate-200 shadow-xl p-6">
+
+        <div className="flex flex-wrap gap-4 justify-center">
+
+          <button
+            onClick={exportToCSV}
+            className="px-5 py-3 rounded-2xl bg-blue-600 text-white font-bold flex items-center gap-2 hover:scale-105 transition-all"
+          >
+
+            <FileText size={18} />
+
+            CSV
+
+          </button>
+
+          <button
+            onClick={exportToExcel}
+            className="px-5 py-3 rounded-2xl bg-emerald-600 text-white font-bold flex items-center gap-2 hover:scale-105 transition-all"
+          >
+
+            <FileSpreadsheet size={18} />
+
+            Excel
+
+          </button>
+
+          <button
+            onClick={exportToPDF}
+            className="px-5 py-3 rounded-2xl bg-red-600 text-white font-bold flex items-center gap-2 hover:scale-105 transition-all"
+          >
+
+            <Download size={18} />
+
+            PDF
+
+          </button>
+
+          <button
+            onClick={printTable}
+            className="px-5 py-3 rounded-2xl bg-slate-700 text-white font-bold flex items-center gap-2 hover:scale-105 transition-all"
+          >
+
+            <Printer size={18} />
+
+            Imprimir
+
+          </button>
+
+        </div>
+
+      </div>
+
     </div>
   );
 }
