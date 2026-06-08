@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import {
   ShieldCheck,
   Save,
-  X,
+  ChevronLeft,
   FileText,
 } from "lucide-react";
 
@@ -14,178 +14,183 @@ const RoleForm = ({
   onCancel,
 }) => {
 
-  const [nome, setNome] =
-    useState("");
-
-  const [descricao, setDescricao] =
-    useState("");
+  const [formData, setFormData] =
+    useState({
+      nome: "",
+      descricao: "",
+    });
 
   useEffect(() => {
 
     if (editingRole) {
 
-      setNome(
-        editingRole.nome || ""
-      );
+      setFormData({
+        nome:
+          editingRole.nome || "",
 
-      setDescricao(
-        editingRole.descricao || ""
-      );
+        descricao:
+          editingRole.descricao || "",
+      });
 
     } else {
 
-      setNome("");
-      setDescricao("");
+      setFormData({
+        nome: "",
+        descricao: "",
+      });
 
     }
 
   }, [editingRole]);
 
+  const handleChange = (e) => {
+
+    setFormData({
+      ...formData,
+      [e.target.name]:
+        e.target.value,
+    });
+
+  };
+
   const handleSubmit = (e) => {
 
     e.preventDefault();
 
-    onSubmit({
-      nome,
-      descricao,
-    });
+    onSubmit(formData);
 
   };
 
   return (
 
-    <div className="bg-white/80 backdrop-blur-xl border border-slate-200 rounded-3xl shadow-xl overflow-hidden">
+    <div className="w-full max-w-5xl mx-auto">
 
-      {/* HEADER */}
-      <div className="bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-500 p-6 text-white">
+      <div className="bg-white/40 backdrop-blur-xl rounded-3xl p-8 lg:p-12 border border-slate-200/40 shadow-2xl">
 
-        <div className="flex items-center justify-between">
+        {/* HEADER */}
+        <div className="flex items-center gap-4 mb-10 pb-8 border-b border-slate-200/30">
 
-          <div className="flex items-center gap-4">
+          <div className="p-4 bg-gradient-to-br from-indigo-500/20 to-blue-500/20 rounded-2xl border border-indigo-200/50">
 
-            <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur-lg">
+            <ShieldCheck className="w-8 h-8 text-indigo-600" />
 
-              <ShieldCheck size={28} />
+          </div>
+
+          <div>
+
+            <h2 className="text-3xl lg:text-4xl font-black bg-gradient-to-r from-slate-900 to-indigo-900 bg-clip-text text-transparent">
+
+              {editingRole
+                ? "Editar Função"
+                : "Nova Função"}
+
+            </h2>
+
+            <p className="text-xl text-slate-600 font-semibold mt-1">
+
+              Gestão de papéis e acessos do sistema
+
+            </p>
+
+          </div>
+
+        </div>
+
+        {/* FORM */}
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-8"
+        >
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+            {/* NOME */}
+            <div className="space-y-3">
+
+              <label className="font-bold text-lg text-slate-800 flex items-center gap-2">
+
+                <ShieldCheck className="w-5 h-5" />
+
+                Nome da Função
+
+              </label>
+
+              <input
+                type="text"
+                name="nome"
+                value={formData.nome}
+                onChange={handleChange}
+                placeholder="Ex: Administrador"
+                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-200 shadow-xl"
+                required
+              />
 
             </div>
 
-            <div>
+            {/* DESCRIÇÃO */}
+            <div className="space-y-3">
 
-              <h2 className="text-2xl font-bold">
+              <label className="font-bold text-lg text-slate-800 flex items-center gap-2">
 
-                {editingRole
-                  ? "Editar Função"
-                  : "Nova Função"}
+                <FileText className="w-5 h-5" />
 
-              </h2>
+                Descrição
 
-              <p className="text-sm text-blue-100 mt-1">
+              </label>
 
-                Gestão premium de papéis e acessos.
-
-              </p>
+              <textarea
+                name="descricao"
+                value={formData.descricao}
+                onChange={handleChange}
+                rows="4"
+                placeholder="Descreva as permissões desta função..."
+                className="w-full px-6 py-5 bg-white/60 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-200 shadow-xl resize-none"
+              />
 
             </div>
 
           </div>
 
-          {editingRole && (
+          {/* BOTÕES */}
+          <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-slate-200/30">
 
             <button
+              type="button"
               onClick={onCancel}
-              className="w-11 h-11 rounded-2xl bg-white/20 hover:bg-red-500 transition-all duration-300 flex items-center justify-center"
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-slate-200 rounded-2xl font-bold hover:bg-slate-300 transition"
             >
 
-              <X size={20} />
+              <ChevronLeft />
+
+              Cancelar
 
             </button>
 
-          )}
+            <button
+              type="submit"
+              disabled={loading}
+              className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-bold text-white transition ${
+                loading
+                  ? "bg-gray-400"
+                  : "bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700"
+              }`}
+            >
 
-        </div>
+              <Save />
 
-      </div>
+              {loading
+                ? "Salvando..."
+                : editingRole
+                ? "Atualizar Função"
+                : "Salvar Função"}
 
-      {/* FORM */}
-      <form
-        onSubmit={handleSubmit}
-        className="p-8 space-y-8"
-      >
-
-        {/* NOME */}
-        <div>
-
-          <label className="block text-sm font-bold text-slate-700 mb-3">
-
-            Nome da Função
-
-          </label>
-
-          <input
-            type="text"
-            value={nome}
-            onChange={(e) =>
-              setNome(e.target.value)
-            }
-            placeholder="Ex: Administrador"
-            className="w-full h-14 rounded-2xl border border-slate-200 bg-white px-5 text-slate-700 shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all duration-300"
-            required
-          />
-
-        </div>
-
-        {/* DESCRIÇÃO */}
-        <div>
-
-          <label className="block text-sm font-bold text-slate-700 mb-3">
-
-            Descrição
-
-          </label>
-
-          <div className="relative">
-
-            <FileText
-              size={18}
-              className="absolute top-5 left-4 text-slate-400"
-            />
-
-            <textarea
-              rows="5"
-              value={descricao}
-              onChange={(e) =>
-                setDescricao(e.target.value)
-              }
-              placeholder="Descreva as responsabilidades desta função..."
-              className="w-full rounded-2xl border border-slate-200 bg-white py-4 pl-12 pr-4 text-slate-700 shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition-all duration-300 resize-none"
-            />
+            </button>
 
           </div>
 
-        </div>
+        </form>
 
-        {/* BOTÃO */}
-        <div className="flex justify-end">
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="h-14 px-8 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-3"
-          >
-
-            <Save size={18} />
-
-            {loading
-              ? "A guardar..."
-              : editingRole
-              ? "Atualizar Função"
-              : "Salvar Função"}
-
-          </button>
-
-        </div>
-
-      </form>
+      </div>
 
     </div>
 
