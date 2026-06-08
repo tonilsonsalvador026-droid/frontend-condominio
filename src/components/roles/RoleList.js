@@ -289,4 +289,3 @@ const RoleList = ({ roles, onDelete, onEdit }) => {
 };
 
 export default RoleList;
-s
