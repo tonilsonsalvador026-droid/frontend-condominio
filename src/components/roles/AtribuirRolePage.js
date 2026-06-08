@@ -5,6 +5,7 @@ import api from "../../api";
 import { toast } from "sonner";
 
 import {
+  ShieldCheck,
   Search,
   Loader2,
   UserCog,
