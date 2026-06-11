@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api";
-import { CheckCircle2, Save } from "lucide-react";
+import { CheckCircle2, Save, Loader2 } from "lucide-react";
 import PermissaoList from "../../components/permissoes/PermissaoList";
 
 export default function AtribuirPermissoesPage() {
@@ -32,14 +32,16 @@ export default function AtribuirPermissoesPage() {
     fetchData();
   }, []);
 
-  // Quando seleciona um papel, carregar as permissões já associadas
+  // Quando seleciona um papel
   const handleSelectRole = async (roleId) => {
     setSelectedRole(roleId);
     setSelectedPermissoes([]);
 
     try {
       const res = await api.get(`/roles/${roleId}`);
-      const permissoesAtuais = res.data.permissoes.map((rp) => rp.permissaoId);
+      const permissoesAtuais = res.data.permissoes.map(
+        (rp) => rp.permissaoId
+      );
       setSelectedPermissoes(permissoesAtuais);
     } catch (error) {
       console.error("Erro ao carregar permissões do papel:", error);
@@ -53,7 +55,7 @@ export default function AtribuirPermissoesPage() {
     );
   };
 
-  // Guardar permissões do papel
+  // Guardar permissões
   const handleSave = async () => {
     if (!selectedRole) {
       alert("Por favor, selecione um papel.");
@@ -65,9 +67,9 @@ export default function AtribuirPermissoesPage() {
       await api.post(`/roles/${selectedRole}/permissoes`, {
         permissaoIds: selectedPermissoes,
       });
+
       alert("Permissões atualizadas com sucesso!");
 
-      // Atualizar a lista de roles com permissões para exibir na tabela
       const updatedRoles = await api.get("/roles");
       setRoles(updatedRoles.data);
     } catch (error) {
@@ -79,16 +81,36 @@ export default function AtribuirPermissoesPage() {
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-semibold mb-4">Atribuir Permissões a Papéis</h2>
+    <div className="space-y-8">
 
-      {/* Selecção do papel */}
-      <div className="bg-white shadow-md rounded-lg p-4 mb-6 w-full md:w-1/2">
-        <label className="block text-sm font-medium mb-2">Selecionar Papel</label>
+      {/* HEADER PREMIUM */}
+      <div className="bg-white/40 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
+        <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
+
+          <div>
+            <h1 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
+              Atribuir Permissões
+            </h1>
+
+            <p className="text-slate-600 mt-2">
+              Gestão de permissões por papel do sistema.
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      {/* SELEÇÃO DE ROLE */}
+      <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-2xl w-full md:w-1/2">
+
+        <label className="block text-sm font-semibold text-slate-700 mb-3">
+          Selecionar Papel
+        </label>
+
         <select
           value={selectedRole || ""}
           onChange={(e) => handleSelectRole(e.target.value)}
-          className="w-full border rounded px-3 py-2 focus:outline-none focus:ring"
+          className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl shadow-lg focus:ring-4 focus:ring-blue-200"
         >
           <option value="">-- Selecione --</option>
           {roles.map((r) => (
@@ -99,21 +121,28 @@ export default function AtribuirPermissoesPage() {
         </select>
       </div>
 
-      {/* Lista de permissões para atribuir */}
+      {/* PERMISSÕES */}
       {selectedRole && (
-        <div className="bg-white shadow-md rounded-lg p-4 mb-6">
-          <h3 className="text-lg font-semibold mb-3">Permissões Disponíveis</h3>
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-2xl">
+
+          <h3 className="text-xl font-bold text-slate-800 mb-4">
+            Permissões Disponíveis
+          </h3>
+
           {loading ? (
-            <p>Carregando permissões...</p>
+            <div className="flex items-center gap-3 text-slate-500 py-10">
+              <Loader2 className="animate-spin" />
+              <span>Carregando permissões...</span>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
               {permissoes.map((perm) => (
                 <label
                   key={perm.id}
-                  className={`flex items-center gap-2 border rounded px-3 py-2 cursor-pointer transition ${
+                  className={`flex items-center gap-2 border rounded-2xl px-4 py-3 cursor-pointer transition-all duration-300 ${
                     selectedPermissoes.includes(perm.id)
-                      ? "bg-blue-50 border-blue-500"
-                      : "hover:bg-gray-50"
+                      ? "bg-blue-50 border-blue-500 shadow-md"
+                      : "hover:bg-slate-50 border-slate-200"
                   }`}
                 >
                   <input
@@ -121,18 +150,20 @@ export default function AtribuirPermissoesPage() {
                     checked={selectedPermissoes.includes(perm.id)}
                     onChange={() => togglePermissao(perm.id)}
                   />
-                  <span>{perm.nome}</span>
+                  <span className="font-medium text-slate-700">
+                    {perm.nome}
+                  </span>
                 </label>
               ))}
             </div>
           )}
 
-          {/* Botão salvar */}
-          <div className="mt-6">
+          {/* BOTÃO SALVAR */}
+          <div className="mt-6 flex justify-end">
             <button
               onClick={handleSave}
               disabled={saving}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
+              className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg transition-all"
             >
               <Save size={18} />
               {saving ? "A Guardar..." : "Guardar Permissões"}
@@ -141,15 +172,15 @@ export default function AtribuirPermissoesPage() {
         </div>
       )}
 
-      {/* Lista de permissões atribuídas - usando o componente separado */}
-      <div className="mt-6">
-        <PermissoesList />
+      {/* LISTA */}
+      <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-2xl">
+        <PermissaoList />
       </div>
 
-      {/* Indicação quando nenhum papel estiver selecionado */}
+      {/* SEM ROLE */}
       {!selectedRole && (
-        <div className="text-gray-600 mt-4">
-          <CheckCircle2 className="inline mr-2 text-blue-500" />
+        <div className="flex items-center gap-2 text-slate-500">
+          <CheckCircle2 className="text-blue-500" />
           Selecione um papel acima para ver e alterar as permissões.
         </div>
       )}
