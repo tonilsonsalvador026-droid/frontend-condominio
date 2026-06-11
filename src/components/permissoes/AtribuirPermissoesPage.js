@@ -11,14 +11,18 @@ export default function AtribuirPermissoesPage() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Buscar roles e permissões
+  // =========================
+  // LOAD DATA
+  // =========================
   const fetchData = async () => {
     try {
       setLoading(true);
+
       const [rolesRes, permsRes] = await Promise.all([
         api.get("/roles"),
         api.get("/permissoes"),
       ]);
+
       setRoles(rolesRes.data);
       setPermissoes(permsRes.data);
     } catch (error) {
@@ -32,7 +36,9 @@ export default function AtribuirPermissoesPage() {
     fetchData();
   }, []);
 
-  // Quando seleciona um papel
+  // =========================
+  // SELECT ROLE
+  // =========================
   const handleSelectRole = async (roleId) => {
     setSelectedRole(roleId);
     setSelectedPermissoes([]);
@@ -44,18 +50,24 @@ export default function AtribuirPermissoesPage() {
       );
       setSelectedPermissoes(permissoesAtuais);
     } catch (error) {
-      console.error("Erro ao carregar permissões do papel:", error);
+      console.error("Erro ao carregar permissões:", error);
     }
   };
 
-  // Alternar checkbox
+  // =========================
+  // TOGGLE PERMISSION
+  // =========================
   const togglePermissao = (id) => {
     setSelectedPermissoes((prev) =>
-      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
+      prev.includes(id)
+        ? prev.filter((p) => p !== id)
+        : [...prev, id]
     );
   };
 
-  // Guardar permissões
+  // =========================
+  // SAVE
+  // =========================
   const handleSave = async () => {
     if (!selectedRole) {
       alert("Por favor, selecione um papel.");
@@ -63,6 +75,7 @@ export default function AtribuirPermissoesPage() {
     }
 
     setSaving(true);
+
     try {
       await api.post(`/roles/${selectedRole}/permissoes`, {
         permissaoIds: selectedPermissoes,
@@ -73,8 +86,8 @@ export default function AtribuirPermissoesPage() {
       const updatedRoles = await api.get("/roles");
       setRoles(updatedRoles.data);
     } catch (error) {
-      console.error("Erro ao atualizar permissões:", error);
-      alert("Erro ao atualizar permissões.");
+      console.error("Erro ao salvar permissões:", error);
+      alert("Erro ao salvar permissões.");
     } finally {
       setSaving(false);
     }
@@ -83,8 +96,11 @@ export default function AtribuirPermissoesPage() {
   return (
     <div className="space-y-8">
 
-      {/* HEADER PREMIUM */}
+      {/* =========================
+          HEADER PREMIUM
+      ========================= */}
       <div className="bg-white/40 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
+
         <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
 
           <div>
@@ -93,14 +109,25 @@ export default function AtribuirPermissoesPage() {
             </h1>
 
             <p className="text-slate-600 mt-2">
-              Gestão de permissões por papel do sistema.
+              Gestão avançada de permissões por papel do sistema.
             </p>
+
+            {selectedRole && (
+              <p className="text-sm text-slate-500 mt-3 font-medium">
+                Papel selecionado:{" "}
+                <span className="text-blue-600 font-semibold">
+                  {roles.find(r => r.id == selectedRole)?.nome}
+                </span>
+              </p>
+            )}
           </div>
 
         </div>
       </div>
 
-      {/* SELEÇÃO DE ROLE */}
+      {/* =========================
+          SELECT ROLE CARD
+      ========================= */}
       <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-2xl w-full md:w-1/2">
 
         <label className="block text-sm font-semibold text-slate-700 mb-3">
@@ -121,49 +148,55 @@ export default function AtribuirPermissoesPage() {
         </select>
       </div>
 
-      {/* PERMISSÕES */}
+      {/* =========================
+          PERMISSÕES GRID
+      ========================= */}
       {selectedRole && (
         <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-2xl">
 
-          <h3 className="text-xl font-bold text-slate-800 mb-4">
-            Permissões Disponíveis
-          </h3>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold text-slate-800">
+              Permissões Disponíveis
+            </h3>
 
-          {loading ? (
-            <div className="flex items-center gap-3 text-slate-500 py-10">
-              <Loader2 className="animate-spin" />
-              <span>Carregando permissões...</span>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              {permissoes.map((perm) => (
-                <label
-                  key={perm.id}
-                  className={`flex items-center gap-2 border rounded-2xl px-4 py-3 cursor-pointer transition-all duration-300 ${
-                    selectedPermissoes.includes(perm.id)
-                      ? "bg-blue-50 border-blue-500 shadow-md"
-                      : "hover:bg-slate-50 border-slate-200"
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedPermissoes.includes(perm.id)}
-                    onChange={() => togglePermissao(perm.id)}
-                  />
-                  <span className="font-medium text-slate-700">
-                    {perm.nome}
-                  </span>
-                </label>
-              ))}
-            </div>
-          )}
+            {loading && (
+              <div className="flex items-center gap-2 text-slate-500">
+                <Loader2 className="animate-spin" size={18} />
+                <span>Carregando...</span>
+              </div>
+            )}
+          </div>
 
-          {/* BOTÃO SALVAR */}
+          {/* GRID */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {permissoes.map((perm) => (
+              <label
+                key={perm.id}
+                className={`flex items-center gap-3 border rounded-2xl px-4 py-3 cursor-pointer transition-all duration-300 ${
+                  selectedPermissoes.includes(perm.id)
+                    ? "bg-blue-50 border-blue-500 shadow-md"
+                    : "hover:bg-slate-50 border-slate-200"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedPermissoes.includes(perm.id)}
+                  onChange={() => togglePermissao(perm.id)}
+                />
+
+                <span className="font-medium text-slate-700">
+                  {perm.nome}
+                </span>
+              </label>
+            ))}
+          </div>
+
+          {/* SAVE BUTTON */}
           <div className="mt-6 flex justify-end">
             <button
               onClick={handleSave}
               disabled={saving}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg transition-all"
+              className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-xl transition-all"
             >
               <Save size={18} />
               {saving ? "A Guardar..." : "Guardar Permissões"}
@@ -172,18 +205,23 @@ export default function AtribuirPermissoesPage() {
         </div>
       )}
 
-      {/* LISTA */}
+      {/* =========================
+          LISTA PREMIUM
+      ========================= */}
       <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-2xl">
         <PermissaoList />
       </div>
 
-      {/* SEM ROLE */}
+      {/* =========================
+          EMPTY STATE
+      ========================= */}
       {!selectedRole && (
         <div className="flex items-center gap-2 text-slate-500">
           <CheckCircle2 className="text-blue-500" />
           Selecione um papel acima para ver e alterar as permissões.
         </div>
       )}
+
     </div>
   );
 }
