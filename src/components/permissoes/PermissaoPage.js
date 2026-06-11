@@ -7,15 +7,17 @@ import {
   FileSpreadsheet,
   Download,
   Printer,
+  Search,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 export default function PermissoesPage() {
   const [roles, setRoles] = useState([]);
   const [roleId, setRoleId] = useState("");
   const [permissoes, setPermissoes] = useState({});
+  const [search, setSearch] = useState("");
 
   const modulos = [
     "Utilizadores",
@@ -92,7 +94,7 @@ export default function PermissoesPage() {
   };
 
   // =========================
-  // SAVE PERMISSIONS
+  // SAVE
   // =========================
   const handleSalvar = async () => {
     if (!roleId) return alert("Selecione uma função primeiro!");
@@ -103,9 +105,7 @@ export default function PermissoesPage() {
     Object.entries(permissoesDaRole).forEach(([modulo, acoes]) => {
       Object.entries(acoes).forEach(([acao, ativo]) => {
         if (ativo) {
-          nomes.push(
-            `${acao}_${modulo.toLowerCase().replace(/\s/g, "_")}`
-          );
+          nomes.push(`${acao}_${modulo.toLowerCase().replace(/\s/g, "_")}`);
         }
       });
     });
@@ -133,7 +133,6 @@ export default function PermissoesPage() {
   // EXPORTS
   // =========================
   const exportExcel = () => {
-    if (!roleId) return alert("Selecione uma função!");
     const data = Object.entries(permissoes[roleId] || {}).map(
       ([mod, acoes]) => ({
         Módulo: mod,
@@ -151,12 +150,10 @@ export default function PermissoesPage() {
   };
 
   const exportPDF = () => {
-    if (!roleId) return alert("Selecione uma função!");
-
     const doc = new jsPDF();
     doc.text("Permissões da Função", 14, 10);
 
-    doc.autoTable({
+    autoTable(doc, {
       head: [["Módulo", "Visualizar", "Criar", "Editar", "Eliminar"]],
       body: Object.entries(permissoes[roleId] || {}).map(
         ([mod, acoes]) => [
@@ -174,7 +171,7 @@ export default function PermissoesPage() {
 
   const printTable = () => {
     const content = document.getElementById("table-permissoes").outerHTML;
-    const win = window.open("", "_blank");
+    const win = window.open("", "", "width=1000,height=700");
 
     win.document.write(`
       <html>
@@ -186,9 +183,7 @@ export default function PermissoesPage() {
             th { background: #f3f4f6; }
           </style>
         </head>
-        <body>
-          ${content}
-        </body>
+        <body>${content}</body>
       </html>
     `);
 
@@ -197,27 +192,59 @@ export default function PermissoesPage() {
   };
 
   // =========================
-  // UI PREMIUM
+  // FILTER
   // =========================
-  return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      {/* HEADER PREMIUM */}
-      <div className="bg-white p-5 rounded-xl shadow mb-6">
-        <div className="flex items-center gap-3">
-          <Shield className="text-blue-600" />
-          <h2 className="text-xl font-bold">
-            Gestão Premium de Permissões
-          </h2>
-        </div>
+  const filteredRoles = roles.filter((r) =>
+    r.nome?.toLowerCase().includes(search.toLowerCase())
+  );
 
-        <p className="text-gray-500 text-sm mt-1">
-          Configure permissões por módulo de forma rápida e segura.
-        </p>
+  return (
+    <div className="space-y-8">
+
+      {/* HEADER PREMIUM (igual RolesPage) */}
+      <div className="bg-white/40 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
+
+        <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
+
+          <div>
+            <h1 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
+              Permissões do Sistema
+            </h1>
+
+            <p className="text-slate-600 mt-2">
+              Gestão avançada de permissões por função.
+            </p>
+
+            {roleId && (
+              <p className="text-sm text-slate-500 mt-3 font-medium">
+                Função selecionada:{" "}
+                <span className="text-blue-600 font-semibold">
+                  {roles.find(r => r.id == roleId)?.nome}
+                </span>
+              </p>
+            )}
+          </div>
+
+          {/* SEARCH */}
+          <div className="relative w-full xl:w-80">
+            <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+
+            <input
+              type="text"
+              placeholder="Pesquisar função..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-12 pr-4 py-4 bg-white/70 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-200 shadow-lg"
+            />
+          </div>
+
+        </div>
       </div>
 
       {/* SELECT ROLE CARD */}
-      <div className="bg-white p-5 rounded-xl shadow mb-6 w-full md:w-1/2">
-        <label className="text-sm font-medium text-gray-600">
+      <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-2xl w-full md:w-1/2">
+
+        <label className="block text-sm font-semibold text-slate-700 mb-3">
           Selecionar Função
         </label>
 
@@ -227,7 +254,7 @@ export default function PermissoesPage() {
             setRoleId(e.target.value);
             fetchPermissoesDaRole(e.target.value);
           }}
-          className="w-full mt-2 border rounded-lg p-2 focus:ring"
+          className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl shadow-lg focus:ring-4 focus:ring-blue-200"
         >
           <option value="">-- Escolha --</option>
           {roles.map((r) => (
@@ -238,25 +265,28 @@ export default function PermissoesPage() {
         </select>
       </div>
 
-      {/* TABLE CARD */}
+      {/* TABLE CARD PREMIUM */}
       {roleId && (
-        <div className="bg-white p-5 rounded-xl shadow">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="font-semibold text-gray-700">
-              Permissões do Sistema
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-2xl">
+
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-bold text-slate-800">
+              Permissões por Módulo
             </h3>
 
-            {/* ACTIONS */}
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex flex-wrap gap-3">
               <button onClick={handleSalvar} className="btn-blue">
                 <Save size={16} /> Guardar
               </button>
+
               <button onClick={exportExcel} className="btn-green">
                 <FileSpreadsheet size={16} /> Excel
               </button>
+
               <button onClick={exportPDF} className="btn-red">
                 <Download size={16} /> PDF
               </button>
+
               <button onClick={printTable} className="btn-gray">
                 <Printer size={16} /> Imprimir
               </button>
@@ -264,11 +294,9 @@ export default function PermissoesPage() {
           </div>
 
           <div className="overflow-x-auto">
-            <table
-              id="table-permissoes"
-              className="w-full text-sm border"
-            >
-              <thead className="bg-gray-100">
+            <table id="table-permissoes" className="w-full text-sm border">
+
+              <thead className="bg-slate-100 text-slate-700">
                 <tr>
                   <th>Módulo</th>
                   <th>Ver</th>
@@ -280,32 +308,33 @@ export default function PermissoesPage() {
 
               <tbody>
                 {modulos.map((modulo) => {
-                  const acoes =
-                    permissoes[roleId]?.[modulo] || {};
+                  const acoes = permissoes[roleId]?.[modulo] || {};
 
                   return (
-                    <tr key={modulo} className="border-t">
-                      <td className="p-2">{modulo}</td>
+                    <tr key={modulo} className="border-t hover:bg-slate-50">
 
-                      {["visualizar", "criar", "editar", "eliminar"].map(
-                        (acao) => (
-                          <td key={acao} className="text-center">
-                            <input
-                              type="checkbox"
-                              checked={acoes[acao] || false}
-                              onChange={() =>
-                                togglePermissao(modulo, acao)
-                              }
-                            />
-                          </td>
-                        )
-                      )}
+                      <td className="p-2 font-semibold text-slate-800">
+                        {modulo}
+                      </td>
+
+                      {["visualizar", "criar", "editar", "eliminar"].map((acao) => (
+                        <td key={acao} className="text-center">
+                          <input
+                            type="checkbox"
+                            checked={acoes[acao] || false}
+                            onChange={() => togglePermissao(modulo, acao)}
+                          />
+                        </td>
+                      ))}
+
                     </tr>
                   );
                 })}
               </tbody>
+
             </table>
           </div>
+
         </div>
       )}
     </div>
