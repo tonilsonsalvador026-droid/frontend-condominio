@@ -3,11 +3,10 @@ import React, { useEffect, useState } from "react";
 import api from "../../api";
 import {
   Shield,
+  Save,
   FileSpreadsheet,
   Download,
   Printer,
-  Save,
-  Loader2,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
@@ -17,7 +16,6 @@ export default function PermissoesPage() {
   const [roles, setRoles] = useState([]);
   const [roleId, setRoleId] = useState("");
   const [permissoes, setPermissoes] = useState({});
-  const [loading, setLoading] = useState(false);
 
   const modulos = [
     "Utilizadores",
@@ -37,7 +35,9 @@ export default function PermissoesPage() {
     "Atribuir Papéis",
   ];
 
-  // 🔹 Roles
+  // =========================
+  // LOAD ROLES
+  // =========================
   const fetchRoles = async () => {
     try {
       const res = await api.get("/roles");
@@ -47,28 +47,27 @@ export default function PermissoesPage() {
     }
   };
 
-  // 🔹 Permissões da role
-  const fetchPermissoesDaRole = async (roleId) => {
+  // =========================
+  // LOAD PERMISSIONS BY ROLE
+  // =========================
+  const fetchPermissoesDaRole = async (id) => {
     try {
-      setLoading(true);
-      const res = await api.get(`/roles/${roleId}`);
+      const res = await api.get(`/roles/${id}`);
       const dados = {};
 
       res.data.permissoes.forEach((rp) => {
         const [acao, ...moduloParts] = rp.permissao.nome.split("_");
         const modulo = moduloParts
-          .map((w) => w[0].toUpperCase() + w.slice(1))
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
           .join(" ");
 
         if (!dados[modulo]) dados[modulo] = {};
         dados[modulo][acao] = true;
       });
 
-      setPermissoes((prev) => ({ ...prev, [roleId]: dados }));
-    } catch (err) {
-      console.error("Erro ao buscar permissões da role:", err);
-    } finally {
-      setLoading(false);
+      setPermissoes((prev) => ({ ...prev, [id]: dados }));
+    } catch (error) {
+      console.error("Erro ao carregar permissões:", error);
     }
   };
 
@@ -76,7 +75,9 @@ export default function PermissoesPage() {
     fetchRoles();
   }, []);
 
-  // 🔹 Toggle checkbox
+  // =========================
+  // TOGGLE CHECKBOX
+  // =========================
   const togglePermissao = (modulo, acao) => {
     setPermissoes((prev) => ({
       ...prev,
@@ -90,17 +91,19 @@ export default function PermissoesPage() {
     }));
   };
 
-  // 🔹 Guardar
-  const handleSalvarPermissoes = async () => {
+  // =========================
+  // SAVE PERMISSIONS
+  // =========================
+  const handleSalvar = async () => {
     if (!roleId) return alert("Selecione uma função primeiro!");
 
     const permissoesDaRole = permissoes[roleId] || {};
+    const nomes = [];
 
-    const permissoesNomes = [];
     Object.entries(permissoesDaRole).forEach(([modulo, acoes]) => {
       Object.entries(acoes).forEach(([acao, ativo]) => {
         if (ativo) {
-          permissoesNomes.push(
+          nomes.push(
             `${acao}_${modulo.toLowerCase().replace(/\s/g, "_")}`
           );
         }
@@ -108,13 +111,14 @@ export default function PermissoesPage() {
     });
 
     try {
-      const todas = await api.get("/permissoes");
-      const idsSelecionados = todas.data
-        .filter((p) => permissoesNomes.includes(p.nome))
+      const all = await api.get("/permissoes");
+
+      const ids = all.data
+        .filter((p) => nomes.includes(p.nome))
         .map((p) => p.id);
 
       await api.post(`/roles/${roleId}/permissoes`, {
-        permissaoIds: idsSelecionados,
+        permissaoIds: ids,
       });
 
       alert("Permissões salvas com sucesso!");
@@ -125,8 +129,10 @@ export default function PermissoesPage() {
     }
   };
 
-  // 🔹 Export Excel
-  const exportToExcel = () => {
+  // =========================
+  // EXPORTS
+  // =========================
+  const exportExcel = () => {
     if (!roleId) return alert("Selecione uma função!");
     const data = Object.entries(permissoes[roleId] || {}).map(
       ([mod, acoes]) => ({
@@ -134,7 +140,7 @@ export default function PermissoesPage() {
         Visualizar: acoes.visualizar ? "Sim" : "Não",
         Criar: acoes.criar ? "Sim" : "Não",
         Editar: acoes.editar ? "Sim" : "Não",
-        Eliminar: acoes.eliminar ? "Não",
+        Eliminar: acoes.eliminar ? "Sim" : "Não",
       })
     );
 
@@ -144,76 +150,86 @@ export default function PermissoesPage() {
     XLSX.writeFile(wb, "permissoes.xlsx");
   };
 
-  // 🔹 Export PDF
-  const exportToPDF = () => {
+  const exportPDF = () => {
     if (!roleId) return alert("Selecione uma função!");
-    const doc = new jsPDF();
 
+    const doc = new jsPDF();
     doc.text("Permissões da Função", 14, 10);
 
     doc.autoTable({
       head: [["Módulo", "Visualizar", "Criar", "Editar", "Eliminar"]],
-      body: Object.entries(permissoes[roleId] || {}).map(([mod, acoes]) => [
-        mod,
-        acoes.visualizar ? "Sim" : "Não",
-        acoes.criar ? "Sim" : "Não",
-        acoes.editar ? "Sim" : "Não",
-        acoes.eliminar ? "Sim" : "Não",
-      ]),
+      body: Object.entries(permissoes[roleId] || {}).map(
+        ([mod, acoes]) => [
+          mod,
+          acoes.visualizar ? "Sim" : "Não",
+          acoes.criar ? "Sim" : "Não",
+          acoes.editar ? "Sim" : "Não",
+          acoes.eliminar ? "Sim" : "Não",
+        ]
+      ),
     });
 
     doc.save("permissoes.pdf");
   };
 
-  // 🔹 Print
   const printTable = () => {
-    const content = document.getElementById("permissoes-table").outerHTML;
+    const content = document.getElementById("table-permissoes").outerHTML;
     const win = window.open("", "_blank");
+
     win.document.write(`
       <html>
-        <head><title>Permissões</title></head>
+        <head>
+          <title>Impressão</title>
+          <style>
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #ddd; padding: 8px; }
+            th { background: #f3f4f6; }
+          </style>
+        </head>
         <body>
-          <h2>Permissões</h2>
           ${content}
         </body>
       </html>
     `);
+
     win.document.close();
     win.print();
   };
 
+  // =========================
+  // UI PREMIUM
+  // =========================
   return (
-    <div className="space-y-8">
-
+    <div className="p-6 bg-gray-50 min-h-screen">
       {/* HEADER PREMIUM */}
-      <div className="bg-white/40 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
-        <div>
-          <h1 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
-            Gestão de Permissões
-          </h1>
-
-          <p className="text-slate-600 mt-2">
-            Configure permissões por função do sistema.
-          </p>
+      <div className="bg-white p-5 rounded-xl shadow mb-6">
+        <div className="flex items-center gap-3">
+          <Shield className="text-blue-600" />
+          <h2 className="text-xl font-bold">
+            Gestão Premium de Permissões
+          </h2>
         </div>
+
+        <p className="text-gray-500 text-sm mt-1">
+          Configure permissões por módulo de forma rápida e segura.
+        </p>
       </div>
 
-      {/* SELECT ROLE */}
-      <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-2xl w-full md:w-2/3">
-        <label className="block text-sm font-semibold text-slate-700 mb-3">
-          Função
+      {/* SELECT ROLE CARD */}
+      <div className="bg-white p-5 rounded-xl shadow mb-6 w-full md:w-1/2">
+        <label className="text-sm font-medium text-gray-600">
+          Selecionar Função
         </label>
 
         <select
           value={roleId}
-          onChange={async (e) => {
-            const id = e.target.value;
-            setRoleId(id);
-            await fetchPermissoesDaRole(id);
+          onChange={(e) => {
+            setRoleId(e.target.value);
+            fetchPermissoesDaRole(e.target.value);
           }}
-          className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl shadow-lg focus:ring-4 focus:ring-blue-200"
+          className="w-full mt-2 border rounded-lg p-2 focus:ring"
         >
-          <option value="">Selecione uma função</option>
+          <option value="">-- Escolha --</option>
           {roles.map((r) => (
             <option key={r.id} value={r.id}>
               {r.nome}
@@ -222,27 +238,43 @@ export default function PermissoesPage() {
         </select>
       </div>
 
-      {/* TABLE */}
+      {/* TABLE CARD */}
       {roleId && (
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-2xl overflow-x-auto">
+        <div className="bg-white p-5 rounded-xl shadow">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-semibold text-gray-700">
+              Permissões do Sistema
+            </h3>
 
-          {loading ? (
-            <div className="flex items-center gap-3 text-slate-500 py-10">
-              <Loader2 className="animate-spin" />
-              <span>Carregando permissões...</span>
+            {/* ACTIONS */}
+            <div className="flex gap-2 flex-wrap">
+              <button onClick={handleSalvar} className="btn-blue">
+                <Save size={16} /> Guardar
+              </button>
+              <button onClick={exportExcel} className="btn-green">
+                <FileSpreadsheet size={16} /> Excel
+              </button>
+              <button onClick={exportPDF} className="btn-red">
+                <Download size={16} /> PDF
+              </button>
+              <button onClick={printTable} className="btn-gray">
+                <Printer size={16} /> Imprimir
+              </button>
             </div>
-          ) : (
+          </div>
+
+          <div className="overflow-x-auto">
             <table
-              id="permissoes-table"
-              className="min-w-full text-sm"
+              id="table-permissoes"
+              className="w-full text-sm border"
             >
-              <thead className="bg-slate-100 text-slate-700">
+              <thead className="bg-gray-100">
                 <tr>
-                  <th className="p-4 text-left">Módulo</th>
-                  <th className="p-4 text-center">Visualizar</th>
-                  <th className="p-4 text-center">Criar</th>
-                  <th className="p-4 text-center">Editar</th>
-                  <th className="p-4 text-center">Eliminar</th>
+                  <th>Módulo</th>
+                  <th>Ver</th>
+                  <th>Criar</th>
+                  <th>Editar</th>
+                  <th>Eliminar</th>
                 </tr>
               </thead>
 
@@ -252,20 +284,12 @@ export default function PermissoesPage() {
                     permissoes[roleId]?.[modulo] || {};
 
                   return (
-                    <tr
-                      key={modulo}
-                      className="border-t hover:bg-slate-50 transition"
-                    >
-                      <td className="p-4 font-medium">
-                        {modulo}
-                      </td>
+                    <tr key={modulo} className="border-t">
+                      <td className="p-2">{modulo}</td>
 
                       {["visualizar", "criar", "editar", "eliminar"].map(
                         (acao) => (
-                          <td
-                            key={acao}
-                            className="p-4 text-center"
-                          >
+                          <td key={acao} className="text-center">
                             <input
                               type="checkbox"
                               checked={acoes[acao] || false}
@@ -281,41 +305,6 @@ export default function PermissoesPage() {
                 })}
               </tbody>
             </table>
-          )}
-
-          {/* BOTÕES */}
-          <div className="flex flex-wrap gap-3 mt-6">
-            <button
-              onClick={handleSalvarPermissoes}
-              className="flex items-center gap-2 px-5 py-3 bg-blue-600 text-white rounded-2xl shadow-lg"
-            >
-              <Save size={16} />
-              Salvar
-            </button>
-
-            <button
-              onClick={exportToExcel}
-              className="flex items-center gap-2 px-5 py-3 bg-green-600 text-white rounded-2xl shadow-lg"
-            >
-              <FileSpreadsheet size={16} />
-              Excel
-            </button>
-
-            <button
-              onClick={exportToPDF}
-              className="flex items-center gap-2 px-5 py-3 bg-red-600 text-white rounded-2xl shadow-lg"
-            >
-              <Download size={16} />
-              PDF
-            </button>
-
-            <button
-              onClick={printTable}
-              className="flex items-center gap-2 px-5 py-3 bg-gray-600 text-white rounded-2xl shadow-lg"
-            >
-              <Printer size={16} />
-              Imprimir
-            </button>
           </div>
         </div>
       )}
