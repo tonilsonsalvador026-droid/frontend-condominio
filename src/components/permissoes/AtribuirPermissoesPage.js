@@ -208,7 +208,6 @@ export default function AtribuirPermissoesPage() {
       {/* =========================
           LISTA PREMIUM
       ========================= */}
-      <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-2xl">
         <PermissaoList />
       </div>
 
