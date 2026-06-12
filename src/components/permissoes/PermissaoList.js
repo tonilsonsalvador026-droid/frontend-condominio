@@ -13,8 +13,6 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-import { format } from "date-fns";
-
 const PermissoesList = () => {
   const [roles, setRoles] = useState([]);
   const [search, setSearch] = useState("");
