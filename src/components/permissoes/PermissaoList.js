@@ -236,13 +236,13 @@ const PermissoesList = () => {
           EXPORT BUTTONS PREMIUM
       ========================= */}
       {filtered.length > 0 && (
-        <div className="bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-2xl">
+       <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
 
           <div className="flex flex-wrap justify-center gap-4">
 
             <button
               onClick={exportCSV}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-xl flex items-center gap-2 transition"
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 text-white font-bold rounded-2xl shadow-xl flex items-center gap-2"
             >
               <FileText size={17} />
               CSV
@@ -250,7 +250,7 @@ const PermissoesList = () => {
 
             <button
               onClick={exportExcel}
-              className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl shadow-xl flex items-center gap-2 transition"
+              className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 text-white font-bold rounded-2xl shadow-xl flex items-center gap-2"
             >
               <FileSpreadsheet size={17} />
               Excel
@@ -258,7 +258,7 @@ const PermissoesList = () => {
 
             <button
               onClick={exportPDF}
-              className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-2xl shadow-xl flex items-center gap-2 transition"
+              className="px-6 py-3 bg-red-600 hover:bg-red-700 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 text-white font-bold rounded-2xl shadow-xl flex items-center gap-2"
             >
               <FileDown size={17} />
               PDF
@@ -266,7 +266,7 @@ const PermissoesList = () => {
 
             <button
               onClick={handlePrint}
-              className="px-6 py-3 bg-slate-700 hover:bg-slate-800 text-white font-bold rounded-2xl shadow-xl flex items-center gap-2 transition"
+              className="px-6 py-3 bg-slate-700 hover:bg-slate-800 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 text-white font-bold rounded-2xl shadow-xl flex items-center gap-2"
             >
               <Printer size={17} />
               Imprimir
