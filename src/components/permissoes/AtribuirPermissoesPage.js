@@ -128,7 +128,7 @@ export default function AtribuirPermissoesPage() {
       {/* =========================
           SELECT ROLE CARD
       ========================= */}
-      <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-2xl w-full md:w-1/2">
+      <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-2xl">
 
         <label className="block text-sm font-semibold text-slate-700 mb-3">
           Selecionar Papel
@@ -196,7 +196,7 @@ export default function AtribuirPermissoesPage() {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-xl transition-all"
+              className="flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 hover:-translate-y-1 hover:shadow-2xl text-white font-bold transition-all duration-300 shadow-xl"
             >
               <Save size={18} />
               {saving ? "A Guardar..." : "Guardar Permissões"}
