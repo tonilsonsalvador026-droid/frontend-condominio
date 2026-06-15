@@ -209,7 +209,6 @@ export default function AtribuirPermissoesPage() {
           LISTA PREMIUM
       ========================= */}
         <PermissaoList />
-      </div>
 
       {/* =========================
           EMPTY STATE
