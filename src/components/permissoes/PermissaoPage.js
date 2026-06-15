@@ -242,7 +242,7 @@ export default function PermissoesPage() {
       </div>
 
       {/* SELECT ROLE CARD */}
-      <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-2xl w-full md:w-1/2">
+      <div className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/40 shadow-2xl">
 
         <label className="block text-sm font-semibold text-slate-700 mb-3">
           Selecionar Função
@@ -274,35 +274,49 @@ export default function PermissoesPage() {
               Permissões por Módulo
             </h3>
 
-            <div className="flex flex-wrap gap-3">
-              <button onClick={handleSalvar} className="btn-blue">
+            <div className="flex flex-wrap justify-center gap-4">
+      <button
+         onClick={handleSalvar}
+      className="px-6 py-3 bg-blue-600 hover:bg-blue-700 hover:-translate-y-1 transition-all duration-300 text-white font-bold rounded-2xl shadow-xl flex items-center gap-2"
+>
                 <Save size={16} /> Guardar
               </button>
 
-              <button onClick={exportExcel} className="btn-green">
+              <button
+  onClick={exportExcel}
+  className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 hover:-translate-y-1 transition-all duration-300 text-white font-bold rounded-2xl shadow-xl flex items-center gap-2"
+>
                 <FileSpreadsheet size={16} /> Excel
               </button>
 
-              <button onClick={exportPDF} className="btn-red">
+              <button
+  onClick={exportPDF}
+  className="px-6 py-3 bg-red-600 hover:bg-red-700 hover:-translate-y-1 transition-all duration-300 text-white font-bold rounded-2xl shadow-xl flex items-center gap-2"
+>
                 <Download size={16} /> PDF
               </button>
 
-              <button onClick={printTable} className="btn-gray">
+<button
+  onClick={printTable}
+  className="px-6 py-3 bg-slate-700 hover:bg-slate-800 hover:-translate-y-1 transition-all duration-300 text-white font-bold rounded-2xl shadow-xl flex items-center gap-2"
+>
                 <Printer size={16} /> Imprimir
               </button>
             </div>
           </div>
 
           <div className="overflow-x-auto">
-            <table id="table-permissoes" className="w-full text-sm border">
-
+           <table
+  id="table-permissoes"
+  className="w-full text-sm md:text-base"
+>
               <thead className="bg-slate-100 text-slate-700">
                 <tr>
-                  <th>Módulo</th>
-                  <th>Ver</th>
-                  <th>Criar</th>
-                  <th>Editar</th>
-                  <th>Eliminar</th>
+                 <th className="p-4 text-left">Módulo</th>
+<th className="p-4 text-center">Ver</th>
+<th className="p-4 text-center">Criar</th>
+<th className="p-4 text-center">Editar</th>
+<th className="p-4 text-center">Eliminar</th>
                 </tr>
               </thead>
 
@@ -311,8 +325,10 @@ export default function PermissoesPage() {
                   const acoes = permissoes[roleId]?.[modulo] || {};
 
                   return (
-                    <tr key={modulo} className="border-t hover:bg-slate-50">
-
+<tr
+  key={modulo}
+  className="border-t hover:bg-slate-50 transition-all duration-300"
+>
                       <td className="p-2 font-semibold text-slate-800">
                         {modulo}
                       </td>
