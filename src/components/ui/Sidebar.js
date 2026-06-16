@@ -24,15 +24,14 @@ const Sidebar = ({ aberto, setAberto }) => {
   }, []);
 
 const temPermissao = (modulo) => {
-  if (role?.toLowerCase() === "admin") return true;
-
-  if (!Array.isArray(permissoes))
-    return false;
-
-  return permissoes.includes(
-    `visualizar_${modulo}`
-  );
-};
+    if (role?.toLowerCase() === "admin") return true;
+    if (!Array.isArray(permissoes) || permissoes.length === 0) return false;
+    return permissoes.some(
+      (p) =>
+        p.modulo?.toLowerCase() === modulo.toLowerCase() &&
+        (p.visualizar === true || p.visualizar === "true")
+    );
+  };
 
   const fecharNoMobile = () => {
     if (window.innerWidth < 768) setAberto(false);
