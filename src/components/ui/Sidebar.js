@@ -24,34 +24,111 @@ const Sidebar = ({ aberto, setAberto }) => {
   }, []);
 
 const temPermissao = (modulo) => {
-    if (role?.toLowerCase() === "admin") return true;
-    if (!Array.isArray(permissoes) || permissoes.length === 0) return false;
-    return permissoes.some(
-      (p) =>
-        p.modulo?.toLowerCase() === modulo.toLowerCase() &&
-        (p.visualizar === true || p.visualizar === "true")
-    );
-  };
+  if (role?.toLowerCase() === "admin") return true;
+
+  if (modulo === "dashboard") return true;
+
+  if (!Array.isArray(permissoes)) return false;
+
+  return permissoes.includes(`visualizar_${modulo}`);
+};
 
   const fecharNoMobile = () => {
     if (window.innerWidth < 768) setAberto(false);
   };
 
-  const menuItems = [
-    { name: "Dashboard", icon: FaHome, path: "/dashboard", key: "dashboard" },
-    { name: "Utilizadores", icon: FaUserShield, path: "/users", key: "users" },
-    { name: "Condomínios", icon: FaBuilding, path: "/condominios", key: "condominios" },
-    { name: "Edifícios", icon: FaBuilding, path: "/edificios", key: "edificios" },
-    { name: "Frações", icon: FaKey, path: "/fracoes", key: "fracoes" },
-    { name: "Proprietários", icon: FaUsers, path: "/proprietarios", key: "proprietarios" },
-    { name: "Inquilinos", icon: FaUsers, path: "/inquilinos", key: "inquilinos" },
-    { name: "Pagamentos", icon: FaFileInvoiceDollar, path: "/pagamentos", key: "pagamentos" },
-    { name: "Recibos", icon: FaReceipt, path: "/recibos", key: "recibos" },
-    { name: "Conta Corrente", icon: FaWallet, path: "/conta-corrente", key: "conta-corrente" },
-    { name: "Serviços Extras", icon: FaTools, path: "/servicos-extras", key: "servicos-extras" },
-    { name: "Serviços Agendados", icon: FaClipboardList, path: "/servicos-agendados", key: "servicos-agendados" },
-    { name: "Eventos", icon: FaCalendarAlt, path: "/eventos", key: "eventos" },
-  ];
+const menuItems = [
+  {
+    name: "Dashboard",
+    icon: FaHome,
+    path: "/dashboard",
+    key: "dashboard",
+  },
+
+  {
+    name: "Utilizadores",
+    icon: FaUserShield,
+    path: "/users",
+    key: "utilizadores",
+  },
+
+  {
+    name: "Condomínios",
+    icon: FaBuilding,
+    path: "/condominios",
+    key: "condominios",
+  },
+
+  {
+    name: "Edifícios",
+    icon: FaBuilding,
+    path: "/edificios",
+    key: "edificios",
+  },
+
+  {
+    name: "Frações",
+    icon: FaKey,
+    path: "/fracoes",
+    key: "fracoes",
+  },
+
+  {
+    name: "Proprietários",
+    icon: FaUsers,
+    path: "/proprietarios",
+    key: "proprietarios",
+  },
+
+  {
+    name: "Inquilinos",
+    icon: FaUsers,
+    path: "/inquilinos",
+    key: "inquilinos",
+  },
+
+  {
+    name: "Pagamentos",
+    icon: FaFileInvoiceDollar,
+    path: "/pagamentos",
+    key: "pagamentos",
+  },
+
+  {
+    name: "Recibos",
+    icon: FaReceipt,
+    path: "/recibos",
+    key: "recibos",
+  },
+
+  {
+    name: "Conta Corrente",
+    icon: FaWallet,
+    path: "/conta-corrente",
+    key: "conta_corrente",
+  },
+
+  {
+    name: "Serviços Extras",
+    icon: FaTools,
+    path: "/servicos-extras",
+    key: "servicos_extras",
+  },
+
+  {
+    name: "Serviços Agendados",
+    icon: FaClipboardList,
+    path: "/servicos-agendados",
+    key: "servicos_agendados",
+  },
+
+  {
+    name: "Eventos",
+    icon: FaCalendarAlt,
+    path: "/eventos",
+    key: "eventos",
+  },
+];
 
   const acessoItems = [
     { name: "Funções / Roles", icon: FaLock, path: "/roles", key: "roles" },
