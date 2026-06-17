@@ -1,5 +1,6 @@
 // src/components/ui/Button.js
 import React from 'react';
+import { temPermissao } from "../../components/permissoes";
 
 const Button = ({
   children,
