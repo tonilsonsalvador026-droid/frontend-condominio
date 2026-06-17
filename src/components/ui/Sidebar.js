@@ -31,7 +31,7 @@ const temPermissao = (modulo) => {
 
   if (!Array.isArray(permissoes)) return false;
 
-  return permissoes.includes(`visualizar_${modulo}`);
+  return permissoes.includes(modulo);
 };
 
   const fecharNoMobile = () => {
