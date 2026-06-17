@@ -9,8 +9,14 @@ import {
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { temPermissao } from "../permissoes";
 
 const FracaoList = () => {
+
+  const podeCriar = temPermissao("criar_fracoes");
+  const podeEditar = temPermissao("editar_fracoes");
+  const podeEliminar = temPermissao("eliminar_fracoes");
+  
   const [fracoes, setFracoes] = useState([]);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
@@ -151,12 +157,15 @@ const FracaoList = () => {
               />
             </div>
 
-            <button
-              onClick={() => setShowForm(true)}
-              className="px-8 py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-xl flex items-center"
-            >
-              <Plus className="w-5 h-5 mr-2" /> Nova Fração
-            </button>
+{podeCriar && (
+  <button
+    onClick={() => setShowForm(true)}
+    className="px-8 py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-xl flex items-center"
+  >
+    <Plus className="w-5 h-5 mr-2" />
+    Nova Fração
+  </button>
+)}
           </div>
         </div>
       </div>
