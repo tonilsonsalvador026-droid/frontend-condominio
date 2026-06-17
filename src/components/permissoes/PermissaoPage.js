@@ -122,7 +122,10 @@ nomes.push(`${acao}_${moduloDB}`);
       const ids = all.data
         .filter((p) => nomes.includes(p.nome))
         .map((p) => p.id);
-
+      
+console.log("Permissões geradas:", nomes);
+console.log("IDs encontrados:", ids);
+      
       await api.post(`/roles/${roleId}/permissoes`, {
         permissaoIds: ids,
       });
