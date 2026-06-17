@@ -105,7 +105,13 @@ export default function PermissoesPage() {
     Object.entries(permissoesDaRole).forEach(([modulo, acoes]) => {
       Object.entries(acoes).forEach(([acao, ativo]) => {
         if (ativo) {
-          nomes.push(`${acao}_${modulo.toLowerCase().replace(/\s/g, "_")}`);
+          const moduloDB = modulo
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "")
+  .toLowerCase()
+  .replace(/\s/g, "_");
+
+nomes.push(`${acao}_${moduloDB}`);
         }
       });
     });
