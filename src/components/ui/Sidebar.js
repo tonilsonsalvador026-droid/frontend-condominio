@@ -6,6 +6,7 @@ import {
   FaReceipt, FaCalendarAlt, FaTools, FaClipboardList, FaUserShield, 
   FaWallet, FaLock, FaUnlockAlt
 } from "react-icons/fa";
+import { temPermissao } from "../../components/permissoes";
 
 const Sidebar = ({ aberto, setAberto }) => {
   const [permissoes, setPermissoes] = useState([]);
