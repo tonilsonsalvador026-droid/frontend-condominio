@@ -9,13 +9,16 @@ import {
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { temPermissao } from "../permissoes";
+import { temPermissao, getPermissoes } from "../permissoes";
 
 const FracaoList = () => {
 
   const podeCriar = temPermissao("criar_fracoes");
   const podeEditar = temPermissao("editar_fracoes");
   const podeEliminar = temPermissao("eliminar_fracoes");
+
+ console.log("Permissões:", getPermissoes());
+ console.log("Pode criar:", podeCriar);
   
   const [fracoes, setFracoes] = useState([]);
   const [error, setError] = useState("");
