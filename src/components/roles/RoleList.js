@@ -10,15 +10,16 @@ import {
 } from "lucide-react";
 
 import { format } from "date-fns";
-
 import * as XLSX from "xlsx";
-
 import jsPDF from "jspdf";
-
 import autoTable from "jspdf-autotable";
+import { temPermissao} from "../permissoes";
 
 const RoleList = ({ roles, onDelete, onEdit }) => {
-
+  
+const podeEditar = temPermissao("editar_roles");
+const podeEliminar = temPermissao("eliminar_roles");
+  
   const data = roles || [];
 
   // FORMATAR DATA
@@ -76,29 +77,23 @@ const RoleList = ({ roles, onDelete, onEdit }) => {
     const wb = XLSX.utils.book_new();
 
     XLSX.utils.book_append_sheet(wb, ws, "Roles");
-
     XLSX.writeFile(wb, "roles.xlsx");
   };
 
   // EXPORT PDF
   const exportPDF = () => {
-
     const doc = new jsPDF();
 
     doc.text("Lista de Funções", 14, 15);
-
     autoTable(doc, {
       startY: 25,
-
       head: [["Nome", "Descrição", "Criado Em"]],
-
       body: data.map((role) => [
         role.nome,
         role.descricao || "-",
         formatDate(role.createdAt),
       ]),
     });
-
     doc.save("roles.pdf");
   };
 
@@ -198,48 +193,42 @@ const RoleList = ({ roles, onDelete, onEdit }) => {
 
                     <div className="flex justify-center gap-4">
 
-                      <button
+                      
+                  {podeEditar && (
+                            <button 
                         onClick={() => onEdit?.(role)}
                         className="text-blue-600 hover:scale-110 transition-all duration-300"
                       >
                         <Edit size={19} />
                       </button>
+                         )} 
 
+                  {podeEliminar && (
                       <button
                         onClick={() => onDelete?.(role.id)}
                         className="text-red-600 hover:scale-110 transition-all duration-300"
                       >
                         <Trash2 size={19} />
                       </button>
+                         )}
 
                     </div>
-
                   </td>
-
                 </tr>
-
               ))
             ) : (
-
               <tr>
-
                 <td
                   colSpan="4"
                   className="text-center p-10 text-slate-400 font-medium"
                 >
                   Nenhuma função encontrada.
                 </td>
-
               </tr>
-
             )}
-
           </tbody>
-
         </table>
-
       </div>
-
       {/* EXPORTAÇÕES PREMIUM */}
       {data.length > 0 && (
 
