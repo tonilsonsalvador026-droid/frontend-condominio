@@ -18,6 +18,13 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
 const CondominioList = () => {
+  
+const podeCriar = temPermissao("criar_condominios");
+const podeEditar = temPermissao("editar_condominios");
+const podeEliminar = temPermissao("eliminar_condominios");
+
+  
+  
   const [condominios, setCondominios] = useState([]);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
