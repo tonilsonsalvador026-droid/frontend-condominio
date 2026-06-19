@@ -200,9 +200,9 @@ const ContaCorrenteList = ({ onEdit, onViewMovimentos, onNew }) => {
                   </td>
               
 
-                 {podeEditar && (
                   <td className="p-3">
                     <div className="flex justify-center gap-4">
+                     {podeEditar && (
                       <button onClick={() => onEdit(conta)} className="text-blue-600 hover:scale-110 transition">
                         <Pencil size={18} />
                       </button>
