@@ -13,16 +13,16 @@ import {
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { temPermissao} from "../permissoes";
 
 const ServicosAgendadosList = ({ agendamentos, onDelete }) => {
 
+const podeEliminar = temPermissao("eliminar_servicos_agendados");
   const data = agendamentos || [];
 
   // ---------------- EXPORT CSV ----------------
   const exportCSV = () => {
-
     const headers = ["Serviço", "Data", "Observações"];
-
     const rows = data.map((a) =>
       [
         a.servico?.nome || "-",
@@ -32,11 +32,8 @@ const ServicosAgendadosList = ({ agendamentos, onDelete }) => {
     );
 
     const csv = [headers.join(","), ...rows].join("\n");
-
     const blob = new Blob([csv], { type: "text/csv" });
-
     const url = window.URL.createObjectURL(blob);
-
     const a = document.createElement("a");
 
     a.href = url;
@@ -194,13 +191,15 @@ const ServicosAgendadosList = ({ agendamentos, onDelete }) => {
 
                     <div className="flex justify-center">
 
-                      <button
+                      
+               {podeEliminar && (
+                          <button
                         onClick={() => onDelete?.(ag.id)}
                         className="text-red-600 hover:scale-110 transition"
                       >
                         <Trash2 size={18} />
                       </button>
-
+                         )} 
                     </div>
 
                   </td>
