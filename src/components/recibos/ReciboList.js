@@ -19,8 +19,14 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { formatCurrency } from "../../utils/formatCurrency";
+import { temPermissao} from "../permissoes";
 
 const ReciboList = () => {
+
+const podeCriar = temPermissao("criar_recibos");
+const podeEditar = temPermissao("editar_recibos");
+const podeEliminar = temPermissao("eliminar_recibos");
+  
   const [recibos, setRecibos] = useState([]);
   const [search, setSearch] = useState("");
   const [paginaAtual, setPaginaAtual] = useState(1);
@@ -182,14 +188,15 @@ const ReciboList = () => {
               />
             </div>
 
-            <button
+            {podeCriar && (
+             <button
               onClick={() => navigate("/recibos/novo")}
-              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-2xl shadow-xl hover:-translate-y-1 transition-all flex items-center"
+               className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center gap-2 whitespace-nowrap"
             >
               <Plus className="w-5 h-5 mr-2" />
               Novo Recibo
             </button>
-
+              )} 
           </div>
         </div>
       </div>
@@ -223,19 +230,24 @@ const ReciboList = () => {
                   {r.pagamento ? formatCurrency(Number(r.pagamento.valor)) : "-"}
                 </td>
 
-                <td className="p-3 flex gap-2">
+                <td className="p-3 flex gap-2">  
+             {podeEditar && (
                   <button onClick={() => navigate(`/recibos/${r.id}/editar`)}>
                     <Pencil />
                   </button>
+                      )} 
                   <button onClick={() => navigate(`/recibos/${r.id}/detalhe`)}>
                     <Eye />
                   </button>
                   <button onClick={() => handleDownloadPDF(r.id)}>
                     <Download />
                   </button>
+                                 
+              {podeEliminar && (     
                   <button onClick={() => handleDelete(r.id)}>
                     <Trash2 className="text-red-600" />
                   </button>
+                     )} 
                 </td>
               </tr>
             ))}
