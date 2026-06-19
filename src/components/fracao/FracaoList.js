@@ -9,7 +9,7 @@ import {
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { temPermissao, getPermissoes } from "../permissoes";
+import { temPermissao} from "../permissoes";
 
 const FracaoList = () => {
 
@@ -17,8 +17,8 @@ const FracaoList = () => {
   const podeEditar = temPermissao("editar_fracoes");
   const podeEliminar = temPermissao("eliminar_fracoes");
 
- console.log("Permissões:", getPermissoes());
- console.log("Pode criar:", podeCriar);
+console.log("FUNÇÃO TEM PERMISSÃO:", temPermissao);
+console.log("CRIAR FRAÇÕES:", temPermissao("criar_fracoes"));
   
   const [fracoes, setFracoes] = useState([]);
   const [error, setError] = useState("");
@@ -160,15 +160,17 @@ const FracaoList = () => {
               />
             </div>
 
-{podeCriar && (
-  <button
-    onClick={() => setShowForm(true)}
-    className="px-8 py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-xl flex items-center"
-  >
-    <Plus className="w-5 h-5 mr-2" />
-    Nova Fração
-  </button>
-)}
+<div
+  style={{
+    background: "red",
+    color: "white",
+    padding: "20px",
+    fontSize: "30px",
+    fontWeight: "bold",
+  }}
+>
+  TESTE PERMISSÃO
+</div>
           </div>
         </div>
       </div>
