@@ -9,8 +9,14 @@ import {
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { temPermissao} from "../permissoes";
 
 const InquilinoList = () => {
+
+  const podeCriar = temPermissao("criar_inquilinos");
+  const podeEditar = temPermissao("editar_inquilinos");
+  const podeEliminar = temPermissao("eliminar_inquilinos");
+  
   const [inquilinos, setInquilinos] = useState([]);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
@@ -144,12 +150,14 @@ const InquilinoList = () => {
               />
             </div>
 
-            <button
+            {podeCriar && (
+             <button
               onClick={() => setShowForm(true)}
-              className="px-8 py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-xl flex items-center"
+className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center gap-2 whitespace-nowrap"
             >
               <Plus className="w-5 h-5 mr-2" /> Novo Inquilino
             </button>
+              )}
 
           </div>
         </div>
