@@ -9,8 +9,14 @@ import {
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { temPermissao} from "../permissoes";
 
 const ProprietarioList = () => {
+
+const podeCriar = temPermissao("criar_proprietarios");
+const podeEditar = temPermissao("editar_proprietarios");
+const podeEliminar = temPermissao("eliminar_proprietarios");
+  
   const [proprietarios, setProprietarios] = useState([]);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
@@ -143,12 +149,16 @@ const ProprietarioList = () => {
               />
             </div>
 
-            <button
+            
+{podeCriar && (
+             <button
               onClick={() => setShowForm(true)}
-              className="px-8 py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-xl flex items-center"
+              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center gap-2 whitespace-nowrap"
             >
-              <Plus className="w-5 h-5 mr-2" /> Novo Proprietário
+              <Plus className="w-5 h-5 mr-2" /> 
+                Novo Proprietário
             </button>
+               )}  
           </div>
         </div>
       </div>
