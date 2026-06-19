@@ -8,18 +8,17 @@ import {
   Plus,
   Search,
 } from "lucide-react";
-
 import ServicosAgendadosForm from "./ServicosAgendadosForm";
 import ServicosAgendadosList from "./ServicosAgendadosList";
+import { temPermissao} from "../permissoes";
 
 const ServicosAgendadosPage = () => {
 
+const podeCriar = temPermissao("criar_servicos_agendados");
+  
   const [agendamentos, setAgendamentos] = useState([]);
-
   const [mostrarForm, setMostrarForm] = useState(false);
-
   const [search, setSearch] = useState("");
-
   const [agendamentoEditando, setAgendamentoEditando] =
     useState(null);
 
@@ -121,16 +120,12 @@ await api.delete(
 
       {/* HEADER PREMIUM */}
       <div className="bg-white/40 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/40 shadow-2xl">
-
         <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
 
           {/* ESQUERDA */}
           <div>
-
             <h1 className="text-4xl font-black bg-gradient-to-r from-slate-900 to-blue-900 bg-clip-text text-transparent">
-
               Serviços Agendados
-
             </h1>
 
             <p className="text-slate-600 mt-2">
@@ -138,11 +133,8 @@ await api.delete(
             </p>
 
             {!mostrarForm && (
-
               <p className="text-sm text-slate-500 mt-3 font-medium">
-
                 {agendamentosFiltrados.length} registos encontrados
-
               </p>
 
             )}
@@ -151,12 +143,10 @@ await api.delete(
 
           {/* DIREITA */}
           {!mostrarForm && (
-
             <div className="flex flex-col sm:flex-row gap-4 w-full xl:w-auto">
 
               {/* PESQUISA */}
               <div className="relative w-full xl:w-80">
-
                 <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
 
                 <input
@@ -172,28 +162,22 @@ await api.delete(
               </div>
 
               {/* BOTÃO */}
-              <button
+              
+     {podeCriar && (
+             <button
                 onClick={handleNovoAgendamento}
-                className="flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow-xl"
-              >
-
+                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center gap-2 whitespace-nowrap"
+            >
                 <Plus size={20} />
-
                 Novo Agendamento
-
               </button>
-
+                 )}
             </div>
-
           )}
-
         </div>
-
       </div>
-
       {/* FORMULÁRIO */}
       {mostrarForm ? (
-
         <ServicosAgendadosForm
           agendamentoEditando={agendamentoEditando}
           onSuccess={handleSuccess}
