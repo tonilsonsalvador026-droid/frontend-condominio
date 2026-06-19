@@ -212,7 +212,7 @@ const ContaCorrenteList = ({ onEdit, onViewMovimentos, onNew }) => {
                         <Eye size={18} />
                       </button>
 
-                     {podeDelete && (
+                     {podeEliminar && (
                       <button onClick={() => handleDelete(conta.id)} className="text-red-600 hover:scale-110 transition">
                         <Trash2 size={18} />
                       </button>
