@@ -18,8 +18,15 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { formatCurrency } from "../../utils/formatCurrency";
+import { temPermissao} from "../permissoes";
+
 
 const ContaCorrenteList = ({ onEdit, onViewMovimentos, onNew }) => {
+
+ const podeCriar = temPermissao("criar_conta_corrente");
+ const podeEditar = temPermissao("editar_conta_corrente");
+ const podeEliminar = temPermissao("eliminar_conta_corrente");
+  
   const [contas, setContas] = useState([]);
   const [search, setSearch] = useState("");
 
@@ -148,14 +155,16 @@ const ContaCorrenteList = ({ onEdit, onViewMovimentos, onNew }) => {
             </div>
 
             {/* BOTÃO NOVO */}
-            <button
+
+            {podeCriar && (
+             <button
               onClick={onNew}
-              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-2xl shadow-xl hover:-translate-y-1 transition flex items-center justify-center"
+              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center gap-2 whitespace-nowrap"
             >
               <Plus className="w-5 h-5 mr-2" />
               Nova Conta
-            </button>
-
+            </button> 
+              )} 
           </div>
         </div>
       </div>
@@ -189,20 +198,25 @@ const ContaCorrenteList = ({ onEdit, onViewMovimentos, onNew }) => {
                   <td className="p-3">
                     {dayjs(conta.criadoEm).format("DD/MM/YYYY")}
                   </td>
+              
 
+                 {podeEditar && (
                   <td className="p-3">
                     <div className="flex justify-center gap-4">
                       <button onClick={() => onEdit(conta)} className="text-blue-600 hover:scale-110 transition">
                         <Pencil size={18} />
                       </button>
+                      )}
 
                       <button onClick={() => onViewMovimentos(conta)} className="text-green-600 hover:scale-110 transition">
                         <Eye size={18} />
                       </button>
 
+                     {podeDelete && (
                       <button onClick={() => handleDelete(conta.id)} className="text-red-600 hover:scale-110 transition">
                         <Trash2 size={18} />
                       </button>
+                       )}
                     </div>
                   </td>
                 </tr>
