@@ -160,17 +160,15 @@ console.log("CRIAR FRAÇÕES:", temPermissao("criar_fracoes"));
               />
             </div>
 
-<div
-  style={{
-    background: "red",
-    color: "white",
-    padding: "20px",
-    fontSize: "30px",
-    fontWeight: "bold",
-  }}
->
-  TESTE PERMISSÃO
-</div>
+{podeCriar && (
+  <button
+    onClick={() => setShowForm(true)}
+    className="px-8 py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-xl flex items-center"
+  >
+    <Plus className="w-5 h-5 mr-2" />
+    Nova Fração
+  </button>
+)}
           </div>
         </div>
       </div>
