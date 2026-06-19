@@ -14,15 +14,12 @@ import { temPermissao} from "../permissoes";
 
 const EventosPage = () => {
 
+const podeCriar = temPermissao("criar_eventos");
+  
   const [eventos, setEventos] = useState([]);
-
-  const [mostrarForm, setMostrarForm] =
-    useState(false);
-
+  const [mostrarForm, setMostrarForm] = useState(false);
   const [search, setSearch] = useState("");
-
-  const [eventoEditando, setEventoEditando] =
-    useState(null);
+  const [eventoEditando, setEventoEditando] = useState(null);
 
   // ---------------- FETCH ----------------
   const fetchEventos = async () => {
