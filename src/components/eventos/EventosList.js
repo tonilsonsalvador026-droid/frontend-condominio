@@ -11,9 +11,7 @@ import {
 } from "lucide-react";
 
 import * as XLSX from "xlsx";
-
 import jsPDF from "jspdf";
-
 import autoTable from "jspdf-autotable";
 import { temPermissao} from "../permissoes";
 
