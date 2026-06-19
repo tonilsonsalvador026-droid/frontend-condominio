@@ -17,9 +17,14 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { formatCurrency } from "../../utils/formatCurrency";
+import { temPermissao} from "../permissoes";
 
 const MovimentoList = ({ conta, onBack, onNew, onEdit }) => {
 
+  const podeCriar = temPermissao("criar_movimentos");
+  const podeEditar = temPermissao("editar_movimentos");
+  const podeEliminar = temPermissao("eliminar_movimentos");
+  
   const [movimentos, setMovimentos] = useState([]);
 const [erro, setErro] = useState(null);
 
@@ -179,11 +184,12 @@ const saldoAtual = totais.saldoFinal || 0;
             )}
 
             {/* BOTÃO NOVO */}
-            {onNew && (
-              <button
-                onClick={onNew}
-                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-2xl shadow-xl hover:-translate-y-1 transition flex items-center justify-center"
-              >
+
+{podeCriar && (
+             <button
+               onClick={() => setShowForm(true)}
+              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center gap-2 whitespace-nowrap"
+            >
                 <Plus className="w-5 h-5 mr-2" />
                 Novo Movimento
               </button>
@@ -242,15 +248,17 @@ const saldoAtual = totais.saldoFinal || 0;
                         <Eye size={18} />
                       </button>
 
-                      {onEdit && (
+                     {podeEditar && (
                         <button onClick={() => onEdit(mov)} className="text-yellow-600 hover:scale-110 transition">
                           <Pencil size={18} />
                         </button>
                       )}
 
+                   {podeEliminar && (
                       <button onClick={() => handleDelete(mov.id)} className="text-red-600 hover:scale-110 transition">
                         <Trash2 size={18} />
                       </button>
+                     )}
                     </div>
                   </td>
 
