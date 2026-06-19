@@ -10,8 +10,14 @@ import {
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { temPermissao } from "../permissoes";
 
 const EdificioList = () => {
+
+const podeCriar = temPermissao("criar_edificios");
+const podeEditar = temPermissao("editar_edificios");
+const podeEliminar = temPermissao("eliminar_edificios");
+  
   const [edificios, setEdificios] = useState([]);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
@@ -119,12 +125,15 @@ const EdificioList = () => {
               />
             </div>
 
-            <button
-              onClick={() => setShowForm(true)}
+      {podeCriar && (
+         <button
+           onClick={() => setShowForm(true)}
               className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all whitespace-nowrap flex items-center justify-center"
             >
-              <Plus className="w-5 h-5 mr-2" /> Novo Edifício
+              <Plus className="w-5 h-5 mr-2" /> 
+                Novo Edifício
             </button>
+                )}
           </div>
         </div>
       </div>
