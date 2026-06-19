@@ -18,8 +18,14 @@ import {
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { temPermissao} from "../permissoes";
 
 const PagamentoList = () => {
+
+const podeCriar = temPermissao("criar_pagamentos");
+const podeEditar = temPermissao("editar_pagamentos");
+const podeEliminar = temPermissao("eliminar_pagamentos");
+  
   const [pagamentos, setPagamentos] = useState([]);
   const [filtroEstado, setFiltroEstado] = useState("");
   const [search, setSearch] = useState("");
@@ -221,12 +227,15 @@ const PagamentoList = () => {
               <option value="ATRASADO">Atrasados</option>
             </select>
 
-            <button
+           {podeCriar && (
+             <button
               onClick={() => navigate("/pagamentos/novo")}
-               className="px-8 py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-xl flex items-center"
+className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center gap-2 whitespace-nowrap"
             >
-              <Plus className="w-5 h-5 mr-2" /> Novo Pagamento
+              <Plus className="w-5 h-5 mr-2" /> 
+                 Novo Pagamento
             </button>
+               )} 
 
             <button
               onClick={() => navigate("/pagamentos/eliminados")}
@@ -268,17 +277,24 @@ const PagamentoList = () => {
                 <td className="p-3">{p.descricao || "-"}</td>
 
                 <td className="p-3 flex gap-3">
-                  <button onClick={() => navigate(`/pagamentos/${p.id}/editar`)}>
+                                    
+                  
+         {podeEditar && (
+             <button onClick={() => navigate(`/pagamentos/${p.id}/editar`)}>
                     <Pencil size={18} />
                   </button>
+                   )} 
 
                   <button onClick={() => navigate(`/pagamentos/${p.id}/detalhe`)}>
                     <Eye size={18} />
                   </button>
 
-                  <button onClick={() => handleDelete(p.id)}>
+                  
+           {podeEliminar && (
+             <button onClick={() => handleDelete(p.id)}>
                     <Trash2 size={18} />
                   </button>
+                     )} 
                 </td>
 
               </tr>
