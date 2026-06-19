@@ -15,6 +15,7 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 
 import autoTable from "jspdf-autotable";
+import { temPermissao} from "../permissoes";
 
 const EventosList = ({
   eventos,
@@ -22,6 +23,9 @@ const EventosList = ({
   onEdit,
 }) => {
 
+  const podeEditar = temPermissao("editar_eventos");
+  const podeEliminar = temPermissao("eliminar_eventos");
+  
   const data = eventos || [];
 
   // ---------------- CSV ----------------
@@ -261,29 +265,30 @@ const EventosList = ({
                     <div className="flex items-center justify-center gap-4">
 
                       {/* EDITAR */}
+                    
+
+              {podeEditar && (
                       <button
                         onClick={() =>
                           onEdit?.(ev)
                         }
                         className="text-blue-600 hover:scale-110 transition"
                       >
-
                         <Pencil size={18} />
-
                       </button>
+                        )}
 
                       {/* DELETE */}
+                  {podeEditar && (
                       <button
                         onClick={() =>
                           onDelete?.(ev.id)
                         }
                         className="text-red-600 hover:scale-110 transition"
                       >
-
                         <Trash2 size={18} />
-
                       </button>
-
+                       )}
                     </div>
 
                   </td>
