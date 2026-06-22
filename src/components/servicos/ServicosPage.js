@@ -14,10 +14,8 @@ const ServicosPage = () => {
 
   // PESQUISA
   const [search, setSearch] = useState("");
-
   // EDITAR
   const [servicoEditando, setServicoEditando] = useState(null);
-
   // Buscar serviços
   const fetchServicos = async () => {
     try {
@@ -63,11 +61,8 @@ const ServicosPage = () => {
 
     try {
       await api.delete(`/servicos-extras/${id}`);
-
       toast.success("Serviço eliminado com sucesso!");
-
       fetchServicos();
-
     } catch (err) {
       console.error(err);
       toast.error("Erro ao eliminar serviço.");
@@ -117,21 +112,20 @@ const ServicosPage = () => {
               </div>
 
               {/* BOTÃO */}
-              <button
+              
+            {podeCriar && (
+             <button
                 onClick={handleNovoServico}
-                className="flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow-xl"
-              >
+                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center gap-2 whitespace-nowrap"
+            >
                 <Plus size={20} />
                 Novo Serviço
               </button>
-
+               )}
             </div>
           )}
-
         </div>
-
       </div>
-
       {/* FORMULÁRIO */}
       {mostrarForm ? (
         <ServicosExtrasForm
@@ -153,5 +147,4 @@ const ServicosPage = () => {
     </div>
   );
 };
-
 export default ServicosPage;
