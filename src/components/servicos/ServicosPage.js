@@ -7,8 +7,12 @@ import { Plus, Search } from "lucide-react";
 
 import ServicosExtrasForm from "./ServicosExtrasForm";
 import ServicosExtrasList from "./ServicosExtrasList";
+import { temPermissao } from "../permissoes";
 
 const ServicosPage = () => {
+
+  const podeCriar = temPermissao("criar_servicos_agendados");
+  
   const [servicos, setServicos] = useState([]);
   const [mostrarForm, setMostrarForm] = useState(false);
 
