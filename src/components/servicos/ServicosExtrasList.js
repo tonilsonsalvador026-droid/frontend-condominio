@@ -14,9 +14,13 @@ import { formatCurrency } from "../../utils/formatCurrency";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { temPermissao } from "../permissoes";
 
 const ServicosExtrasList = ({ servicos, onDelete, onEdit }) => {
 
+const podeEditar = temPermissao("editar_servicos_agendados");
+const podeEliminar = temPermissao("eliminar_servicos_agendados");
+  
   const data = servicos || [];
 
   // ---------------- EXPORT CSV ----------------
@@ -32,11 +36,8 @@ const ServicosExtrasList = ({ servicos, onDelete, onEdit }) => {
     );
 
     const csv = [headers.join(","), ...rows].join("\n");
-
     const blob = new Blob([csv], { type: "text/csv" });
-
     const url = window.URL.createObjectURL(blob);
-
     const a = document.createElement("a");
 
     a.href = url;
@@ -55,18 +56,14 @@ const ServicosExtrasList = ({ servicos, onDelete, onEdit }) => {
     );
 
     const wb = XLSX.utils.book_new();
-
     XLSX.utils.book_append_sheet(wb, ws, "Serviços Extras");
-
     XLSX.writeFile(wb, "servicos_extras.xlsx");
   };
 
   // ---------------- EXPORT PDF ----------------
   const exportPDF = () => {
     const doc = new jsPDF();
-
     doc.text("Lista de Serviços Extras", 14, 15);
-
     autoTable(doc, {
       startY: 25,
       head: [["Nome", "Valor", "Descrição"]],
@@ -83,26 +80,20 @@ const ServicosExtrasList = ({ servicos, onDelete, onEdit }) => {
   // ---------------- PRINT ----------------
   const handlePrint = () => {
     const content = document.getElementById("printAreaServicosExtras").innerHTML;
-
     const win = window.open("", "", "width=900,height=650");
-
     win.document.write(`<html><body>${content}</body></html>`);
-
     win.document.close();
-
     win.print();
   };
 
   return (
     <div className="space-y-8 w-full">
-
       {/* TABLE */}
       <div
         id="printAreaServicosExtras"
         className="bg-white/80 backdrop-blur-xl rounded-3xl p-6 border shadow-xl overflow-x-auto"
       >
         <table className="w-full text-sm md:text-base">
-
           <thead className="bg-slate-100 text-slate-700">
             <tr>
               <th className="p-3 text-left">Nome</th>
@@ -135,20 +126,24 @@ const ServicosExtrasList = ({ servicos, onDelete, onEdit }) => {
                   <td className="p-3">
                     <div className="flex justify-center gap-4">
 
-                      <button
+                  {podeEditar && (
+                       <button
                         onClick={() => onEdit?.(srv)}
                         className="text-blue-600 hover:scale-110 transition"
                       >
                         <Edit size={18} />
                       </button>
-
+                        )}
+                          
+                      
+                    {podeEliminar && (
                       <button
                         onClick={() => onDelete?.(srv.id)}
                         className="text-red-600 hover:scale-110 transition"
                       >
                         <Trash2 size={18} />
                       </button>
-
+                        )}
                     </div>
                   </td>
 
