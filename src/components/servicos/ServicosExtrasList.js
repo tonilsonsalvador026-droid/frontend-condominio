@@ -18,8 +18,8 @@ import { temPermissao } from "../permissoes";
 
 const ServicosExtrasList = ({ servicos, onDelete, onEdit }) => {
 
-const podeEditar = temPermissao("editar_servicos_agendados");
-const podeEliminar = temPermissao("eliminar_servicos_agendados");
+const podeEditar = temPermissao("editar_servicos_extras");
+const podeEliminar = temPermissao("eliminar_servicos_extras");
   
   const data = servicos || [];
 
