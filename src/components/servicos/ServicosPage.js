@@ -11,7 +11,7 @@ import { temPermissao } from "../permissoes";
 
 const ServicosPage = () => {
 
-  const podeCriar = temPermissao("criar_servicos_agendados");
+  const podeCriar = temPermissao("criar_servicos_extras");
   
   const [servicos, setServicos] = useState([]);
   const [mostrarForm, setMostrarForm] = useState(false);
