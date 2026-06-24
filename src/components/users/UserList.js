@@ -3,8 +3,12 @@ import React, { useEffect, useState } from "react";
 import api from "../../api";
 import dayjs from "dayjs";
 import { Pencil, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { temPermissao } from "../permissoes";
 
 const UserList = ({ onEdit }) => {
+
+  const podeEditar = temPermissao("editar_utilizadores");
+  const podeEliminar = temPermissao("eliminar_utilizadores");
   const [users, setUsers] = useState([]);
 
   const loadUsers = async () => {
@@ -65,18 +69,22 @@ const UserList = ({ onEdit }) => {
               </td>
               <td className="p-2 border">{dayjs(u.criadoEm).format("DD/MM/YYYY")}</td>
               <td className="p-2 border text-center space-x-2">
-                <button
-                  onClick={() => onEdit(u)}
+                {podeEditar && (
+                  <button
+                     onClick={() => onEdit(u)}
                   className="text-blue-600 hover:text-blue-800"
-                >
+                  >
                   <Pencil size={18} />
-                </button>
-                <button
-                  onClick={() => handleDelete(u.id)}
-                  className="text-red-600 hover:text-red-800"
-                >
-                  <Trash2 size={18} />
-                </button>
+                 </button>
+                    )}
+               {podeEliminar && (
+                 <button
+                    onClick={() => handleDelete(u.id)}
+               className="text-red-600 hover:text-red-800"
+                 >
+                <Trash2 size={18} />
+                 </button>
+                    )}
               </td>
             </tr>
           ))}
