@@ -5,11 +5,9 @@ import { Plus, Search } from "lucide-react";
 
 import RoleForm from "./RoleForm";
 import RoleList from "./RoleList";
-import { temPermissao} from "../permissoes";
+
 
 const RolePage = () => {
-  
-const podeCriar = temPermissao("criar_roles");
   
   const [roles, setRoles] = useState([]);
   const [mostrarForm, setMostrarForm] = useState(false);
@@ -117,7 +115,7 @@ const podeCriar = temPermissao("criar_roles");
               {/* BOTÃO */}
            
               
-{podeCriar && (
+
              <button
                 onClick={handleNovo}
                 className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center gap-2 whitespace-nowrap"
@@ -125,7 +123,7 @@ const podeCriar = temPermissao("criar_roles");
                 <Plus size={20} />
                 Nova Função
               </button>
-                  )} 
+                  
             </div>
           )}
 
