@@ -108,21 +108,52 @@ function App() {
           <Route path="/fracoes/editar/:id" element={<FracaoEditPage />} />
 
           <Route path="/eventos" element={<EventosPage />} />
-          <Route path="/servicos-extras" element={<ServicosPage />} />
-          <Route path="/servicos-agendados" element={<ServicosAgendadosPage />} />
-
-          <Route path="/proprietarios" element={<ProprietarioPage />} />
-          <Route path="/inquilinos" element={<InquilinoPage />} />
+          <Route path="/servicos-extras" element={ <ProtectedRoute permissao="visualizar_servicos_extras"
+          <ServicosPage />
+          </ProtectedRoute>
+           }
+          /> 
+          <Route path="/servicos-agendados" element={ <ProtectedRoute permissao="visualizar_servicos_agendados"
+          <ServicosAgendadosPage />
+          </ProtectedRoute>
+           }
+          /> 
+          <Route path="/proprietarios" element={ <ProtectedRoute permissao="visualizar_proprietarios"
+          <ProprietarioPage />
+          </ProtectedRoute>
+           }
+          />  
+          <Route path="/inquilinos" element={ <ProtectedRoute permissao="visualizar_inquilinos"
+          <InquilinoPage />
+          </ProtectedRoute>
+           }
+          /> 
           <Route path="/inquilinos" element={<InquilinoForm />} />
           <Route path="/condominios"  element={ <ProtectedRoute permissao="visualizar_condominios">
           <CondominioPage />
           </ProtectedRoute>
            }
           />
-          <Route path="/users" element={<UsersPage />} />
-          <Route path="/roles" element={<RolePage />} />
-          <Route path="/permissoes" element={<PermissaoPage />} />
-          <Route path="/atribuir-role" element={<AtribuirRolePage />} />
+          <Route path="/users"element={ <ProtectedRoute permissao="visualizar_utilizadores">
+          <UsersPage />
+          </ProtectedRoute>
+          }
+          />
+          <Route path="/roles" element={ <ProtectedRoute permissao="visualizar_roles">
+          <RolePage />
+          </ProtectedRoute>
+          }
+          />
+         <Route path="/permissoes" element={ <ProtectedRoute permissao="visualizar_permissoes"
+         <PermissaoPage />
+         </ProtectedRoute>
+          }
+          />
+          <Route path="/atribuir-role" element={ <ProtectedRoute permissao="visualizar_atribuir_role"
+          <AtribuirRolePage />
+         </ProtectedRoute>
+          }
+          />
         </Route>
       </Routes>
     </Router>
