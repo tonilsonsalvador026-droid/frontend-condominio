@@ -54,6 +54,9 @@ import AtribuirRolePage from "./components/roles/AtribuirRolePage";
 import InquilinoForm from "./components/inquilinos/InquilinoForm";
 import ServicosAgendadosPage from "./components/servicos/ServicosAgendadosPage";
 
+import AcessoNegado from "./components/AcessoNegado";
+import ProtectedRoute from "./components/permissoes/ProtectedRoute";
+
 function App() {
   return (
     <Router>
@@ -63,7 +66,9 @@ function App() {
     
       <Routes>
         {/* 🔓 ROTAS PÚBLICAS */}
+
         <Route path="/" element={<LoginPage />} />
+        <Route path="/acesso-negado" element={<AcessoNegado />} />
         <Route path="/recuperar-senha" element={<RecuperarPasswordPage />} />
         <Route path="/welcome" element={<WelcomePage />} />
         <Route path="/welcome-actions" element={<WelcomeActionsPage />} />
@@ -109,7 +114,11 @@ function App() {
           <Route path="/proprietarios" element={<ProprietarioPage />} />
           <Route path="/inquilinos" element={<InquilinoPage />} />
           <Route path="/inquilinos" element={<InquilinoForm />} />
-          <Route path="/condominios" element={<CondominioPage />} />
+          <Route path="/condominios"  element={ <ProtectedRoute permissao="visualizar_condominios">
+          <CondominioPage />
+          </ProtectedRoute>
+           }
+          />
           <Route path="/users" element={<UsersPage />} />
           <Route path="/roles" element={<RolePage />} />
           <Route path="/permissoes" element={<PermissaoPage />} />
