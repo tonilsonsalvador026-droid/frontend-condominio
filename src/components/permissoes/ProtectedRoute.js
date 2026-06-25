@@ -1,16 +1,16 @@
 import { Navigate } from "react-router-dom";
-import { temPermissao } from "./index";
+import { temPermissao } from "../permissoes";
 
 const ProtectedRoute = ({
-permissao,
-children,
+  permissao,
+  children,
 }) => {
 
-if (!temPermissao(permissao)) {
-return <Navigate to="/acesso-negado" replace />;
-}
+  if (!temPermissao(permissao)) {
+    return <Navigate to="/acesso-negado" replace />;
+  }
 
-return children;
+  return children;
 };
 
 export default ProtectedRoute;
