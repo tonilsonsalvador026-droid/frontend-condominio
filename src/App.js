@@ -60,20 +60,30 @@ import ProtectedRoute from "./components/permissoes/ProtectedRoute";
 function App() {
   return (
     <Router>
-    
-     {/* 🔥 TOAST GLOBAL (OBRIGATÓRIO PARA FUNCIONAR OS ALERTS) */}
+      {/* 🔥 TOAST GLOBAL (OBRIGATÓRIO PARA FUNCIONAR OS ALERTS) */}
       <Toaster richColors position="top-right" />
-    
+
       <Routes>
         {/* 🔓 ROTAS PÚBLICAS */}
-
         <Route path="/" element={<LoginPage />} />
         <Route path="/acesso-negado" element={<AcessoNegado />} />
-        <Route path="/recuperar-senha" element={<RecuperarPasswordPage />} />
+        <Route
+          path="/recuperar-senha"
+          element={<RecuperarPasswordPage />}
+        />
         <Route path="/welcome" element={<WelcomePage />} />
-        <Route path="/welcome-actions" element={<WelcomeActionsPage />} />
-        <Route path="/invite-user" element={<InviteUserPage />} />
-        <Route path="/set-password" element={<SetPasswordPage />} />
+        <Route
+          path="/welcome-actions"
+          element={<WelcomeActionsPage />}
+        />
+        <Route
+          path="/invite-user"
+          element={<InviteUserPage />}
+        />
+        <Route
+          path="/set-password"
+          element={<SetPasswordPage />}
+        />
 
         {/* 🔐 TODAS AS ROTAS PROTEGIDAS */}
         <Route
@@ -83,76 +93,281 @@ function App() {
             </PrivateRoute>
           }
         >
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/perfil" element={<PerfilPage />} />
-
-          {/* Pagamentos */}
-          <Route path="/pagamentos" element={<PagamentoPage />} />
-          <Route path="/pagamentos/novo" element={<PagamentoFormPage />} />
-          <Route path="/pagamentos/:id/editar" element={<PagamentoFormPage />} />
-          <Route path="/pagamentos/:id/detalhe" element={<PagamentoDetalhe />} />
-          <Route path="/pagamentos/:id/historico" element={<HistoricoPagamento />} />
-          <Route path="/pagamentos/eliminados" element={<PagamentoEliminado />} />
-
-          {/* Outros */}
-          <Route path="/recibos" element={<ReciboPage />} />
-          <Route path="/recibos/novo" element={<ReciboForm />} />
-          <Route path="/recibos/:id/editar" element={<ReciboForm />} />
-          <Route path="/recibos/:id/detalhe" element={<ReciboDetalhe />} />
-
-          <Route path="/conta-corrente" element={<ContaCorrentePage />} />
-          <Route path="/mensagens/enviar" element={<EnviarMensagem />} />
-          <Route path="/edificios" element={<EdificioPage />} />
-          <Route path="/edificios/:id" element={<EdificioDetalhes />} />
-          <Route path="/fracoes" element={<FracoesPage />} />
-          <Route path="/fracoes/editar/:id" element={<FracaoEditPage />} />
-
-          <Route path="/eventos" element={<EventosPage />} />
-          <Route path="/servicos-extras" element={ <ProtectedRoute permissao="visualizar_servicos_extras"
-          <ServicosPage />
-          </ProtectedRoute>
-           }
-          /> 
-          <Route path="/servicos-agendados" element={ <ProtectedRoute permissao="visualizar_servicos_agendados"
-          <ServicosAgendadosPage />
-          </ProtectedRoute>
-           }
-          /> 
-          <Route path="/proprietarios" element={ <ProtectedRoute permissao="visualizar_proprietarios"
-          <ProprietarioPage />
-          </ProtectedRoute>
-           }
-          />  
-          <Route path="/inquilinos" element={ <ProtectedRoute permissao="visualizar_inquilinos"
-          <InquilinoPage />
-          </ProtectedRoute>
-           }
-          /> 
-          <Route path="/inquilinos" element={<InquilinoForm />} />
-          <Route path="/condominios"  element={ <ProtectedRoute permissao="visualizar_condominios">
-          <CondominioPage />
-          </ProtectedRoute>
-           }
+          {/* Dashboard */}
+          <Route
+            path="/dashboard"
+            element={<Dashboard />}
           />
-          <Route path="/users"element={ <ProtectedRoute permissao="visualizar_utilizadores">
-          <UsersPage />
-          </ProtectedRoute>
-          }
+
+          <Route
+            path="/perfil"
+            element={<PerfilPage />}
           />
-          <Route path="/roles" element={ <ProtectedRoute permissao="visualizar_roles">
-          <RolePage />
-          </ProtectedRoute>
-          }
+
+          {/* PAGAMENTOS */}
+
+          <Route
+            path="/pagamentos"
+            element={
+              <ProtectedRoute permissao="visualizar_pagamentos">
+                <PagamentoPage />
+              </ProtectedRoute>
+            }
           />
-         <Route path="/permissoes" element={ <ProtectedRoute permissao="visualizar_permissoes"
-         <PermissaoPage />
-         </ProtectedRoute>
-          }
+
+          <Route
+            path="/pagamentos/novo"
+            element={
+              <ProtectedRoute permissao="criar_pagamentos">
+                <PagamentoFormPage />
+              </ProtectedRoute>
+            }
           />
-          <Route path="/atribuir-role" element={ <ProtectedRoute permissao="visualizar_atribuir_role"
-          <AtribuirRolePage />
-         </ProtectedRoute>
-          }
+
+          <Route
+            path="/pagamentos/:id/editar"
+            element={
+              <ProtectedRoute permissao="editar_pagamentos">
+                <PagamentoFormPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/pagamentos/:id/detalhe"
+            element={
+              <ProtectedRoute permissao="visualizar_pagamentos">
+                <PagamentoDetalhe />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/pagamentos/:id/historico"
+            element={
+              <ProtectedRoute permissao="visualizar_pagamentos">
+                <HistoricoPagamento />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/pagamentos/eliminados"
+            element={
+              <ProtectedRoute permissao="visualizar_pagamentos">
+                <PagamentoEliminado />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* RECIBOS */}
+
+          <Route
+            path="/recibos"
+            element={
+              <ProtectedRoute permissao="visualizar_recibos">
+                <ReciboPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/recibos/novo"
+            element={
+              <ProtectedRoute permissao="criar_recibos">
+                <ReciboForm />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/recibos/:id/editar"
+            element={
+              <ProtectedRoute permissao="editar_recibos">
+                <ReciboForm />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/recibos/:id/detalhe"
+            element={
+              <ProtectedRoute permissao="visualizar_recibos">
+                <ReciboDetalhe />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* CONTA CORRENTE */}
+
+          <Route
+            path="/conta-corrente"
+            element={
+              <ProtectedRoute permissao="visualizar_conta_corrente">
+                <ContaCorrentePage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* MENSAGENS */}
+
+          <Route
+            path="/mensagens/enviar"
+            element={
+              <ProtectedRoute permissao="criar_mensagens">
+                <EnviarMensagem />
+              </ProtectedRoute>
+            }
+          />
+
+          {/*EDIFÍCIOS*/}
+
+          <Route
+            path="/edificios"
+            element={
+              <ProtectedRoute permissao="visualizar_edificios">
+                <EdificioPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/edificios/:id"
+            element={
+              <ProtectedRoute permissao="visualizar_edificios">
+                <EdificioDetalhes />
+              </ProtectedRoute>
+            }
+          />
+
+          {/*FRAÇÕES*/}
+
+          <Route
+            path="/fracoes"
+            element={
+              <ProtectedRoute permissao="visualizar_fracoes">
+                <FracoesPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/fracoes/editar/:id"
+            element={
+              <ProtectedRoute permissao="editar_fracoes">
+                <FracaoEditPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/*EVENTOS*/}
+
+          <Route
+            path="/eventos"
+            element={
+              <ProtectedRoute permissao="visualizar_eventos">
+                <EventosPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/*SERVIÇOS EXTRAS*/}
+
+          <Route
+            path="/servicos-extras"
+            element={
+              <ProtectedRoute permissao="visualizar_servicos_extras">
+                <ServicosPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/*SERVIÇOS AGENDADOS*/}
+
+          <Route
+            path="/servicos-agendados"
+            element={
+              <ProtectedRoute permissao="visualizar_servicos_agendados">
+                <ServicosAgendadosPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/*PROPRIETÁRIOS*/}
+
+          <Route
+            path="/proprietarios"
+            element={
+              <ProtectedRoute permissao="visualizar_proprietarios">
+                <ProprietarioPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/*INQUILINOS*/}
+
+          <Route
+            path="/inquilinos"
+            element={
+              <ProtectedRoute permissao="visualizar_inquilinos">
+                <InquilinoPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/*CONDOMÍNIOS*/}
+
+          <Route
+            path="/condominios"
+            element={
+              <ProtectedRoute permissao="visualizar_condominios">
+                <CondominioPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/*UTILIZADORES*/}
+
+          <Route
+            path="/users"
+            element={
+              <ProtectedRoute permissao="visualizar_utilizadores">
+                <UsersPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/*FUNÇÕES*/}
+
+          <Route
+            path="/roles"
+            element={
+              <ProtectedRoute permissao="visualizar_roles">
+                <RolePage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/*PERMISSÕES*/}
+
+          <Route
+            path="/permissoes"
+            element={
+              <ProtectedRoute permissao="visualizar_permissoes">
+                <PermissaoPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/*ATRIBUIR PAPÉIS */}
+
+          <Route
+            path="/atribuir-role"
+            element={
+              <ProtectedRoute permissao="visualizar_atribuir_papeis">
+                <AtribuirRolePage />
+              </ProtectedRoute>
+            }
           />
         </Route>
       </Routes>
@@ -161,4 +376,3 @@ function App() {
 }
 
 export default App;
-
