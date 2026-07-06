@@ -139,36 +139,36 @@ const menuItems = [
 
   return (
     <>
-      <aside
-className={`
-fixed
-md:static
-top-0
-left-0
-h-screen
-w-72
-bg-gradient-to-b
-from-slate-900/95
-to-slate-900/80
-backdrop-blur-xl
-border-r
-border-slate-800/50
-text-white
-z-50
-shadow-2xl
-transform
--transition-x-full
-md:translate-x-0
-transition-all
-duration-300
-ease-in-out
-flex-shrink-0
-overflow-y-auto
-overflow-x-hidden
-${aberto ? "translate-x-0" : ""}
-`}
+     <aside
+  className={`
+    fixed
+    md:fixed
+    top-0
+    left-0
+    h-screen
+    w-72
+    bg-gradient-to-b
+    from-slate-900/95
+    to-slate-900/80
+    backdrop-blur-xl
+    border-r
+    border-slate-800/50
+    text-white
+    z-50
+    shadow-2xl
+    transform
+    -translate-x-full
+    md:translate-x-0
+    transition-all
+    duration-300
+    ease-in-out
+    flex-shrink-0
+    overflow-y-auto
+    overflow-x-hidden
+    overscroll-contain
+    ${aberto ? "translate-x-0" : ""}
+  `}
 >
-      `}>
         {/* Logo/Header */}
         <div className="p-8 pb-4 border-b border-slate-800/50 sticky top-0 bg-slate-900/50 backdrop-blur-sm z-10">
           <div className="flex items-center space-x-3">
