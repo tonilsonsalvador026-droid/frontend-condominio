@@ -31,6 +31,7 @@ const MainLayout = () => {
             flex-1
             overflow-y-auto
             md:ml-72
+            mt-16
             p-8
             lg:p-12
             bg-gradient-to-br
