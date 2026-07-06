@@ -8,26 +8,38 @@ const MainLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="bg-gradient-to-br from-slate-50/90 via-blue-50/50 to-indigo-50/30 min-h-screen w-screen flex overflow-hidden">
-      
-      {/* Sidebar */}
-      <Sidebar aberto={sidebarOpen} setAberto={setSidebarOpen} />
+   <div className="h-screen flex overflow-hidden bg-gradient-to-br from-slate-50/90 via-blue-50/50 to-indigo-50/30">
 
-      {/* Área direita */}
-      <div className="flex flex-col flex-1">
-        
-        {/* Topbar (Header) */}
-        <Topbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+    <Sidebar
+        aberto={sidebarOpen}
+        setAberto={setSidebarOpen}
+    />
 
-        {/* Conteúdo */}
-        <main className="flex-1 overflow-y-auto h-[calc(100vh-80px)] md:ml-72 p-8 lg:p-12 bg-gradient-to-br from-slate-50/80 via-blue-50/30 to-indigo-50/20 backdrop-blur-sm">
-          <div className="w-full space-y-8">
+    <div className="flex flex-col flex-1 overflow-hidden">
+
+        <Topbar
+            onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        />
+
+        <main
+            className="
+                flex-1
+                overflow-y-auto
+                md:ml-72
+                p-8
+                lg:p-12
+                bg-gradient-to-br
+                from-slate-50/80
+                via-blue-50/30
+                to-indigo-50/20
+            "
+        >
             <Outlet />
-          </div>
         </main>
 
-      </div>
     </div>
+
+</div>
   );
 };
 
