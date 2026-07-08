@@ -2,7 +2,7 @@ import React from "react";
 import { Languages } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-const LanguageSelector = () => {
+const Languageselector = () => {
   const { i18n } = useTranslation();
 
   const mudarIdioma = (lng) => {
