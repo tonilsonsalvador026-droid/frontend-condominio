@@ -46,51 +46,75 @@ const Languageselector = () => {
       >
         {/* Botão Português */}
         <button
-          onClick={() => mudarIdioma("pt")}
-          className="
-            w-full
-            px-4
-            py-3
-            text-left
-            text-slate-700
-            hover:bg-slate-100
-            transition
-          "
-        >
-          🇦🇴 Português
-        </button>
+  onClick={() => i18n.changeLanguage("pt")}
+  className="
+    w-full
+    px-4
+    py-3
+    flex
+    items-center
+    gap-3
+    text-slate-700
+    hover:bg-slate-100
+    transition
+  "
+>
+  <img
+    src="https://flagcdn.com/ao.svg"
+    alt="Angola"
+    className="w-5 h-5 rounded-full"
+  />
+
+  <span>Português</span>
+</button>
 
         {/* Botão Kimbundu */}
-        <button
-          onClick={() => mudarIdioma("kmb")}
-          className="
-            w-full
-            px-4
-            py-3
-            text-left
-            text-slate-700
-            hover:bg-slate-100
-            transition
-          "
-        >
-          🇦🇴 Kimbundu
-        </button>
+<button
+  onClick={() => i18n.changeLanguage("kmb")}
+  className="
+    w-full
+    px-4
+    py-3
+    flex
+    items-center
+    gap-3
+    text-slate-700
+    hover:bg-slate-100
+    transition
+  "
+>
+  <img
+    src="https://flagcdn.com/ao.svg"
+    alt="Angola"
+    className="w-5 h-5 rounded-full"
+  />
+
+  <span>Kimbundu</span>
+</button>
 
         {/* Botão Umbundu */}
-        <button
-          onClick={() => mudarIdioma("umb")}
-          className="
-            w-full
-            px-4
-            py-3
-            text-left
-            text-slate-700
-            hover:bg-slate-100
-            transition
-          "
-        >
-          🇦🇴 Umbundu
-        </button>
+<button
+  onClick={() => i18n.changeLanguage("umb")}
+  className="
+    w-full
+    px-4
+    py-3
+    flex
+    items-center
+    gap-3
+    text-slate-700
+    hover:bg-slate-100
+    transition
+  "
+>
+  <img
+    src="https://flagcdn.com/ao.svg"
+    alt="Angola"
+    className="w-5 h-5 rounded-full"
+  />
+
+  <span>Umbundu</span>
+</button>
       </div>
     </div>
   );
