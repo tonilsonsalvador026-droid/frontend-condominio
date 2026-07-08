@@ -94,7 +94,7 @@ const UserMenu = () => {
           right-0
           mt-3
           w-72
-          bg-white
+          bg-white text-slate-800
           rounded-2xl
           shadow-2xl
           overflow-hidden
@@ -129,15 +129,16 @@ const UserMenu = () => {
           <button
             onClick={() => navigate("/perfil")}
             className="
-            w-full
-            flex
-            items-center
-            gap-3
-            px-5
-            py-3
-            hover:bg-slate-100
-            transition
-            "
+w-full
+flex
+items-center
+gap-3
+px-5
+py-3
+text-slate-700
+hover:bg-slate-100
+transition
+"
           >
             <User size={18} />
             Perfil
@@ -145,15 +146,16 @@ const UserMenu = () => {
 
           <button
             className="
-            w-full
-            flex
-            items-center
-            gap-3
-            px-5
-            py-3
-            hover:bg-slate-100
-            transition
-            "
+w-full
+flex
+items-center
+gap-3
+px-5
+py-3
+text-slate-700
+hover:bg-slate-100
+transition
+"
           >
             <Settings size={18} />
             Configurações
