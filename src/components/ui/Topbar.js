@@ -55,7 +55,7 @@ const Topbar = ({ onToggleSidebar }) => {
 
       {/* Lado direito */}
       <div className="flex items-center gap-3">
-        <LanguageSelector />
+        <Languageselector />
 
         <NotificationBell />
 
