@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Bell, Check, Trash2 } from "lucide-react";
-import api from "../../api";
+import api from "../../../api";
 
 const NotificationBell = () => {
   const [open, setOpen] = useState(false);
