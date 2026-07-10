@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Bell, Check, Trash2 } from "lucide-react";
-import { useNavigate } from "react-router-dom"; // 🆕 Adicionado para navegação
+import { useNavigate } from "react-router-dom";
 import api from "../../../api";
 
 const NotificationBell = () => {
-  const navigate = useNavigate(); // 🆕 Inicialização do hook de rotas
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [notificacoes, setNotificacoes] = useState([]);
 
@@ -56,24 +56,28 @@ const NotificationBell = () => {
     }
   };
 
-  // 🆕 Função para lidar com o clique na notificação e redirecionar
+  // 🆕 Função atualizada com as rotas reais do teu projeto!
   const abrirNotificacao = async (notificacao) => {
     try {
       if (!notificacao.lida) {
         await marcarComoLida(notificacao.id);
       }
 
+      // ⚠️ Corrigido de acordo com as rotas reais do teu App.js
       switch (notificacao.tipo) {
         case "pagamento_vencido":
-          navigate(`/pagamentos/${notificacao.referenciaId}`);
+          // Redireciona para a página de detalhes real: /pagamentos/6/detalhe
+          navigate(`/pagamentos/${notificacao.referenciaId}/detalhe`);
           break;
 
         case "evento_proximo":
-          navigate(`/eventos/${notificacao.referenciaId}`);
+          // Como não há página para evento único, vai para a lista geral de eventos
+          navigate("/eventos");
           break;
 
         case "servico_agendado":
-          navigate(`/servicos-agendados/${notificacao.referenciaId}`);
+          // Vai para a lista geral de serviços agendados
+          navigate("/servicos-agendados");
           break;
 
         default:
@@ -167,7 +171,7 @@ const NotificationBell = () => {
             notificacoes.map((n) => (
               <div
                 key={n.id}
-                onClick={() => abrirNotificacao(n)} // 🆕 Clique adicionado aqui
+                onClick={() => abrirNotificacao(n)}
                 className={`
                   p-4
                   border-b
@@ -194,12 +198,11 @@ const NotificationBell = () => {
                     </span>
                   </div>
 
-                  {/* Botões de Ação rápida */}
                   <div className="flex flex-col gap-2">
                     {!n.lida && (
                       <button
                         onClick={(e) => {
-                          e.stopPropagation(); // 🆕 Evita abrir o link ao clicar só no Check
+                          e.stopPropagation();
                           marcarComoLida(n.id);
                         }}
                         className="text-green-600 hover:scale-110 transition"
@@ -210,7 +213,7 @@ const NotificationBell = () => {
 
                     <button
                       onClick={(e) => {
-                        e.stopPropagation(); // 🆕 Evita abrir o link ao clicar só na Lixeira
+                        e.stopPropagation();
                         eliminar(n.id);
                       }}
                       className="text-red-600 hover:scale-110 transition"
