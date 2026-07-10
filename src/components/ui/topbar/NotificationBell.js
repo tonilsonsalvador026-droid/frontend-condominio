@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Bell, Check, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom"; // 🆕 Adicionado para navegação
 import api from "../../../api";
 
 const NotificationBell = () => {
+  const navigate = useNavigate(); // 🆕 Inicialização do hook de rotas
   const [open, setOpen] = useState(false);
   const [notificacoes, setNotificacoes] = useState([]);
 
@@ -51,6 +53,36 @@ const NotificationBell = () => {
       carregarNotificacoes();
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  // 🆕 Função para lidar com o clique na notificação e redirecionar
+  const abrirNotificacao = async (notificacao) => {
+    try {
+      if (!notificacao.lida) {
+        await marcarComoLida(notificacao.id);
+      }
+
+      switch (notificacao.tipo) {
+        case "pagamento_vencido":
+          navigate(`/pagamentos/${notificacao.referenciaId}`);
+          break;
+
+        case "evento_proximo":
+          navigate(`/eventos/${notificacao.referenciaId}`);
+          break;
+
+        case "servico_agendado":
+          navigate(`/servicos-agendados/${notificacao.referenciaId}`);
+          break;
+
+        default:
+          break;
+      }
+
+      setOpen(false); // Fecha o menu do sino
+    } catch (err) {
+      console.error("Erro ao abrir a notificação:", err);
     }
   };
 
@@ -135,11 +167,13 @@ const NotificationBell = () => {
             notificacoes.map((n) => (
               <div
                 key={n.id}
+                onClick={() => abrirNotificacao(n)} // 🆕 Clique adicionado aqui
                 className={`
                   p-4
                   border-b
                   hover:bg-slate-50
                   transition
+                  cursor-pointer
                   ${!n.lida ? "bg-blue-50" : ""}
                 `}
               >
@@ -156,29 +190,30 @@ const NotificationBell = () => {
                     )}
 
                     <span className="text-xs text-slate-400">
-                      {new Date(
-                        n.criadoEm
-                      ).toLocaleString("pt-PT")}
+                      {new Date(n.criadoEm).toLocaleString("pt-PT")}
                     </span>
                   </div>
 
+                  {/* Botões de Ação rápida */}
                   <div className="flex flex-col gap-2">
                     {!n.lida && (
                       <button
-                        onClick={() =>
-                          marcarComoLida(n.id)
-                        }
-                        className="text-green-600"
+                        onClick={(e) => {
+                          e.stopPropagation(); // 🆕 Evita abrir o link ao clicar só no Check
+                          marcarComoLida(n.id);
+                        }}
+                        className="text-green-600 hover:scale-110 transition"
                       >
                         <Check size={18} />
                       </button>
                     )}
 
                     <button
-                      onClick={() =>
-                        eliminar(n.id)
-                      }
-                      className="text-red-600"
+                      onClick={(e) => {
+                        e.stopPropagation(); // 🆕 Evita abrir o link ao clicar só na Lixeira
+                        eliminar(n.id);
+                      }}
+                      className="text-red-600 hover:scale-110 transition"
                     >
                       <Trash2 size={18} />
                     </button>
