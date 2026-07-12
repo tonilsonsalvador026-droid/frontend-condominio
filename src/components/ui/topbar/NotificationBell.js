@@ -56,27 +56,24 @@ const NotificationBell = () => {
     }
   };
 
-  // 🆕 Função atualizada com as rotas reais do teu projeto!
+  // Função que abre a página correta ao clicar na notificação
   const abrirNotificacao = async (notificacao) => {
     try {
       if (!notificacao.lida) {
         await marcarComoLida(notificacao.id);
       }
 
-      // ⚠️ Corrigido de acordo com as rotas reais do teu App.js
       switch (notificacao.tipo) {
         case "pagamento_vencido":
-          // Redireciona para a página de detalhes real: /pagamentos/6/detalhe
           navigate(`/pagamentos/${notificacao.referenciaId}/detalhe`);
           break;
 
         case "evento_proximo":
-          // Como não há página para evento único, vai para a lista geral de eventos
           navigate("/eventos");
           break;
 
         case "servico_agendado":
-          // Vai para a lista geral de serviços agendados
+          // Redireciona o gestor para a lista de serviços agendados
           navigate("/servicos-agendados");
           break;
 
