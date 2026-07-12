@@ -203,7 +203,7 @@ function App() {
           <Route
             path="/conta-corrente"
             element={
-              <ProtectedRoute permissao="visualizar_conta_corrente">
+              <ProtectedRoute permissao="visualizar_contas_correntes">
                 <ContaCorrentePage />
               </ProtectedRoute>
             }
