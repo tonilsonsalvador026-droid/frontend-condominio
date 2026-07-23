@@ -1,6 +1,6 @@
 // src/components/Perfil/PerfilPage.js
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Save,
   User,
@@ -39,6 +39,10 @@ export default function PerfilPage() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
+  // Referência para o input oculto de ficheiro
+  const fileInputRef = useRef(null);
 
   // --------------------------------------------------
   // OBTER INICIAIS DO UTILIZADOR
@@ -136,6 +140,56 @@ export default function PerfilPage() {
   };
 
   // --------------------------------------------------
+  // UPLOAD DA FOTO DE PERFIL
+  // --------------------------------------------------
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecione apenas um ficheiro de imagem.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("A imagem não pode ultrapassar 5 MB.");
+      return;
+    }
+
+    try {
+      setUploadingAvatar(true);
+
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      // Certifique-se de que a rota no backend aceita multipart/form-data
+      const response = await api.post("/perfil/avatar", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      setPerfil((prev) => ({
+        ...prev,
+        avatar: response.data.avatar,
+      }));
+
+      toast.success("Fotografia de perfil atualizada com sucesso!");
+    } catch (error) {
+      console.error("Erro ao enviar fotografia:", error);
+
+      toast.error(
+        error.response?.data?.error ||
+          "Não foi possível atualizar a fotografia."
+      );
+    } finally {
+      setUploadingAvatar(false);
+      e.target.value = "";
+    }
+  };
+
+  // --------------------------------------------------
   // GUARDAR ALTERAÇÕES
   // --------------------------------------------------
   const handleSave = async () => {
@@ -149,7 +203,6 @@ export default function PerfilPage() {
 
       const payload = {
         nome: perfil.nome.trim(),
-        avatar: perfil.avatar.trim(),
         telefone: perfil.telefone.trim(),
         nif: perfil.nif.trim(),
         dataNascimento: perfil.dataNascimento || null,
@@ -264,9 +317,15 @@ export default function PerfilPage() {
 
             <div className="relative flex flex-col md:flex-row md:items-center gap-6">
 
-              {/* AVATAR */}
+              {/* AVATAR + BOTÃO DE UPLOAD */}
               <div className="relative">
-                <div className="h-24 w-24 md:h-28 md:w-28 rounded-3xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-2xl overflow-hidden">
+                <div className="h-24 w-24 md:h-28 md:w-28 rounded-3xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-2xl overflow-hidden relative">
+                  {uploadingAvatar ? (
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-sm z-10">
+                      <Loader2 className="h-8 w-8 text-white animate-spin" />
+                    </div>
+                  ) : null}
+
                   {perfil.avatar ? (
                     <img
                       src={perfil.avatar}
@@ -283,9 +342,25 @@ export default function PerfilPage() {
                   )}
                 </div>
 
-                <div className="absolute -right-2 -bottom-2 h-9 w-9 rounded-xl bg-white text-blue-600 flex items-center justify-center shadow-lg">
+                {/* Input de Ficheiro Oculto */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={handleAvatarChange}
+                />
+
+                {/* Botão com Ícone da Câmara */}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingAvatar}
+                  title="Alterar fotografia de perfil"
+                  className="absolute -right-2 -bottom-2 h-9 w-9 rounded-xl bg-white text-blue-600 flex items-center justify-center shadow-lg hover:bg-gray-100 transition disabled:opacity-50 cursor-pointer z-20"
+                >
                   <Camera className="h-4 w-4" />
-                </div>
+                </button>
               </div>
 
               {/* INFORMAÇÕES */}
@@ -422,24 +497,6 @@ export default function PerfilPage() {
                     <p className="text-xs text-gray-500 mt-2">
                       Por motivos de segurança, a alteração de e-mail requer validação direta.
                     </p>
-                  </div>
-
-                  {/* AVATAR */}
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      URL da foto de perfil
-                    </label>
-                    <div className="relative">
-                      <Camera className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
-                      <input
-                        type="url"
-                        name="avatar"
-                        value={perfil.avatar}
-                        onChange={handleChange}
-                        placeholder="https://exemplo.com/foto.jpg"
-                        className="w-full pl-12 pr-4 py-3.5 border border-gray-200 rounded-2xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
-                      />
-                    </div>
                   </div>
 
                 </div>
