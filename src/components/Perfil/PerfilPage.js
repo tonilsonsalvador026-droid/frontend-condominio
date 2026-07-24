@@ -235,6 +235,7 @@ export default function PerfilPage() {
 
       const payload = {
         nome: perfil.nome.trim(),
+        email: perfil.email(),
         telefone: perfil.telefone.trim(),
         nif: perfil.nif.trim(),
         dataNascimento: perfil.dataNascimento || null,
