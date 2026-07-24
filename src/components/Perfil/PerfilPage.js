@@ -142,52 +142,84 @@ export default function PerfilPage() {
   // --------------------------------------------------
   // UPLOAD DA FOTO DE PERFIL
   // --------------------------------------------------
-  const handleAvatarChange = async (e) => {
-    const file = e.target.files?.[0];
+ const handleAvatarChange = async (e) => {
+  const file = e.target.files?.[0];
 
-    if (!file) return;
+  if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      toast.error("Selecione apenas um ficheiro de imagem.");
-      return;
-    }
+  // Validar tipo de ficheiro
+  if (!file.type.startsWith("image/")) {
+    toast.error("Selecione apenas um ficheiro de imagem.");
+    e.target.value = "";
+    return;
+  }
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("A imagem não pode ultrapassar 5 MB.");
-      return;
-    }
+  // Validar tamanho máximo de 5 MB
+  if (file.size > 5 * 1024 * 1024) {
+    toast.error("A imagem não pode ultrapassar 5 MB.");
+    e.target.value = "";
+    return;
+  }
 
-    try {
-      setUploadingAvatar(true);
+  try {
+    setUploadingAvatar(true);
 
-      const formData = new FormData();
-      formData.append("avatar", file);
+    const formData = new FormData();
+    formData.append("avatar", file);
 
-      // Certifique-se de que a rota no backend aceita multipart/form-data
-      const response = await api.post("/perfil/avatar", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+    // Enviar imagem para o backend
+    // O Axios irá definir automaticamente o Content-Type
+    // correto com o boundary do multipart/form-data.
+    const response = await api.post(
+      "/perfil/avatar",
+      formData
+    );
 
-      setPerfil((prev) => ({
-        ...prev,
-        avatar: response.data.avatar,
-      }));
+    console.log("Resposta do upload:", response.data);
 
-      toast.success("Fotografia de perfil atualizada com sucesso!");
-    } catch (error) {
-      console.error("Erro ao enviar fotografia:", error);
+    // O backend devolve:
+    // response.data.user.avatar
+    const novoAvatar = response.data?.user?.avatar;
 
-      toast.error(
-        error.response?.data?.error ||
-          "Não foi possível atualizar a fotografia."
+    if (!novoAvatar) {
+      throw new Error(
+        "O servidor não devolveu o endereço da fotografia."
       );
-    } finally {
-      setUploadingAvatar(false);
-      e.target.value = "";
     }
-  };
+
+    // Atualizar o perfil imediatamente no frontend
+    setPerfil((prev) => ({
+      ...prev,
+      avatar: novoAvatar,
+    }));
+
+    toast.success(
+      "Fotografia de perfil atualizada com sucesso!"
+    );
+
+  } catch (error) {
+    console.error(
+      "Erro ao enviar fotografia:",
+      error
+    );
+
+    console.error(
+      "Resposta do servidor:",
+      error.response?.data
+    );
+
+    toast.error(
+      error.response?.data?.error ||
+      "Não foi possível atualizar a fotografia."
+    );
+
+  } finally {
+    setUploadingAvatar(false);
+
+    // Permitir selecionar novamente a mesma imagem
+    e.target.value = "";
+  }
+};
 
   // --------------------------------------------------
   // GUARDAR ALTERAÇÕES
